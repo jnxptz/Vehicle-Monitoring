@@ -1,0 +1,174 @@
+/* Admin Page Wrapper */
+.admin-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+    min-height: 100vh;
+}
+
+/* Content Card */
+.content-card {
+    max-width: 1000px;
+    width: 100%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid #ff9800;
+    box-sizing: border-box;
+}
+
+.content-card h2 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.content-card .success-message {
+    padding: 12px 16px;
+    background: #d4edda;
+    color: #155724;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.content-card .error-message {
+    padding: 12px 16px;
+    background: #ffebee;
+    color: #d32f2f;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+.content-card .empty-message {
+    color: #d32f2f;
+    text-align: center;
+    padding: 20px;
+}
+
+.content-card .action-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+}
+
+.content-card .btn-primary {
+    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.content-card .btn-primary:hover {
+    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    transform: translateY(-1px);
+}
+
+/* Tables */
+.content-card table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+}
+
+.content-card table thead {
+    background: #1976d2;
+    color: #fff;
+}
+
+.content-card table th {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+    text-align: left;
+    font-weight: 600;
+}
+
+.content-card table td {
+    padding: 12px;
+    border: 1px solid #e0e0e0;
+}
+
+.content-card table tbody tr:nth-child(even) {
+    background: #f9f9f9;
+}
+
+.content-card table tbody tr:hover {
+    background: #f0f7ff;
+}
+
+/* Action Buttons */
+.content-card .btn-edit {
+    background: #1976d2;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    display: inline-block;
+    margin-right: 8px;
+    transition: background 0.2s;
+}
+
+.content-card .btn-edit:hover {
+    background: #1565c0;
+}
+
+.content-card .btn-delete {
+    background: #ff9800;
+    color: #fff;
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.content-card .btn-delete:hover {
+    background: #fb8c00;
+}
+
+.content-card .action-buttons {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+/* -------------------------
+   Responsive adjustments
+   ------------------------- */
+@media (max-width: 768px) {
+    .content-card {
+        margin: 16px;
+        padding: 18px;
+    }
+
+    .content-card h2 {
+        font-size: 20px;
+    }
+
+    .content-card table {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .content-card table th,
+    .content-card table td {
+        padding: 8px;
+        font-size: 13px;
+    }
+
+    .content-card .action-header {
+        justify-content: flex-start;
+    }
+}

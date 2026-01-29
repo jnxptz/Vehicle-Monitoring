@@ -1,0 +1,92 @@
+/* Form Card Container */
+.form-card {
+    max-width: 600px;
+    width: 100%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid #ff9800;
+    box-sizing: border-box;
+}
+
+.form-card h2 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 25px;
+    font-size: 24px;
+    font-weight: 600;
+}
+
+.form-card label {
+    display: block;
+    margin: 12px 0 5px;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+.form-card input[type="text"],
+.form-card input[type="number"],
+.form-card input[type="date"],
+.form-card input[type="email"],
+.form-card select,
+.form-card textarea,
+.form-card input[type="file"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #b0bec5;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    margin-bottom: 4px;
+    box-sizing: border-box;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.form-card textarea {
+    resize: vertical;
+}
+
+.form-card input[type="file"] {
+    padding: 10px;
+    background: #fff;
+}
+
+.form-card input:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+}
+
+.form-card .error-list {
+    color: #d32f2f;
+    background: #ffebee;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    list-style: inside;
+}
+
+.form-card .error-list li {
+    margin: 4px 0;
+}
+
+.form-card button[type="submit"] {
+    display: block;
+    width: 100%;
+    padding: 14px;
+    margin-top: 20px;
+    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.form-card button[type="submit"]:hover {
+    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    transform: translateY(-2px);
+}

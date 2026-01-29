@@ -1,0 +1,21 @@
+.app-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 16px;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.app-header img {
+    height: 32px;
+}
+
+.app-header-title {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 18px;
+    font-weight: 600;
+    color: #1976d2;
+    margin: 0;
+}
+

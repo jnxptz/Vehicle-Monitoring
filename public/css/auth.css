@@ -1,0 +1,112 @@
+/* General Body */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+}
+
+/* Auth Container (login & register) */
+.auth-container {
+    width: 400px;
+    background: #ffffff;
+    padding: 40px 50px;
+    border-radius: 15px;
+    box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
+    border-top: 5px solid #ff9800;
+    transition: transform 0.3s, box-shadow 0.3s;
+}
+
+.auth-container:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 18px 30px rgba(0, 0, 0, 0.2);
+}
+
+/* Heading */
+.auth-container h2 {
+    text-align: center;
+    color: #1976d2;
+    margin-bottom: 25px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+/* Labels */
+.auth-container label {
+    display: block;
+    margin: 12px 0 5px;
+    color: #1976d2;
+    font-weight: 500;
+}
+
+/* Input Fields */
+.auth-container input[type="text"],
+.auth-container input[type="email"],
+.auth-container input[type="password"] {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #b0bec5;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    transition: border 0.3s, box-shadow 0.3s;
+}
+
+.auth-container input:focus {
+    border-color: #ff9800;
+    box-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+}
+
+/* Buttons */
+.auth-container button {
+    display: block;
+    width: 80%;
+    margin-left: auto;
+    margin-right: auto;
+    padding: 14px;
+    margin-top: 20px;
+    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    border: none;
+    border-radius: 8px;
+    color: #fff;
+    font-weight: 600;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+.auth-container button:hover {
+    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    transform: translateY(-2px);
+}
+
+/* Error Messages */
+.auth-container .error {
+    color: #d32f2f;
+    background: #ffebee;
+    padding: 10px;
+    border-radius: 6px;
+    text-align: center;
+    margin-bottom: 15px;
+    font-weight: 500;
+}
+
+/* Link Section */
+.auth-container .link {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 14px;
+}
+
+.auth-container .link a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-container .link a:hover {
+    text-decoration: underline;
+}

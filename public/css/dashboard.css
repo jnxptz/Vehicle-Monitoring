@@ -1,0 +1,259 @@
+/* Page wrapper — boardmember dashboard only */
+.dashboard-page {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+    min-height: 100vh;
+}
+
+/* Header */
+.dashboard-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #1976d2;
+    color: #fff;
+    padding: 16px 24px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+}
+
+.dashboard-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dashboard-title img {
+    height: 64px;
+}
+
+.logout-form {
+    margin: 0;
+}
+
+.logout-btn {
+    background: #ff9800;
+    color: #fff;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    font-size: 14px;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.logout-btn:hover {
+    background: #fb8c00;
+    transform: translateY(-1px);
+}
+
+/* Nav */
+.dashboard-nav {
+    background: #f5f5f5;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.dashboard-nav .nav-logo {
+    display: flex;
+    align-items: center;
+    margin-right: 8px;
+}
+
+.dashboard-nav .nav-logo img {
+    height: 32px;
+    display: block;
+}
+
+.dashboard-nav a {
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.dashboard-nav a:hover {
+    text-decoration: underline;
+}
+
+.dashboard-nav .nav-logo:hover {
+    text-decoration: none;
+    opacity: 0.9;
+}
+
+/* Dashboard Container */
+.dashboard-container {
+    max-width: 700px;
+    width: 100%;
+    margin: 30px auto;
+    background: #fff;
+    padding: 30px;
+    border-radius: 10px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+    border-top: 5px solid #ff9800;
+    box-sizing: border-box;
+}
+
+/* Welcome Message */
+.dashboard-container h2 {
+    text-align: center;
+    color: #1976d2;
+}
+
+/* Alerts Box */
+.alerts-box {
+    background: #ffe6e6;
+    padding: 15px;
+    border: 1px solid red;
+    border-radius: 5px;
+    margin-bottom: 20px;
+}
+
+.alerts-box h3 {
+    color: red;
+}
+
+/* Section headings */
+.dashboard-container h3 {
+    color: #1976d2;
+}
+
+.budget-bar, .fuel-bar {
+    background: #eee;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 15px;
+    height: 20px;
+}
+
+.budget-used {
+    height: 100%;
+    background: #1976d2;
+}
+
+.budget-used.warning {
+    background: red;
+}
+
+.fuel-used {
+    height: 100%;
+    background: #FFA500;
+}
+
+.fuel-used.warning {
+    background: red;
+}
+
+/* Warning Text */
+.warning-text {
+    color: red;
+}
+
+/* Vehicle Registration Link */
+.register-vehicle {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.register-vehicle a {
+    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    color: #fff;
+    padding: 10px 20px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    border: none;
+    display: inline-block;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.register-vehicle a:hover {
+    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    transform: translateY(-1px);
+}
+
+/* Generic primary button (dashboard pages) */
+.btn-primary {
+    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    color: #fff;
+    padding: 10px 16px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    display: inline-block;
+    border: none;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    transform: translateY(-1px);
+}
+
+/* -------------------------
+   Responsive adjustments
+   ------------------------- */
+@media (max-width: 768px) {
+    .dashboard-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+        padding: 12px 16px;
+    }
+
+    .dashboard-header h1 {
+        font-size: 18px;
+    }
+
+    .dashboard-nav {
+        flex-wrap: wrap;
+        gap: 10px;
+        padding: 10px 16px;
+    }
+
+    .dashboard-nav .nav-logo img {
+        height: 28px;
+    }
+
+    .dashboard-container {
+        margin: 16px;
+        padding: 18px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .dashboard-container h2 {
+        font-size: 20px;
+    }
+
+    .dashboard-container h3 {
+        font-size: 16px;
+    }
+
+    .budget-bar,
+    .fuel-bar {
+        height: 16px;
+    }
+
+    /* Make any tables in dashboard content horizontally scrollable on small screens */
+    .dashboard-container table {
+        width: 100%;
+        border-collapse: collapse;
+        display: block;
+        overflow-x: auto;
+        white-space: nowrap;
+    }
+
+    .dashboard-container table th,
+    .dashboard-container table td {
+        padding: 8px;
+    }
+}
