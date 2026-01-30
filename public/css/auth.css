@@ -16,7 +16,7 @@ body {
     padding: 40px 50px;
     border-radius: 15px;
     box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
-    border-top: 5px solid #ff9800;
+    border-top: 5px solid #FF9B00;
     transition: transform 0.3s, box-shadow 0.3s;
 }
 
@@ -56,8 +56,8 @@ body {
 }
 
 .auth-container input:focus {
-    border-color: #ff9800;
-    box-shadow: 0 0 8px rgba(255, 152, 0, 0.3);
+    border-color: #FF9B00;
+    box-shadow: 0 0 8px rgba(255, 155, 0, 0.3);
 }
 
 /* Buttons */
@@ -68,7 +68,7 @@ body {
     margin-right: auto;
     padding: 14px;
     margin-top: 20px;
-    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    background: linear-gradient(90deg, #FF9B00, #FFB366);
     border: none;
     border-radius: 8px;
     color: #fff;
@@ -79,7 +79,7 @@ body {
 }
 
 .auth-container button:hover {
-    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    background: linear-gradient(90deg, #E58C00, #FF9B00);
     transform: translateY(-2px);
 }
 

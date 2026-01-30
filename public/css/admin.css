@@ -14,7 +14,7 @@
     padding: 30px;
     border-radius: 10px;
     box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-top: 5px solid #ff9800;
+    border-top: 5px solid #FF9B00;
     box-sizing: border-box;
 }
 
@@ -55,7 +55,7 @@
 }
 
 .content-card .btn-primary {
-    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    background: linear-gradient(90deg, #FF9B00, #FFB366);
     color: #fff;
     padding: 10px 20px;
     border-radius: 8px;
@@ -66,7 +66,7 @@
 }
 
 .content-card .btn-primary:hover {
-    background: linear-gradient(90deg, #fb8c00, #ffa726);
+    background: linear-gradient(90deg, #E58C00, #FF9B00);
     transform: translateY(-1px);
 }
 
@@ -121,7 +121,7 @@
 }
 
 .content-card .btn-delete {
-    background: #ff9800;
+    background: #FF9B00;
     color: #fff;
     padding: 6px 12px;
     border-radius: 6px;
@@ -133,7 +133,7 @@
 }
 
 .content-card .btn-delete:hover {
-    background: #fb8c00;
+    background: #E58C00;
 }
 
 .content-card .action-buttons {

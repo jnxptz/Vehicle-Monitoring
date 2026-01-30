@@ -78,10 +78,10 @@
                                     <td>{{ $row['vehicle']?->plate_number ?? '—' }}</td>
                                     <td>₱{{ number_format((float) $row['yearlyBudget'], 2) }}</td>
                                     <td>₱{{ number_format((float) $row['totalUsed'], 2) }}</td>
-                                    <td style="{{ $overBudget ? 'color:#d32f2f; font-weight:700;' : ($warnBudget ? 'color:#ff6f00; font-weight:700;' : '') }}">
+                                    <td style="{{ $overBudget ? 'color:#d32f2f; font-weight:700;' : ($warnBudget ? 'color:#FF9B00; font-weight:700;' : '') }}">
                                         ₱{{ number_format((float) $row['remainingBudget'], 2) }}
                                     </td>
-                                    <td style="{{ $warnBudget ? 'color:#ff6f00; font-weight:700;' : '' }}">
+                                    <td style="{{ $warnBudget ? 'color:#FF9B00; font-weight:700;' : '' }}">
                                         {{ number_format((float) $row['budgetUsedPercentage'], 2) }}%
                                     </td>
                                     <td>{{ $row['monthlyLimit'] > 0 ? number_format((float) $row['monthlyLimit'], 2) . ' L' : '—' }}</td>

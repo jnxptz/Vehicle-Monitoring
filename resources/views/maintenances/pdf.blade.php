@@ -3,11 +3,25 @@
 <head>
     <meta charset="utf-8">
     <title>Maintenance PDF</title>
-    <link rel="stylesheet" href="{{ asset('css/pdf.css') }}">
+    <style>
+        body { font-family: DejaVu Sans, Arial, sans-serif; font-size: 12px; color: #111; }
+        h1 { color: #1976d2; text-align: center; margin: 0 0 6px; font-size: 18px; }
+        .meta { text-align: center; color: #555; margin-bottom: 14px; }
+        .meta .row { margin: 2px 0; }
+        .label { font-weight: 700; }
+        .box { border: 1px solid #e0e0e0; border-top: 4px solid #FF9B00; padding: 14px; border-radius: 6px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 6px; }
+        td { padding: 8px 10px; vertical-align: top; border-bottom: 1px solid #eee; }
+        td.key { width: 34%; background: #fafafa; font-weight: 700; }
+        .photo { margin-top: 14px; }
+        .photo .label { margin-bottom: 6px; }
+        .photo img { max-width: 100%; height: auto; border: 1px solid #e0e0e0; border-radius: 6px; }
+        .footer { margin-top: 14px; font-size: 11px; color: #666; text-align: center; }
+    </style>
 </head>
 <body>
     <div style="text-align:center; margin-bottom:6px;">
-        <img src="{{ public_path('images/splogoo.png') }}" alt="Logo" style="height: 64px;px; margin-bottom:4px;">
+        <img src="{{ public_path('images/logo.png') }}" alt="Logo" style="height:32px; margin-bottom:4px;">
     </div>
     <h1>Maintenance Record</h1>
 
@@ -54,7 +68,6 @@
 
         @if($maintenance->photo)
             @php
-                // Read from storage/app/public to avoid relying on the public/storage symlink
                 $photoPath = storage_path('app/public/' . $maintenance->photo);
                 $photoDataUri = null;
                 if (is_file($photoPath)) {
@@ -65,7 +78,7 @@
 
             @if($photoDataUri)
                 <div class="photo">
-                    <div class="label" style="margin-bottom: 6px;">Photo</div>
+                    <div class="label">Photo</div>
                     <img src="{{ $photoDataUri }}" alt="Maintenance photo">
                 </div>
             @endif
@@ -77,4 +90,3 @@
     </div>
 </body>
 </html>
-

@@ -7,7 +7,7 @@ use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Carbon;
 
-class AdminUserSeeder extends Seeder
+class AdminSeeder extends Seeder
 {
     public function run()
     {
@@ -17,7 +17,6 @@ class AdminUserSeeder extends Seeder
                 'name'       => 'System Admin',
                 'password'   => Hash::make(env('ADMIN_PASSWORD', 'admin123')),
                 'role'       => 'admin',
-                'email_verified_at' => Carbon::now(),
             ]
         );
     }

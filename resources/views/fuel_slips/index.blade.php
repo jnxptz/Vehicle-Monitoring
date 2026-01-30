@@ -76,11 +76,9 @@
 
             {{-- Main Content --}}
             <div class="dashboard-container">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                <div class="page-header">
                     <h2>Fuel Slips</h2>
-                    <div class="top-actions">
-                        <a href="{{ route('fuel-slips.create') }}" class="btn-primary btn-sm">+ Add Fuel Slip</a>
-                    </div>
+                    <a href="{{ route('fuel-slips.create') }}" class="btn-primary btn-sm">+ Add Fuel Slip</a>
                 </div>
 @endif
 

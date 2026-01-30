@@ -51,6 +51,10 @@ class MaintenanceController extends Controller
     public function create()
     {
         $vehicles = Vehicle::orderBy('plate_number')->get();
+        if ($vehicles->isEmpty()) {
+            return redirect()->route('maintenances.index')
+                ->with('error', 'Add at least one vehicle before creating a maintenance record.');
+        }
         return view('maintenances.create', compact('vehicles'));
     }
 
@@ -60,22 +64,32 @@ class MaintenanceController extends Controller
             'vehicle_id' => 'required|exists:vehicles,id',
             'maintenance_type' => 'required|in:preventive,repair',
             'maintenance_km' => 'required|integer|min:0',
-            'operation' => 'required|string',
+            'operation' => 'required|string|max:65535',
             'cost' => 'required|numeric|min:0',
-            'conduct' => 'required|string',
+            'conduct' => 'required|string|max:255',
             'date' => 'required|date',
-            'photo' => 'nullable|image|mimes:jpg,jpeg,png,webp|max:4096',
+            'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp,gif|max:5120',
         ]);
 
-        $data = $validated;
-        $data['call_of_no'] = $this->generateUniqueCallOfNo();
+        $data = array_merge($validated, [
+            'call_of_no' => $this->generateUniqueCallOfNo(),
+            'photo' => null,
+        ]);
 
         if ($request->hasFile('photo')) {
             $data['photo'] = $request->file('photo')->store('maintenance_photos', 'public');
         }
 
-        Maintenance::create($data);
-        return redirect()->route('maintenances.index')->with('success', 'Maintenance recorded');
+        try {
+            Maintenance::create($data);
+        } catch (\Throwable $e) {
+            report($e);
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Could not save maintenance. Please try again.');
+        }
+
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance recorded.');
     }
 
     public function exportPDF($id)

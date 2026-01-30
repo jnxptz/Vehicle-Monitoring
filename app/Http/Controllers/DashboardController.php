@@ -20,7 +20,7 @@ class DashboardController extends Controller
         if ($selectedMonth < 1 || $selectedMonth > 12) {
             $selectedMonth = now()->month;
         }
-        $selectedMonthName = now()->setMonth($selectedMonth)->format('F');
+        $selectedMonthName = \Carbon\Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         $year = now()->year;
         $yearlyBudgetDefault = 100000;
@@ -107,7 +107,7 @@ class DashboardController extends Controller
         if ($selectedMonth < 1 || $selectedMonth > 12) {
             $selectedMonth = now()->month;
         }
-        $selectedMonthName = now()->setMonth($selectedMonth)->format('F');
+        $selectedMonthName = \Carbon\Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
             $yearlyBudget = 100000; // Default yearly budget
@@ -222,7 +222,7 @@ class DashboardController extends Controller
         if ($selectedMonth < 1 || $selectedMonth > 12) {
             $selectedMonth = now()->month;
         }
-        $selectedMonthName = now()->setMonth($selectedMonth)->format('F');
+        $selectedMonthName = \Carbon\Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
             $yearlyBudget = 100000;

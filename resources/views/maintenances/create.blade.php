@@ -26,7 +26,14 @@
     </nav>
 
     <div class="form-card">
-        <h2>Add Maintenance</h2>
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; margin-bottom:20px;">
+            <h2 style="margin:0;">Add Maintenance</h2>
+            <a href="{{ route('maintenances.index') }}" class="btn-primary btn-sm">← Back to Maintenances</a>
+        </div>
+
+        @if (session('error'))
+            <div class="error-message">{{ session('error') }}</div>
+        @endif
 
         @if ($errors->any())
             <ul class="error-list">

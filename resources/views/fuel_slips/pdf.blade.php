@@ -9,7 +9,7 @@
         .meta { text-align: center; color: #555; margin-bottom: 14px; }
         .meta .row { margin: 2px 0; }
         .label { font-weight: 700; }
-        .box { border: 1px solid #e0e0e0; border-top: 4px solid #ff9800; padding: 14px; border-radius: 6px; }
+        .box { border: 1px solid #e0e0e0; border-top: 4px solid #FF9B00; padding: 14px; border-radius: 6px; }
         table { width: 100%; border-collapse: collapse; margin-top: 6px; }
         td { padding: 8px 10px; vertical-align: top; border-bottom: 1px solid #eee; }
         td.key { width: 34%; background: #fafafa; font-weight: 700; }

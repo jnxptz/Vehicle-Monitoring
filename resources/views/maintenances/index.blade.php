@@ -32,7 +32,10 @@
 
             {{-- Main Content --}}
             <div class="dashboard-container">
-                <h2 style="margin-top: 20px;">Maintenances</h2>
+                <div class="page-header">
+                    <h2>Maintenances</h2>
+                    <a href="{{ route('maintenances.create') }}" class="btn-primary btn-sm">+ Add Maintenance</a>
+                </div>
 
 @else
     <div class="dashboard-page">
@@ -59,13 +62,8 @@
 
             {{-- Main Content --}}
             <div class="dashboard-container">
-                <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
+                <div class="page-header">
                     <h2>Maintenances</h2>
-                    @if(auth()->user()->role === 'admin')
-                        <div class="top-actions">
-                            <a href="{{ route('maintenances.create') }}" class="btn-primary btn-sm">+ Add Maintenance</a>
-                        </div>
-                    @endif
                 </div>
 @endif
 
@@ -73,6 +71,12 @@
                 @if(session('success'))
                     <div class="success-message">
                         {{ session('success') }}
+                    </div>
+                @endif
+
+                @if(session('error'))
+                    <div class="error-message">
+                        {{ session('error') }}
                     </div>
                 @endif
 

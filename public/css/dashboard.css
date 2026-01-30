@@ -8,12 +8,18 @@
 /* Header */
 .dashboard-header {
     display: flex;
+    flex-wrap: wrap;
     justify-content: space-between;
     align-items: center;
+    gap: 12px;
     background: #1976d2;
     color: #fff;
-    padding: 16px 24px;
+    padding: 14px 20px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.dashboard-header .logout-form {
+    margin: 0;
 }
 
 .dashboard-title {
@@ -27,7 +33,7 @@
 }
 
 .logout-btn {
-    background: #ff9800;
+    background: #FF9B00;
     color: #fff;
     border: none;
     padding: 10px 20px;
@@ -37,14 +43,15 @@
 }
 
 .logout-btn:hover {
-    background: #fb8c00;
+    background: #E58C00;
 }
 
 /* Dashboard Body: Sidebar + Content */
 .dashboard-body {
     display: flex;
     gap: 20px;
-    padding: 20px;
+    padding: 20px 24px 32px;
+    align-items: flex-start;
 }
 
 /* Sidebar */
@@ -76,11 +83,32 @@
 /* Main Content */
 .dashboard-container {
     flex: 1;
+    min-width: 0;
     background: #fff;
-    padding: 30px;
+    padding: 28px 32px;
     border-radius: 10px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
-    border-top: 5px solid #ff9800;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+    border-top: 4px solid #FF9B00;
+}
+
+.dashboard-container h2 {
+    margin: 0 0 20px 0;
+    font-size: 1.35rem;
+    color: #1565c0;
+    font-weight: 600;
+}
+
+.page-header {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+}
+
+.page-header h2 {
+    margin: 0;
 }
 
 /* Tables on dashboard-style pages (fuel slips, maintenances, etc.) */
@@ -101,9 +129,10 @@
 .dashboard-container table td,
 .content-card table th,
 .content-card table td {
-    padding: 12px;
-    border: 1px solid #e0e0e0;
+    padding: 10px 12px;
+    border: 1px solid #e2e8f0;
     text-align: left;
+    vertical-align: middle;
 }
 
 .dashboard-container table th,
@@ -124,24 +153,9 @@
 /* Dashboard Sections (Horizontal Cards) */
 .dashboard-sections {
     display: flex;
-    gap: 20px;
-    margin-top: 20px;
+    gap: 16px;
+    margin-bottom: 24px;
     flex-wrap: wrap;
-}
-
-.dashboard-card {
-    flex: 1;
-    min-width: 250px;
-    background: #fff;
-    padding: 20px;
-    border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    border-top: 4px solid #ff9800;
-}
-
-.dashboard-card h3 {
-    margin-top: 0;
-    color: #1976d2;
 }
 
 /* Progress Bars */
@@ -164,7 +178,7 @@
 
 .fuel-used {
     height: 100%;
-    background: #FFA500;
+    background: #FF9B00;
 }
 
 .fuel-used.warning {
@@ -172,12 +186,32 @@
 }
 
 .warning-text {
-    color: red;
+    color: #b91c1c;
+}
+
+.alerts-box {
+    padding: 14px 18px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+}
+
+.alerts-box h3 {
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
+    color: #b91c1c;
+}
+
+.alerts-box ul {
+    margin: 0;
+    padding-left: 20px;
+    color: #991b1b;
 }
 
 /* Buttons */
 .btn-primary {
-    background: linear-gradient(90deg, #ff9800, #ffb74d);
+    background: linear-gradient(90deg, #FF9B00, #FFB366);
     color: #fff;
     padding: 10px 16px;
     border-radius: 8px;
@@ -189,35 +223,116 @@
 }
 
 .btn-primary:hover {
-    background: linear-gradient(90deg, #fb8c00, #ffa726);
-}
-
-/* Horizontal sections/cards */
-.dashboard-sections {
-    display: flex;
-    gap: 20px;
-    margin-bottom: 20px;
-    flex-wrap: wrap; /* wrap on smaller screens */
+    background: linear-gradient(90deg, #E58C00, #FF9B00);
 }
 
 .dashboard-card {
     flex: 1;
-    min-width: 200px;
-    background: #fff;
-    padding: 20px;
+    min-width: 180px;
+    padding: 18px 20px;
     border-radius: 10px;
-    box-shadow: 0 6px 15px rgba(0,0,0,0.08);
-    border-top: 4px solid #ff9800;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-top: 4px solid #FF9B00;
     text-align: center;
 }
 
 .dashboard-card h3 {
-    margin: 0 0 10px 0;
+    margin: 0 0 8px 0;
+    font-size: 0.95rem;
     color: #1976d2;
+    font-weight: 600;
+}
+
+.dashboard-card p {
+    margin: 0;
+    font-size: 1.1rem;
+    color: #334155;
 }
 
 .table-wrapper {
     overflow-x: auto; /* horizontal scroll on small screens */
+}
+
+/* Form layout: narrow, centered form (create pages) */
+.form-layout {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+.form-layout .form-block label {
+    display: block;
+    margin: 14px 0 6px;
+    color: #1565c0;
+    font-weight: 500;
+    font-size: 0.9rem;
+}
+
+.form-layout .form-block input[type="text"],
+.form-layout .form-block input[type="number"],
+.form-layout .form-block input[type="date"],
+.form-layout .form-block input[type="email"],
+.form-layout .form-block select,
+.form-layout .form-block textarea {
+    width: 100%;
+    padding: 10px 12px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    outline: none;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border 0.2s, box-shadow 0.2s;
+}
+
+.form-layout .form-block input:focus {
+    border-color: #FF9B00;
+    box-shadow: 0 0 0 3px rgba(255, 155, 0, 0.25);
+}
+
+.form-layout .form-tip {
+    margin: 6px 0 4px;
+    font-size: 12px;
+    color: #64748b;
+    line-height: 1.4;
+}
+
+.form-layout .form-block button[type="submit"] {
+    margin-top: 24px;
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 15px;
+}
+
+.dashboard-container .error-list {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
+    list-style: inside;
+}
+
+.dashboard-container .error-list li {
+    margin: 2px 0;
+}
+
+.dashboard-container .success-message {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #f0fdf4;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+}
+
+.dashboard-container .error-message {
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    border: 1px solid #fecaca;
 }
 
 /* Top-right action area for small buttons */
@@ -234,28 +349,36 @@
     border-radius: 6px;
 }
 
-/* Tighter table spacing for dashboard tables */
 .dashboard-container table th,
-.dashboard-container table td {
-    padding: 8px;
-    vertical-align: middle;
-}
-
-/* Prevent long wrapping in headers */
-.dashboard-container table th {
+.content-card table th {
     white-space: nowrap;
 }
 
 
 /* Responsive */
 @media (max-width: 768px) {
+    .dashboard-header {
+        padding: 12px 16px;
+    }
+
+    .dashboard-title img {
+        height: 48px;
+    }
+
     .dashboard-body {
         flex-direction: column;
         padding: 16px;
     }
 
+    .dashboard-container {
+        padding: 20px;
+    }
+
     .dashboard-nav {
+        flex: 0 0 auto;
+        width: 100%;
         flex-direction: row;
+        flex-wrap: wrap;
         overflow-x: auto;
         gap: 8px;
         padding: 12px;
@@ -267,6 +390,15 @@
 
     .dashboard-sections {
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
+    }
+
+    .form-layout {
+        max-width: 100%;
+    }
+
+    .page-header {
+        flex-direction: column;
+        align-items: flex-start;
     }
 }
