@@ -10,11 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class MaintenanceController extends Controller
 {
-    /**
-     * Generate a unique call-of number for a maintenance record.
-     *
-     * Format: MN-YYYYMMDD-XXXXXX
-     */
+    
     private function generateUniqueCallOfNo(): string
     {
         $datePart = now()->format('Ymd');
@@ -37,7 +33,7 @@ class MaintenanceController extends Controller
 
         $query = Maintenance::with('vehicle');
 
-        // Boardmembers can only see maintenances for their own vehicle(s)
+        
         if ($user && $user->role === 'boardmember') {
             $query->whereHas('vehicle', function ($q) use ($user) {
                 $q->where('bm_id', $user->id);
@@ -96,7 +92,7 @@ class MaintenanceController extends Controller
     {
         $maintenance = Maintenance::with(['vehicle', 'vehicle.bm'])->findOrFail($id);
 
-        // Only allow boardmember to export their own vehicle maintenance
+        
         if (auth()->user()->role === 'boardmember' && $maintenance->vehicle?->bm_id !== auth()->id()) {
             abort(403);
         }

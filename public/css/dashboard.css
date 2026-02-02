@@ -73,11 +73,19 @@
     border-radius: 6px;
     text-decoration: none;
     font-weight: 500;
-    transition: background 0.2s;
+    transition: background 0.2s, box-shadow 0.2s;
+    border-left: 4px solid transparent;
 }
 
 .dashboard-nav a:hover {
     background: #bbdefb;
+}
+
+.dashboard-nav a.active {
+    background: #1976d2;
+    color: #fff;
+    border-left: 4px solid #FF9B00;
+    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
 }
 
 /* Main Content */

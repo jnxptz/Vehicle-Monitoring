@@ -11,7 +11,12 @@ RUN apt-get update && apt-get install -y \
     curl \
     libzip-dev \
     libonig-dev \
-    && docker-php-ext-install pdo_mysql zip mbstring
+    libpng-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    pkg-config \
+    && docker-php-ext-configure gd --with-jpeg --with-freetype \
+    && docker-php-ext-install -j$(nproc) gd pdo_mysql zip mbstring
 
 # Install Composer
 RUN curl -sS https://getcomposer.org/installer | php \

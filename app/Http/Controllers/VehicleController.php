@@ -27,7 +27,7 @@ class VehicleController extends Controller
         ]);
 
         $vehicle = Vehicle::create([
-            'bm_id' => Auth::id(), // Link vehicle to boardmember
+            'bm_id' => Auth::id(), 
             'plate_number' => $request->plate_number,
             'monthly_fuel_limit' => $request->monthly_fuel_limit,
         ]);

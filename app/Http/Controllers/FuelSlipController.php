@@ -10,11 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 
 class FuelSlipController extends Controller
 {
-    /**
-     * Generate a unique control number for a fuel slip.
-     *
-     * Format: FS-YYYYMMDD-XXXXXX
-     */
+    
     private function generateUniqueControlNumber(): string
     {
         $datePart = now()->format('Ymd');
@@ -28,7 +24,7 @@ class FuelSlipController extends Controller
             }
         }
 
-        // Extremely unlikely, but guarantees a unique value even under heavy collision.
+        
         return 'FS-' . now()->format('YmdHisv') . '-' . str_pad((string) random_int(0, 999999), 6, '0', STR_PAD_LEFT);
     }
 
@@ -60,14 +56,14 @@ class FuelSlipController extends Controller
             'date' => 'required|date',
         ]);
 
-        // Try to link this fuel slip to the logged-in boardmember's vehicle (if any)
+        
         $vehicle = Vehicle::where('bm_id', Auth::id())->first();
 
         FuelSlip::create([
             'user_id' => Auth::id(),
-            'vehicle_id' => $vehicle?->id, // link when possible
+            'vehicle_id' => $vehicle?->id, 
             'vehicle_name' => $request->vehicle_name,
-            // Always use the registered vehicle plate when available, to avoid mismatches
+           
             'plate_number' => $vehicle?->plate_number ?? $request->plate_number,
             'liters' => $request->liters,
             'cost' => $request->cost,
@@ -77,8 +73,7 @@ class FuelSlipController extends Controller
             'date' => $request->date,
         ]);
 
-        // After adding a slip, go back to the dashboard so
-        // the user immediately sees the updated budget and fuel usage.
+        
         return redirect()
             ->route('boardmember.dashboard')
             ->with('success', 'Fuel slip added successfully and your dashboard has been updated.');
@@ -86,9 +81,9 @@ class FuelSlipController extends Controller
 
     public function exportPDF($id)
 {
-    $fuelSlip = FuelSlip::findOrFail($id); // no eager load needed
+    $fuelSlip = FuelSlip::findOrFail($id); 
 
-    // Only allow boardmember to export their own slip
+   
     if (auth()->user()->role === 'boardmember' && $fuelSlip->user_id !== auth()->id()) {
         abort(403);
     }

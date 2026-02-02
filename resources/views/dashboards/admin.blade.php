@@ -2,13 +2,12 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
-<link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 
 <div class="dashboard-page">
     <div class="dashboard-header">
         <div class="dashboard-title">
             <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
-            <h1>Admin Dashboard</h1>
+            <h1>Sangguniang Panlalawigan</h1>
         </div>
         <form action="{{ route('logout') }}" method="POST" class="logout-form">
             @csrf
@@ -18,31 +17,28 @@
 
     <div class="dashboard-body">
 
-        {{-- Sidebar --}}
         <nav class="dashboard-nav">
-            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-            <a href="{{ route('vehicles.index') }}">Vehicles</a>
-            <a href="{{ route('fuel-slips.index') }}">Fuel Slips</a>
-            <a href="{{ route('maintenances.index') }}">Maintenances</a>
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+            <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+            <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+            <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
         </nav>
 
-        {{-- Main Content --}}
         <div class="dashboard-container">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                <h2 style="margin-top: 0;">Boardmembers Overview</h2>
+            <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; margin-bottom:20px;">
+                <h2 style="margin:0;">Boardmembers Overview</h2>
+                <form method="GET" action="{{ route('admin.dashboard') }}" style="display:flex; align-items:center; gap:10px;">
+                    <label for="month" style="font-weight: 600; color:#475569;">Month:</label>
+                    <select id="month" name="month" onchange="this.form.submit()" style="padding: 8px 12px; border-radius: 6px; border: 1px solid #e2e8f0; font-size: 14px;">
+                        @foreach(range(1, 12) as $month)
+                            <option value="{{ $month }}" {{ $month == $selectedMonth ? 'selected' : '' }}>
+                                {{ \Carbon\Carbon::create()->month($month)->format('F') }}
+                            </option>
+                        @endforeach
+                    </select>
+                    <span style="font-size: 14px; color: #607d8b;">{{ $selectedMonthName }} {{ $year }}</span>
+                </form>
             </div>
-
-            <form method="GET" action="{{ route('admin.dashboard') }}" style="margin: 10px 0 18px; display:flex; align-items:center; gap:10px; justify-content:flex-end;">
-                <label for="month" style="font-weight: 600; color:#1976d2;">Month:</label>
-                <select id="month" name="month" onchange="this.form.submit()">
-                    @foreach(range(1, 12) as $month)
-                        <option value="{{ $month }}" {{ $month == $selectedMonth ? 'selected' : '' }}>
-                            {{ \Carbon\Carbon::create()->month($month)->format('F') }}
-                        </option>
-                    @endforeach
-                </select>
-                <span style="font-size: 12px; color:#607d8b;">{{ $selectedMonthName }} {{ $year }}</span>
-            </form>
 
             @if(empty($rows) || $rows->count() === 0)
                 <p class="empty-message">No boardmembers found.</p>
@@ -60,6 +56,7 @@
                                 <th>Budget Used</th>
                                 <th>Monthly Limit</th>
                                 <th>Liters Used ({{ $selectedMonthName }})</th>
+                                <th>Budget Recommendation</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -88,13 +85,43 @@
                                     <td style="{{ $overMonthly ? 'color:#d32f2f; font-weight:700;' : '' }}">
                                         {{ number_format((float) $row['monthlyLitersUsed'], 2) }} L
                                     </td>
+                                    <td>
+                                        @if(isset($row['budgetRecommendation']) && $row['budgetRecommendation'])
+                                            <div style="font-size: 12px;">
+                                                <span style="
+                                                    display: inline-block;
+                                                    padding: 4px 8px;
+                                                    border-radius: 4px;
+                                                    font-weight: 600;
+                                                    white-space: nowrap;
+                                                    @if($row['budgetRecommendation']['status'] === 'increase')
+                                                        background: #fef2f2;
+                                                        color: #dc2626;
+                                                    @elseif($row['budgetRecommendation']['status'] === 'decrease')
+                                                        background: #f0fdf4;
+                                                        color: #16a34a;
+                                                    @else
+                                                        background: #f0f9ff;
+                                                        color: #0369a1;
+                                                    @endif
+                                                ">
+                                                    {{ ucfirst($row['budgetRecommendation']['status']) }}
+                                                </span>
+                                                <div style="font-size: 11px; color: #475569; margin-top: 4px;">
+                                                    Suggest: ₱{{ number_format((float) $row['budgetRecommendation']['suggestedBudget'], 2) }}
+                                                </div>
+                                            </div>
+                                        @else
+                                            —
+                                        @endif
+                                    </td>
                                 </tr>
                             @endforeach
                         </tbody>
                     </table>
                 </div>
             @endif
-        </div> {{-- dashboard-container --}}
-    </div> {{-- dashboard-body --}}
-</div> {{-- dashboard-page --}}
+        </div> 
+    </div> 
+</div> 
 @endsection

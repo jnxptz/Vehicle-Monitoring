@@ -9,13 +9,13 @@ use App\Models\User;
 
 class AuthController extends Controller
 {
-    // Show login form
+    
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
-    // Handle login
+    
     public function login(Request $request)
     {
         $credentials = $request->only('email', 'password');
@@ -25,14 +25,14 @@ class AuthController extends Controller
 
             $user = Auth::user();
 
-            // Redirect based on role
+            
             if ($user->role === 'admin') {
                 return redirect()->route('admin.dashboard');
             } elseif ($user->role === 'boardmember') {
                 return redirect()->route('boardmember.dashboard');
             }
 
-            // Invalid role: logout
+            
             Auth::logout();
             return redirect()->route('login.form')->with('error', 'Your account role is invalid.');
         }
@@ -40,13 +40,13 @@ class AuthController extends Controller
         return back()->with('error', 'Invalid email or password!');
     }
 
-    // Show registration form
+    
     public function showRegisterForm()
     {
         return view('auth.register');
     }
 
-    // Handle registration
+    
     public function register(Request $request)
     {
         $request->validate([
@@ -67,7 +67,7 @@ class AuthController extends Controller
         return redirect()->route('boardmember.dashboard');
     }
 
-    // Handle logout
+    
     public function logout(Request $request)
     {
         Auth::logout();
