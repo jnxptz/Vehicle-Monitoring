@@ -6,7 +6,8 @@
 </head>
 <body>
     <div class="auth-container">
-        <h2>Register</h2>
+        <img src="{{ asset('images/SP Seal.png') }}" alt="Logo" class="auth-logo">
+        <h2>Vehicle Monitoring System</h2>
 
         @if ($errors->any())
             <div class="error">

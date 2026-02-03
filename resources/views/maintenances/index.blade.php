@@ -11,23 +11,24 @@
         {{-- Header --}}
         <div class="dashboard-header">
             <div class="dashboard-title">
-                <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
+                <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
                 <h1>Admin Dashboard</h1>
             </div>
-            <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
         </div>
 
         <div class="dashboard-body">
 
             {{-- Sidebar --}}
             <nav class="dashboard-nav">
-                <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-                <a href="{{ route('vehicles.index') }}">Vehicles</a>
-                <a href="{{ route('fuel-slips.index') }}">Fuel Slips</a>
-                <a href="{{ route('maintenances.index') }}">Maintenances</a>
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </nav>
             </nav>
 
             {{-- Main Content --}}
@@ -45,19 +46,21 @@
                 <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
                 <h1>Sangguniang Panlalawigan</h1>
             </div>
-            <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
+            
         </div>
 
         <div class="dashboard-body">
 
             {{-- Sidebar --}}
             <nav class="dashboard-nav">
-                <a href="{{ route('boardmember.dashboard') }}">Dashboard</a>
-                <a href="{{ route('fuel-slips.index') }}">Fuel Slips</a>
-                <a href="{{ route('maintenances.index') }}">Maintenances</a>
+                <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </nav>
             </nav>
 
             {{-- Main Content --}}

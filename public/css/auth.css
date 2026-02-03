@@ -1,7 +1,8 @@
 /* General Body */
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
+    background: url("../images/facade.jpg") no-repeat center center fixed;
+    background-size: cover;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,6 +33,14 @@ body {
     margin-bottom: 25px;
     font-size: 26px;
     font-weight: 600;
+}
+
+/* Logo */
+.auth-logo {
+    display: block;
+    margin: 0 auto 20px;
+    height: 140px;
+    width: auto;
 }
 
 /* Labels */
@@ -109,4 +118,107 @@ body {
 
 .auth-container .link a:hover {
     text-decoration: underline;
+}
+/* Mobile Responsive */
+@media (max-width: 768px) {
+    /* Auth Container */
+    .auth-container {
+        width: 90%;
+        max-width: 400px;
+        padding: 30px 25px;
+        margin: 20px;
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+    }
+
+    .auth-container h2 {
+        font-size: 22px;
+        margin-bottom: 20px;
+    }
+
+    .auth-logo {
+        height: 100px;
+        margin-bottom: 15px;
+    }
+
+    .auth-container label {
+        font-size: 13px;
+        margin: 10px 0 4px;
+    }
+
+    .auth-container input[type="text"],
+    .auth-container input[type="email"],
+    .auth-container input[type="password"] {
+        font-size: 16px; /* Prevents zoom on iOS */
+        padding: 14px;
+        margin-bottom: 8px;
+    }
+
+    .auth-container button {
+        width: 100%;
+        padding: 16px;
+        margin-top: 15px;
+        font-size: 16px;
+    }
+
+    .auth-container .error {
+        font-size: 13px;
+        padding: 12px;
+    }
+
+    .auth-container .link {
+        font-size: 13px;
+        margin-top: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+    }
+
+    .auth-container {
+        width: 100%;
+        max-width: none;
+        padding: 25px 20px;
+        margin: 0;
+        border-radius: 0;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        box-shadow: none;
+    }
+
+    .auth-container h2 {
+        font-size: 20px;
+        margin-bottom: 18px;
+    }
+
+    .auth-logo {
+        height: 80px;
+        margin-bottom: 12px;
+    }
+
+    .auth-container label {
+        font-size: 12px;
+    }
+
+    .auth-container input[type="text"],
+    .auth-container input[type="email"],
+    .auth-container input[type="password"] {
+        font-size: 16px;
+        padding: 14px 10px;
+    }
+
+    .auth-container button {
+        width: 100%;
+        padding: 16px;
+        margin-top: 12px;
+        font-size: 16px;
+        border-radius: 6px;
+    }
+
+    .auth-container .link {
+        font-size: 12px;
+    }
 }

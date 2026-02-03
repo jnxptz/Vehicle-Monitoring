@@ -6,21 +6,22 @@
 <div class="dashboard-page">
     <div class="dashboard-header">
         <div class="dashboard-title">
-            <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
+            <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
             <h1>Sangguniang Panlalawigan</h1>
         </div>
-        <form action="{{ route('logout') }}" method="POST" class="logout-form">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+        
     </div>
 
     <div class="dashboard-body">
         <nav class="dashboard-nav">
-            <a href="{{ route('boardmember.dashboard') }}">Dashboard</a>
-            <a href="{{ route('fuel-slips.index') }}">Fuel Slips</a>
-            <a href="{{ route('maintenances.index') }}">Maintenances</a>
-        </nav>
+                <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </nav>
 
         <div class="dashboard-container">
             <div class="form-layout">

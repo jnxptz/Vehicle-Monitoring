@@ -6,13 +6,10 @@
 <div class="dashboard-page">
     <div class="dashboard-header">
         <div class="dashboard-title">
-            <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
+            <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
             <h1>Sangguniang Panlalawigan</h1>
         </div>
-        <form action="{{ route('logout') }}" method="POST" class="logout-form">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+        
     </div>
 
     <div class="dashboard-body">
@@ -22,6 +19,10 @@
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+            <form action="{{ route('logout') }}" method="POST" class="logout-form">
+            @csrf
+            <button type="submit" class="logout-btn">Logout</button>
+        </form>
         </nav>
 
         <div class="dashboard-container">
@@ -53,8 +54,6 @@
                                 <th>Yearly Budget</th>
                                 <th>Total Used (YTD)</th>
                                 <th>Remaining Budget</th>
-                                <th>Budget Used</th>
-                                <th>Monthly Limit</th>
                                 <th>Liters Used ({{ $selectedMonthName }})</th>
                                 <th>Budget Recommendation</th>
                             </tr>
@@ -78,10 +77,6 @@
                                     <td style="{{ $overBudget ? 'color:#d32f2f; font-weight:700;' : ($warnBudget ? 'color:#FF9B00; font-weight:700;' : '') }}">
                                         ₱{{ number_format((float) $row['remainingBudget'], 2) }}
                                     </td>
-                                    <td style="{{ $warnBudget ? 'color:#FF9B00; font-weight:700;' : '' }}">
-                                        {{ number_format((float) $row['budgetUsedPercentage'], 2) }}%
-                                    </td>
-                                    <td>{{ $row['monthlyLimit'] > 0 ? number_format((float) $row['monthlyLimit'], 2) . ' L' : '—' }}</td>
                                     <td style="{{ $overMonthly ? 'color:#d32f2f; font-weight:700;' : '' }}">
                                         {{ number_format((float) $row['monthlyLitersUsed'], 2) }} L
                                     </td>

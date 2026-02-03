@@ -9,128 +9,92 @@ use App\Models\FuelSlip;
 use App\Models\Maintenance;
 use App\Models\User;
 use Barryvdh\DomPDF\Facade\Pdf;
+use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
     /**
-     * Calculate budget recommendation based on current spending patterns
+     * Calculate budget recommendation based on spending patterns
      */
     private function calculateBudgetRecommendation($userId, $vehicleId, $yearlyBudget)
     {
         $currentMonth = now()->month;
         $currentYear = now()->year;
-        
-        // Get total spent so far this year
-        $fuelCost = (float) (FuelSlip::where('user_id', $userId)
+
+        $fuelCost = (float) FuelSlip::where('user_id', $userId)
             ->whereYear('date', $currentYear)
-            ->sum('cost') ?? 0);
-            
-        $maintenanceCost = (float) (Maintenance::where('vehicle_id', $vehicleId)
+            ->sum('cost');
+
+        $maintenanceCost = (float) Maintenance::where('vehicle_id', $vehicleId)
             ->whereYear('date', $currentYear)
-            ->sum('cost') ?? 0);
-            
-        $totalUsedSoFar = $fuelCost + $maintenanceCost;
-        
-        // Calculate average monthly spending
-        $averageMonthlySpending = $currentMonth > 0 ? $totalUsedSoFar / $currentMonth : 0;
-        
-        // Forecast year-end spending
-        $projectedYearEndSpending = $averageMonthlySpending * 12;
-        
-        // Calculate recommendation
-        $recommendation = [
-            'status' => 'maintain', // maintain, increase, decrease
-            'message' => '',
-            'projectedYearEnd' => $projectedYearEndSpending,
-            'suggestedBudget' => $yearlyBudget,
-            'variance' => 0,
-        ];
-        
-        if ($projectedYearEndSpending > 0) {
-            $variance = (($projectedYearEndSpending - $yearlyBudget) / $yearlyBudget) * 100;
-            $recommendation['variance'] = round($variance, 2);
-            
-            if ($variance > 20) {
-                // Need to increase budget significantly
-                $suggestedBudget = ceil($projectedYearEndSpending * 1.1 / 1000) * 1000; // Round up to nearest 1000
-                $recommendation['status'] = 'increase';
-                $recommendation['suggestedBudget'] = $suggestedBudget;
-                $recommendation['message'] = "Based on current spending pace, budget should be increased to ₱" . number_format($suggestedBudget, 2) . " (projected year-end: ₱" . number_format($projectedYearEndSpending, 2) . ")";
-            } elseif ($variance < -15) {
-                // Budget can be reduced
-                $suggestedBudget = max(50000, floor($projectedYearEndSpending * 1.15 / 1000) * 1000); // Round down, minimum 50k
-                $recommendation['status'] = 'decrease';
-                $recommendation['suggestedBudget'] = $suggestedBudget;
-                $savings = $yearlyBudget - $suggestedBudget;
-                $recommendation['message'] = "Budget utilization is low. Consider reducing to ₱" . number_format($suggestedBudget, 2) . " (potential savings: ₱" . number_format($savings, 2) . ")";
-            } else {
-                // Current budget is appropriate
-                $recommendation['status'] = 'maintain';
-                $recommendation['message'] = "Current budget is appropriate for spending patterns (projected year-end: ₱" . number_format($projectedYearEndSpending, 2) . ")";
-            }
+            ->sum('cost');
+
+        $totalUsed = $fuelCost + $maintenanceCost;
+
+        // Average monthly spending
+        $avgMonthly = $currentMonth > 0 ? $totalUsed / $currentMonth : 0;
+
+        // Projected year-end with 10% buffer
+        $projectedYearEnd = $avgMonthly * 12 * 1.10;
+
+        // Hard caps to prevent unrealistic recommendations
+        $maxBudget = $yearlyBudget * 1.15;
+        $minBudget = $yearlyBudget * 0.85;
+        $suggestedBudget = min(max($projectedYearEnd, $minBudget), $maxBudget);
+
+        // Determine status
+        if ($suggestedBudget > $yearlyBudget * 1.05) {
+            $status = 'increase';
+        } elseif ($suggestedBudget < $yearlyBudget * 0.95) {
+            $status = 'decrease';
+        } else {
+            $status = 'maintain';
         }
-        
-        return $recommendation;
+
+        return [
+            'status' => $status,
+            'suggestedBudget' => round($suggestedBudget, 2),
+            'projectedYearEnd' => round($projectedYearEnd, 2),
+        ];
     }
 
-    
+    /**
+     * Admin dashboard
+     */
     public function admin(Request $request)
     {
-        
         $selectedMonth = (int) $request->input('month', now()->month);
-        if ($selectedMonth < 1 || $selectedMonth > 12) {
-            $selectedMonth = now()->month;
-        }
-        $selectedMonthName = \Carbon\Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
-
+        $selectedMonth = ($selectedMonth >= 1 && $selectedMonth <= 12) ? $selectedMonth : now()->month;
+        $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
         $year = now()->year;
         $yearlyBudgetDefault = 100000;
 
-        $boardmembers = User::query()
-            ->where('role', 'boardmember')
-            ->with('vehicle')
-            ->orderBy('name')
-            ->get();
+        $boardmembers = User::where('role', 'boardmember')->with('vehicle')->orderBy('name')->get();
+        $ids = $boardmembers->pluck('id');
 
-        $ids = $boardmembers->pluck('id')->all();
+        $totalCostByUser = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
+            ->selectRaw('user_id, SUM(cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
-        $totalCostByUserId = FuelSlip::query()
-            ->whereIn('user_id', $ids)
-            ->whereYear('date', $year)
-            ->selectRaw('user_id, SUM(cost) as total_cost')
-            ->groupBy('user_id')
-            ->pluck('total_cost', 'user_id');
+        $maintenanceByVehicle = Maintenance::whereYear('date', $year)
+            ->selectRaw('vehicle_id, SUM(cost) as total_cost')->groupBy('vehicle_id')->pluck('total_cost', 'vehicle_id');
 
-        
-        $maintenanceCostsByVehicleId = Maintenance::query()
-            ->whereYear('date', $year)
-            ->selectRaw('vehicle_id, SUM(cost) as total_cost')
-            ->groupBy('vehicle_id')
-            ->pluck('total_cost', 'vehicle_id');
+        $monthlyLitersByUser = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
+            ->selectRaw('user_id, SUM(liters) as total_liters')->groupBy('user_id')->pluck('total_liters', 'user_id');
 
-        $monthlyLitersByUserId = FuelSlip::query()
-            ->whereIn('user_id', $ids)
-            ->whereYear('date', $year)
-            ->whereMonth('date', $selectedMonth)
-            ->selectRaw('user_id, SUM(liters) as total_liters')
-            ->groupBy('user_id')
-            ->pluck('total_liters', 'user_id');
-
-        $rows = $boardmembers->map(function ($bm) use ($totalCostByUserId, $maintenanceCostsByVehicleId, $monthlyLitersByUserId, $yearlyBudgetDefault) {
+        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $yearlyBudgetDefault) {
             $vehicle = $bm->vehicle;
             $yearlyBudget = $vehicle ? $yearlyBudgetDefault : 0;
 
-            $fuelCost = (float) ($totalCostByUserId[$bm->id] ?? 0);
-            $maintenanceCost = (float) ($vehicle ? ($maintenanceCostsByVehicleId[$vehicle->id] ?? 0) : 0);
+            $fuelCost = (float) ($totalCostByUser[$bm->id] ?? 0);
+            $maintenanceCost = $vehicle ? (float) ($maintenanceByVehicle[$vehicle->id] ?? 0) : 0;
             $totalUsed = $fuelCost + $maintenanceCost;
             $remainingBudget = $yearlyBudget - $totalUsed;
-            $budgetUsedPercentage = $yearlyBudget > 0
-                ? round(($totalUsed / $yearlyBudget) * 100, 2)
-                : 0;
+            $budgetUsedPercentage = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
 
-            $monthlyLitersUsed = (float) ($monthlyLitersByUserId[$bm->id] ?? 0);
+            $monthlyLitersUsed = (float) ($monthlyLitersByUser[$bm->id] ?? 0);
             $monthlyLimit = (float) ($vehicle?->monthly_fuel_limit ?? 0);
-            
+
             $budgetRecommendation = $vehicle ? $this->calculateBudgetRecommendation($bm->id, $vehicle->id, $yearlyBudget) : null;
 
             return [
@@ -149,15 +113,14 @@ class DashboardController extends Controller
         return view('dashboards.admin', compact('rows', 'selectedMonth', 'selectedMonthName', 'year'));
     }
 
-    
+    /**
+     * Boardmember dashboard
+     */
     public function boardmember(Request $request)
     {
         $user = Auth::user();
-
-        
         $vehicle = Vehicle::where('bm_id', $user->id)->first();
 
-        
         $yearlyBudget = 0;
         $remainingBudget = 0;
         $budgetUsedPercentage = 0;
@@ -167,86 +130,55 @@ class DashboardController extends Controller
         $budgetRecommendation = null;
         $alerts = [];
 
-        
         $selectedMonth = (int) $request->input('month', now()->month);
-        if ($selectedMonth < 1 || $selectedMonth > 12) {
-            $selectedMonth = now()->month;
-        }
-        $selectedMonthName = \Carbon\Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
+        $selectedMonth = ($selectedMonth >= 1 && $selectedMonth <= 12) ? $selectedMonth : now()->month;
+        $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = 100000; // Default yearly budget
+            $yearlyBudget = 100000;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
-            
-            $latestSlipKm = (int) (FuelSlip::where('user_id', $user->id)->max('km_reading') ?? 0);
-            $currentKm = max((int) ($vehicle->current_km ?? 0), $latestSlipKm);
+            $latestKm = (int) FuelSlip::where('user_id', $user->id)->max('km_reading');
+            $currentKm = max((int) ($vehicle->current_km ?? 0), $latestKm);
 
-           
-            $fuelCost = FuelSlip::where('user_id', $user->id)
-                ->whereYear('date', now()->year)
-                ->sum('cost');
-
-       
-            $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)
-                ->whereYear('date', now()->year)
-                ->sum('cost');
+            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
+            $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', now()->year)->sum('cost');
 
             $totalUsed = $fuelCost + $maintenanceCost;
             $remainingBudget = $yearlyBudget - $totalUsed;
-            $budgetUsedPercentage = $yearlyBudget > 0
-                ? round(($totalUsed / $yearlyBudget) * 100, 2)
-                : 0;
+            $budgetUsedPercentage = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
 
-            
             $monthlyLitersUsed = FuelSlip::where('user_id', $user->id)
                 ->whereYear('date', now()->year)
                 ->whereMonth('date', $selectedMonth)
                 ->sum('liters');
 
-         
+            // Alerts
             if ($monthlyLitersUsed > $monthlyLimit) {
                 $alerts[] = "You have exceeded your monthly fuel limit of {$monthlyLimit} liters!";
             }
-
-          
             if ($remainingBudget < 0) {
-                $alerts[] = "Your yearly budget of ₱" . number_format($yearlyBudget, 2) . " has been exceeded! (Fuel + Maintenance costs)";
+                $alerts[] = "Your yearly budget of ₱" . number_format($yearlyBudget, 2) . " has been exceeded!";
             }
-
-           
             if ($remainingBudget > 0 && $budgetUsedPercentage >= 80) {
                 $alerts[] = "Warning: You have used {$budgetUsedPercentage}% of your yearly budget.";
             }
-
-           
             $recentFuel = FuelSlip::where('user_id', $user->id)
-                ->whereYear('date', now()->year)
-                ->whereMonth('date', $selectedMonth)
-                ->exists();
-
+                ->whereYear('date', now()->year)->whereMonth('date', $selectedMonth)->exists();
             if (!$recentFuel) {
-                $alerts[] = "No fuel recorded for this month. Remember to submit your fuel slips.";
+                $alerts[] = "No fuel recorded for {$selectedMonthName}.";
             }
 
-            $lastPreventiveKm = (int) (Maintenance::where('vehicle_id', $vehicle->id)
+            $lastPreventiveKm = (int) Maintenance::where('vehicle_id', $vehicle->id)
                 ->where('maintenance_type', 'preventive')
-                ->orderByDesc('maintenance_km')
-                ->value('maintenance_km') ?? 0);
+                ->orderByDesc('maintenance_km')->value('maintenance_km');
 
-           
-            $nextDueAt = ($lastPreventiveKm > 0) ? ($lastPreventiveKm + 5000) : 5000;
-
-            if ($currentKm >= $nextDueAt) {
-                $alerts[] = "Preventive Maintenance System: Preventive maintenance is due every 5,000 km. Last preventive KM: {$lastPreventiveKm} km. Next due at: {$nextDueAt} km. Current KM: {$currentKm} km.";
+            $nextDueKm = ($lastPreventiveKm > 0) ? ($lastPreventiveKm + 5000) : 5000;
+            if ($currentKm >= $nextDueKm) {
+                $alerts[] = "Preventive maintenance due: last at {$lastPreventiveKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
             }
 
-            
-            $maintenanceOverview = Maintenance::where('vehicle_id', $vehicle->id)
-                ->latest('date')
-                ->take(5)
-                ->get();
-            
+            $maintenanceOverview = Maintenance::where('vehicle_id', $vehicle->id)->latest('date')->take(5)->get();
             $budgetRecommendation = $this->calculateBudgetRecommendation($user->id, $vehicle->id, $yearlyBudget);
         }
 
@@ -265,9 +197,11 @@ class DashboardController extends Controller
         ));
     }
 
+    /**
+     * Export boardmember dashboard PDF
+     */
     public function exportPdf(Request $request)
     {
-        
         $user = Auth::user();
         $vehicle = Vehicle::where('bm_id', $user->id)->first();
 
@@ -279,29 +213,19 @@ class DashboardController extends Controller
         $alerts = [];
 
         $selectedMonth = (int) $request->input('month', now()->month);
-        if ($selectedMonth < 1 || $selectedMonth > 12) {
-            $selectedMonth = now()->month;
-        }
-        $selectedMonthName = \Carbon\Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
+        $selectedMonth = ($selectedMonth >= 1 && $selectedMonth <= 12) ? $selectedMonth : now()->month;
+        $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
             $yearlyBudget = 100000;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
-            $fuelCost = FuelSlip::where('user_id', $user->id)
-                ->whereYear('date', now()->year)
-                ->sum('cost');
-
-            
-            $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)
-                ->whereYear('date', now()->year)
-                ->sum('cost');
+            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
+            $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', now()->year)->sum('cost');
 
             $totalUsed = $fuelCost + $maintenanceCost;
             $remainingBudget = $yearlyBudget - $totalUsed;
-            $budgetUsedPercentage = $yearlyBudget > 0
-                ? round(($totalUsed / $yearlyBudget) * 100, 2)
-                : 0;
+            $budgetUsedPercentage = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
 
             $monthlyLitersUsed = FuelSlip::where('user_id', $user->id)
                 ->whereYear('date', now()->year)
@@ -312,16 +236,13 @@ class DashboardController extends Controller
                 $alerts[] = "You have exceeded your monthly fuel limit of {$monthlyLimit} liters!";
             }
             if ($remainingBudget < 0) {
-                $alerts[] = "Your yearly budget of ₱" . number_format($yearlyBudget, 2) . " has been exceeded! (Fuel + Maintenance costs)";
+                $alerts[] = "Your yearly budget of ₱" . number_format($yearlyBudget, 2) . " has been exceeded!";
             }
             if ($remainingBudget > 0 && $budgetUsedPercentage >= 80) {
                 $alerts[] = "Warning: You have used {$budgetUsedPercentage}% of your yearly budget.";
             }
-
             $recentFuel = FuelSlip::where('user_id', $user->id)
-                ->whereYear('date', now()->year)
-                ->whereMonth('date', $selectedMonth)
-                ->exists();
+                ->whereYear('date', now()->year)->whereMonth('date', $selectedMonth)->exists();
             if (!$recentFuel) {
                 $alerts[] = "No fuel recorded for {$selectedMonthName}.";
             }

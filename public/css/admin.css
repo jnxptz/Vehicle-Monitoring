@@ -171,4 +171,111 @@
     .content-card .action-header {
         justify-content: flex-start;
     }
+
+    .content-card .btn-primary {
+        padding: 12px 18px;
+        font-size: 14px;
+    }
+
+    .content-card .action-buttons {
+        flex-wrap: wrap;
+    }
+
+    .content-card .btn-edit,
+    .content-card .btn-delete {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
 }
+
+@media (max-width: 480px) {
+    body {
+        padding: 0;
+    }
+
+    .admin-page {
+        min-height: 100vh;
+        padding: 0;
+    }
+
+    .content-card {
+        width: 100%;
+        margin: 0;
+        padding: 15px;
+        border-radius: 0;
+        box-shadow: none;
+        border-top: 3px solid #FF9B00;
+    }
+
+    .content-card h2 {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    .content-card .success-message,
+    .content-card .error-message {
+        padding: 10px 12px;
+        font-size: 13px;
+        border-radius: 6px;
+    }
+
+    /* Tables on small screens */
+    .content-card table {
+        font-size: 12px;
+        margin-top: 15px;
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        white-space: nowrap;
+    }
+
+    .content-card table thead {
+        background: #1565c0;
+    }
+
+    .content-card table th,
+    .content-card table td {
+        padding: 10px 6px;
+        font-size: 11px;
+        border: 1px solid #e0e0e0;
+    }
+
+    .content-card table th {
+        font-weight: 600;
+    }
+
+    .content-card .btn-primary {
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 10px;
+        text-align: center;
+        font-size: 14px;
+    }
+
+    .content-card .action-header {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .content-card .action-buttons {
+        flex-direction: column;
+        gap: 6px;
+        width: 100%;
+    }
+
+    .content-card .btn-edit,
+    .content-card .btn-delete {
+        width: 100%;
+        padding: 10px;
+        font-size: 12px;
+        text-align: center;
+        border-radius: 6px;
+    }
+
+    .content-card .empty-message {
+        padding: 15px;
+        font-size: 14px;
+    }
+}
+

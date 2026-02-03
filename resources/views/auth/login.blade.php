@@ -1,12 +1,15 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login</title>
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
 <body>
     <div class="auth-container">
-        <h2>Log In</h2>
+        <img src="{{ asset('images/SP Seal.png') }}" alt="Logo" class="auth-logo">
+        <h2>Vehicle Monitoring System</h2>
 
         @if(session('error'))
             <div class="error">{{ session('error') }}</div>

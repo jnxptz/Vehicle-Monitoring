@@ -11,7 +11,7 @@
     @if(auth()->user()->role === 'admin')
         <div class="dashboard-header">
             <div class="dashboard-title">
-                <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
+                <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
                 <h1>Admin Dashboard</h1>
             </div>
             <form action="{{ route('logout') }}" method="POST" class="logout-form">
@@ -22,7 +22,7 @@
     @else
         <div class="dashboard-header">
             <div class="dashboard-title">
-                <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
+                <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
                 <h1>Sangguniang Panlalawigan</h1>
             </div>
             <form action="{{ route('logout') }}" method="POST" class="logout-form">
