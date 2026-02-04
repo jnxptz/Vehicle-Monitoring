@@ -1,3 +1,15 @@
+/* Critical: Prevent horizontal overflow */
+* {
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden;
+    width: 100%;
+    margin: 0;
+    padding: 0;
+}
+
 /* Form Card Container */
 .form-card {
     max-width: 600px;
@@ -98,4 +110,144 @@
 .form-card button[type="submit"]:hover {
     background: linear-gradient(90deg, #E58C00, #FF9B00);
     transform: translateY(-2px);
+}
+
+/* Mobile Responsive Styles for Forms */
+@media (max-width: 768px) {
+    .form-card {
+        margin: 20px auto;
+        padding: 24px;
+        border-radius: 10px;
+    }
+
+    .form-card h2 {
+        font-size: 20px;
+        margin-bottom: 20px;
+    }
+
+    .form-card label {
+        font-size: 14px;
+        margin: 12px 0 5px;
+    }
+
+    .form-card input[type="text"],
+    .form-card input[type="number"],
+    .form-card input[type="date"],
+    .form-card input[type="email"],
+    .form-card select,
+    .form-card textarea,
+    .form-card input[type="file"] {
+        font-size: 14px;
+        padding: 12px;
+        border-radius: 8px;
+    }
+
+    .form-card button[type="submit"] {
+        padding: 12px 16px;
+        font-size: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .form-card {
+        margin: 12px;
+        padding: 20px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .form-card h2 {
+        font-size: 18px;
+        margin-bottom: 18px;
+        text-align: center;
+        color: #1976d2;
+    }
+
+    .form-card label {
+        display: block;
+        font-size: 13px;
+        margin: 12px 0 6px;
+        color: #1976d2;
+        font-weight: 500;
+    }
+
+    .form-card input[type="text"],
+    .form-card input[type="number"],
+    .form-card input[type="date"],
+    .form-card input[type="email"],
+    .form-card select,
+    .form-card textarea,
+    .form-card input[type="file"] {
+        width: 100%;
+        font-size: 16px; /* Prevents iOS zoom */
+        padding: 12px;
+        border: 1px solid #b0bec5;
+        border-radius: 8px;
+        margin-bottom: 4px;
+        box-sizing: border-box;
+        font-family: inherit;
+    }
+
+    .form-card textarea {
+        resize: vertical;
+        min-height: 100px;
+    }
+
+    .form-card input:focus,
+    .form-card select:focus,
+    .form-card textarea:focus {
+        border-color: #FF9B00;
+        box-shadow: 0 0 8px rgba(255, 155, 0, 0.3);
+        outline: none;
+    }
+
+    .form-card .error-list {
+        font-size: 12px;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+        background: #ffebee;
+        border-radius: 6px;
+    }
+
+    .form-card .error-list li {
+        margin: 3px 0;
+    }
+
+    .form-card .error-message {
+        font-size: 12px;
+        padding: 10px 12px;
+        margin-bottom: 16px;
+        border-radius: 6px;
+    }
+
+    .form-card button[type="submit"] {
+        width: 100%;
+        padding: 14px;
+        margin-top: 16px;
+        font-size: 14px;
+        border-radius: 6px;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        background: linear-gradient(90deg, #FF9B00, #FFB366);
+        color: #fff;
+        transition: background 0.3s, transform 0.2s;
+        min-height: 44px;
+    }
+
+    .form-card button[type="submit"]:active {
+        transform: translateY(1px);
+    }
+
+    /* Dropdown/Select improvements */
+    .form-card select {
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 8px center;
+        background-size: 20px;
+        padding-right: 32px;
+    }
 }

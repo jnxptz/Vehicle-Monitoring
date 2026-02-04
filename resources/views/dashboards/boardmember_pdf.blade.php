@@ -7,7 +7,8 @@
 </head>
 <body>
     <div style="text-align:center; margin-bottom:6px;">
-        <img src="{{ public_path('images/logo.png') }}" alt="Logo" style="height:32px; margin-bottom:4px;">
+        <img src="{{ public_path('images/vmbslogo.png') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
+        <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
     </div>
     <h1>Boardmember Dashboard</h1>
     <div class="meta">

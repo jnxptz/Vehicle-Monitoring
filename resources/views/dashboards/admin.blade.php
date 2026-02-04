@@ -38,7 +38,10 @@
                         @endforeach
                     </select>
                     <span style="font-size: 14px; color: #607d8b;">{{ $selectedMonthName }} {{ $year }}</span>
-                </form>
+                    </form>
+                    <div style="display:flex; gap:8px; align-items:center;">
+                        <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="btn" style="background:#FF9B00; color:#fff; padding:8px 12px; border-radius:6px; text-decoration:none; font-weight:600;">Export Yearly PDF</a>
+                    </div>
             </div>
 
             @if(empty($rows) || $rows->count() === 0)

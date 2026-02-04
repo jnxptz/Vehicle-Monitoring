@@ -20,6 +20,12 @@ Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login.form
 Route::post('/login', [AuthController::class, 'login'])->name('login');
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
+Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
+Route::post('/forgot-password', [AuthController::class, 'sendPasswordReset'])->name('password.email');
+
+Route::get('/reset-password/{token}', [AuthController::class, 'showResetPasswordForm'])->name('password.reset');
+Route::post('/reset-password', [AuthController::class, 'resetPassword'])->name('password.update');
+
 Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register.form');
 Route::post('/register', [AuthController::class, 'register'])->name('register');
 
@@ -54,6 +60,16 @@ Route::get('/boardmember/dashboard', [DashboardController::class, 'boardmember']
 Route::get('/boardmember/dashboard/pdf', [DashboardController::class, 'exportPdf'])
     ->middleware(['auth', 'role:boardmember'])
     ->name('boardmember.dashboard.pdf');
+
+// Boardmember yearly PDF export (January to December)
+Route::get('/boardmember/dashboard/yearly-pdf', [DashboardController::class, 'exportYearlyPdf'])
+    ->middleware(['auth', 'role:boardmember'])
+    ->name('boardmember.dashboard.yearly.pdf');
+
+// Admin yearly PDF export (fleet-wide)
+Route::get('/admin/dashboard/yearly-pdf', [DashboardController::class, 'exportAdminYearlyPdf'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.dashboard.yearly.pdf');
 
 // --------------------
 // Admin-only routes

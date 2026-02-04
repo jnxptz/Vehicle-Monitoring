@@ -23,6 +23,7 @@
     <div style="text-align:center; margin-bottom:6px;">
         <img src="{{ public_path('images/SP Seal.png') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
         <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
+        <img src="{{ public_path('images/bmvslogo.png') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
     </div>
     <h1>Maintenance Record</h1>
 

@@ -2,4 +2,18 @@
 
 .dashboard-title img {
     height: 64px;
+    max-width: 100%;
+}
+
+/* Mobile responsive for boardmember dashboard */
+@media (max-width: 768px) {
+    .dashboard-title img {
+        height: 48px;
+    }
+}
+
+@media (max-width: 480px) {
+    .dashboard-title img {
+        height: 36px;
+    }
 }

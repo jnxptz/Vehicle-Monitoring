@@ -263,4 +263,124 @@ class DashboardController extends Controller
         $filename = 'dashboard-' . now()->format('Y-m-d') . '-' . strtolower($selectedMonthName) . '.pdf';
         return $pdf->download($filename);
     }
+
+    /**
+     * Export boardmember yearly PDF (January to December)
+     */
+    public function exportYearlyPdf()
+    {
+        $user = Auth::user();
+        $vehicle = Vehicle::where('bm_id', $user->id)->first();
+
+        $yearlyBudget = 0;
+        $remainingBudget = 0;
+        $budgetUsedPercentage = 0;
+        $monthlyLimit = 0;
+        $monthlyData = [];
+        $alerts = [];
+
+        if ($vehicle) {
+            $yearlyBudget = 100000;
+            $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
+
+            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
+            $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', now()->year)->sum('cost');
+
+            $totalUsed = $fuelCost + $maintenanceCost;
+            $remainingBudget = $yearlyBudget - $totalUsed;
+            $budgetUsedPercentage = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
+
+            // Get monthly data for all 12 months
+            for ($month = 1; $month <= 12; $month++) {
+                $monthName = Carbon::createFromDate(null, $month, 1)->format('F');
+                $monthlyLiters = FuelSlip::where('user_id', $user->id)
+                    ->whereYear('date', now()->year)
+                    ->whereMonth('date', $month)
+                    ->sum('liters');
+                $monthlyCost = FuelSlip::where('user_id', $user->id)
+                    ->whereYear('date', now()->year)
+                    ->whereMonth('date', $month)
+                    ->sum('cost');
+
+                $monthlyData[] = [
+                    'month' => $monthName,
+                    'liters' => $monthlyLiters,
+                    'cost' => $monthlyCost,
+                ];
+            }
+
+            // Generate year-to-date alerts
+            if ($remainingBudget < 0) {
+                $alerts[] = "Your yearly budget of ₱" . number_format($yearlyBudget, 2) . " has been exceeded!";
+            }
+            if ($remainingBudget > 0 && $budgetUsedPercentage >= 80) {
+                $alerts[] = "Warning: You have used {$budgetUsedPercentage}% of your yearly budget.";
+            }
+        }
+
+        $pdf = Pdf::loadView('dashboards.boardmember_yearly_pdf', compact(
+            'vehicle',
+            'yearlyBudget',
+            'remainingBudget',
+            'budgetUsedPercentage',
+            'monthlyLimit',
+            'monthlyData',
+            'alerts'
+        ));
+
+        $filename = 'dashboard-yearly-' . now()->year . '-' . now()->format('Y-m-d') . '.pdf';
+        return $pdf->download($filename);
+    }
+
+    /**
+     * Export admin yearly PDF (fleet-wide January to December)
+     */
+    public function exportAdminYearlyPdf()
+    {
+        $year = now()->year;
+        $monthlyData = [];
+        $totalLiters = 0;
+        $totalCost = 0;
+
+        for ($month = 1; $month <= 12; $month++) {
+            $monthName = Carbon::createFromDate(null, $month, 1)->format('F');
+            $monthlyLiters = FuelSlip::whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->sum('liters');
+            $monthlyCost = FuelSlip::whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->sum('cost');
+
+            $monthlyData[] = [
+                'month' => $monthName,
+                'liters' => $monthlyLiters,
+                'cost' => $monthlyCost,
+            ];
+
+            $totalLiters += $monthlyLiters;
+            $totalCost += $monthlyCost;
+        }
+
+        // Find highest consumption month across fleet
+        $sorted = collect($monthlyData)->sortByDesc('liters');
+        $highest = $sorted->first() ?? null;
+
+        // Optionally include top vehicles by liters (top 5)
+        $vehicles = Vehicle::all();
+        $topVehicles = collect();
+        foreach ($vehicles as $v) {
+            $vLiters = FuelSlip::where('vehicle_id', $v->id)->whereYear('date', $year)->sum('liters');
+            if ($vLiters > 0) {
+                $topVehicles->push([ 'vehicle' => $v, 'liters' => $vLiters ]);
+            }
+        }
+        $topVehicles = $topVehicles->sortByDesc('liters')->take(5)->values();
+
+        $pdf = Pdf::loadView('dashboards.admin_yearly_pdf', compact(
+            'monthlyData', 'totalLiters', 'totalCost', 'highest', 'topVehicles', 'year'
+        ));
+
+        $filename = 'admin-dashboard-yearly-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
+        return $pdf->download($filename);
+    }
 }

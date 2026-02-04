@@ -69,9 +69,12 @@
                 </form>
 
                
-                <div style="margin: 10px 0 20px;">
+                <div style="margin: 10px 0 20px; display: flex; gap: 10px; flex-wrap: wrap;">
                     <a class="btn-primary" href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}">
-                        Export Dashboard PDF
+                        Export Monthly PDF
+                    </a>
+                    <a class="btn-primary" href="{{ route('boardmember.dashboard.yearly.pdf') }}" style="background: linear-gradient(90deg, #4CAF50, #66BB6A);">
+                        Export Yearly PDF
                     </a>
                 </div>
 
