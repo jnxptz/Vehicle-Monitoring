@@ -17,7 +17,7 @@
         <img src="{{ public_path('images/SP Seal.png') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
         <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
     </div>
-    <h1>Admin Yearly Dashboard (Fleet-wide)</h1>
+    <h1>Board Member Dashboard (Fleet-wide)</h1>
     <div class="meta">
         <div><span class="label">Generated:</span> {{ now()->format('F d, Y h:i A') }}</div>
         <div><span class="label">Year:</span> {{ $year }}</div>

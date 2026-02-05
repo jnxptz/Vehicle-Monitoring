@@ -16,47 +16,51 @@ class DashboardController extends Controller
     /**
      * Calculate budget recommendation based on spending patterns
      */
-    private function calculateBudgetRecommendation($userId, $vehicleId, $yearlyBudget)
-    {
-        $currentMonth = now()->month;
-        $currentYear = now()->year;
+   private function calculateBudgetRecommendation($userId, $vehicleId, $yearlyBudget)
+{
+    $month = now()->month;
+    $year = now()->year;
 
-        $fuelCost = (float) FuelSlip::where('user_id', $userId)
-            ->whereYear('date', $currentYear)
-            ->sum('cost');
+    // Total spent so far
+    $fuelCost = FuelSlip::where('user_id', $userId)
+        ->whereYear('date', $year)
+        ->sum('cost');
 
-        $maintenanceCost = (float) Maintenance::where('vehicle_id', $vehicleId)
-            ->whereYear('date', $currentYear)
-            ->sum('cost');
+    $maintenanceCost = Maintenance::where('vehicle_id', $vehicleId)
+        ->whereYear('date', $year)
+        ->sum('cost');
 
-        $totalUsed = $fuelCost + $maintenanceCost;
+    $totalUsed = $fuelCost + $maintenanceCost;
+    $remaining = $yearlyBudget - $totalUsed;
+    $remainingPercent = $yearlyBudget > 0 ? ($remaining / $yearlyBudget) * 100 : 0;
 
-        // Average monthly spending
-        $avgMonthly = $currentMonth > 0 ? $totalUsed / $currentMonth : 0;
+    // Defaults
+    $status = 'maintain';
+    $suggestedBudget = $yearlyBudget;
 
-        // Projected year-end with 10% buffer
-        $projectedYearEnd = $avgMonthly * 12 * 1.10;
-
-        // Hard caps to prevent unrealistic recommendations
-        $maxBudget = $yearlyBudget * 1.15;
-        $minBudget = $yearlyBudget * 0.85;
-        $suggestedBudget = min(max($projectedYearEnd, $minBudget), $maxBudget);
-
-        // Determine status
-        if ($suggestedBudget > $yearlyBudget * 1.05) {
-            $status = 'increase';
-        } elseif ($suggestedBudget < $yearlyBudget * 0.95) {
-            $status = 'decrease';
-        } else {
-            $status = 'maintain';
-        }
-
-        return [
-            'status' => $status,
-            'suggestedBudget' => round($suggestedBudget, 2),
-            'projectedYearEnd' => round($projectedYearEnd, 2),
-        ];
+    // 🔴 Increase only if used ≥ 90%
+    if ($totalUsed / $yearlyBudget >= 0.80) {
+        $status = 'increase';
+        $suggestedBudget = $yearlyBudget * 1.05; // small buffer
     }
+    // ⚠️ Decrease if remaining ≈ 30k–40k
+    elseif ($remaining >= 30000 && $remaining <= 40000) {
+        $status = 'decrease';
+        $suggestedBudget = $yearlyBudget * 0.85;
+    }
+    // ✅ Otherwise maintain
+    else {
+        $status = 'maintain';
+        $suggestedBudget = $yearlyBudget;
+    }
+
+    return [
+        'status' => $status,
+        'suggestedBudget' => round($suggestedBudget, 2),
+        'remaining' => round($remaining, 2),
+        'remainingPercent' => round($remainingPercent, 2)
+    ];
+}
 
     /**
      * Admin dashboard

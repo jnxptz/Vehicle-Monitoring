@@ -27,105 +27,131 @@
         .monthly-table tbody tr:nth-child(even) {
             background: #f9f9f9;
         }
-        .monthly-table tbody tr:hover {
-            background: #f0f7ff;
-        }
         .text-right {
             text-align: right;
         }
-        .page-break {
-            page-break-before: always;
-        }x`
+        .bar {
+            background: #e0e0e0;
+            height: 10px;
+            border-radius: 5px;
+            margin: 6px 0;
+        }
+        .bar-blue {
+            background: #1976d2;
+            height: 10px;
+            border-radius: 5px;
+        }
+        .small {
+            font-size: 11px;
+            color: #666;
+        }
     </style>
 </head>
 <body>
-    <div style="text-align:center; margin-bottom:6px;">
-        <img src="{{ public_path('images/SP Seal.png') }}" alt="Logo" style="height:32px; margin-bottom:4px;">
-    </div>
-    <h1>Boardmember Yearly Dashboard</h1>
-    <div class="meta">
-        <div><span class="label">Generated:</span> {{ now()->format('F d, Y h:i A') }}</div>
-        <div><span class="label">Year:</span> {{ now()->year }} (January to December)</div>
-    </div>
 
-    <div class="box">
-        @if(!empty($alerts))
-            <div class="alerts">
-                <div class="label">Year-to-Date Alerts</div>
-                <ul>
-                    @foreach($alerts as $alert)
-                        <li>{{ $alert }}</li>
-                    @endforeach
-                </ul>
-            </div>
-        @endif
+<div style="text-align:center; margin-bottom:6px;">
+    <img src="{{ public_path('images/SP Seal.png') }}" style="height:32px;">
+</div>
 
-        @if($vehicle)
-            <h2>Vehicle Information</h2>
-            <div class="row"><span class="label">Plate Number:</span> {{ $vehicle->plate_number }}</div>
-            <div class="row"><span class="label">Monthly Fuel Limit:</span> {{ $monthlyLimit }} liters</div>
+<h1>Boardmember Yearly Dashboard</h1>
 
-            <h2>Yearly Budget Overview</h2>
-            <div class="row"><span class="label">Yearly Budget:</span> ₱{{ number_format($yearlyBudget, 2) }}</div>
-            <div class="row"><span class="label">Total Used (YTD):</span> ₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</div>
-            <div class="row"><span class="label">Remaining Budget:</span> ₱{{ number_format($remainingBudget, 2) }}</div>
-            <div class="row"><span class="label">Budget Used:</span> {{ $budgetUsedPercentage }}%</div>
-            <div class="bar">
-                <div class="bar-blue" style="width: {{ min(max($budgetUsedPercentage, 0), 100) }}%;"></div>
-            </div>
-            <div class="small">This budget bar reflects year-to-date fuel slip and maintenance costs.</div>
+<div class="meta">
+    <div><strong>Generated:</strong> {{ now()->format('F d, Y h:i A') }}</div>
+    <div><strong>Year:</strong> {{ now()->year }} (January – December)</div>
+</div>
 
-            <h2>Monthly Breakdown ({{ now()->year }})</h2>
-            <table class="monthly-table">
-                <thead>
-                    <tr>
-                        <th>Month</th>
-                        <th class="text-right">Liters Used</th>
-                        <th class="text-right">Cost (₱)</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @php
-                        $totalLiters = 0;
-                        $totalCost = 0;
-                    @endphp
-                    @foreach($monthlyData as $month)
-                        @php
-                            $totalLiters += $month['liters'];
-                            $totalCost += $month['cost'];
-                        @endphp
-                        <tr>
-                            <td>{{ $month['month'] }}</td>
-                            <td class="text-right">{{ number_format($month['liters'], 2) }}</td>
-                            <td class="text-right">₱{{ number_format($month['cost'], 2) }}</td>
-                        </tr>
-                    @endforeach
-                    <tr style="background: #f5f5f5; font-weight: 600;">
-                        <td><strong>Total</strong></td>
-                        <td class="text-right"><strong>{{ number_format($totalLiters, 2) }}</strong></td>
-                        <td class="text-right"><strong>₱{{ number_format($totalCost, 2) }}</strong></td>
-                    </tr>
-                </tbody>
-            </table>
+@if($vehicle)
+<div class="box">
 
-            <h2 style="margin-top: 20px;">Summary Statistics</h2>
-            <div class="row"><span class="label">Average Monthly Usage:</span> {{ number_format($totalLiters / 12, 2) }} liters</div>
-            <div class="row"><span class="label">Average Monthly Cost:</span> ₱{{ number_format($totalCost / 12, 2) }}</div>
-            @php
-                $sorted = collect($monthlyData)->sortByDesc('liters');
-                $highest = $sorted->first() ?? null;
-            @endphp
-            <div class="row"><span class="label">Highest Consumption Month:</span>
-                {{ $highest['month'] ?? 'N/A' }} ({{ number_format($highest['liters'] ?? 0, 2) }} L)
-            </div>
-        @else
-            <div class="row"><span class="label">Vehicle:</span> No vehicle assigned.</div>
-        @endif
+    <h2>Vehicle Information</h2>
+    <div><strong>Plate Number:</strong> {{ $vehicle->plate_number }}</div>
+    <div><strong>Monthly Fuel Limit:</strong> {{ $monthlyLimit }} liters</div>
+
+    <h2>Yearly Budget Overview</h2>
+    <div><strong>Yearly Budget:</strong> ₱{{ number_format($yearlyBudget, 2) }}</div>
+    <div><strong>Total Used (YTD):</strong> ₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</div>
+    <div><strong>Remaining Budget:</strong> ₱{{ number_format($remainingBudget, 2) }}</div>
+    <div><strong>Budget Used:</strong> {{ $budgetUsedPercentage }}%</div>
+
+    <div class="bar">
+        <div class="bar-blue" style="width: {{ min(max($budgetUsedPercentage,0),100) }}%;"></div>
     </div>
 
-    <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #e0e0e0; text-align: center; font-size: 11px; color: #666;">
-        <p>This is an official yearly report generated from the BM Vehicle Monitoring System.</p>
-        <p>Report generated on {{ now()->format('F d, Y') }} at {{ now()->format('h:i A') }}</p>
-    </div>
+    {{-- ✅ GOVERNMENT-SAFE BUDGET LOGIC --}}
+    <h2>Budget Recommendation</h2>
+
+    @php
+        $remainingPercent = 100 - $budgetUsedPercentage;
+    @endphp
+
+    @if($budgetUsedPercentage >= 90)
+        <strong style="color:#c62828;">Increase Budget</strong>
+        <p class="small">
+            More than 90% of the annual budget has been utilized. Additional allocation may be required to sustain operations.
+        </p>
+
+    @elseif($remainingPercent >= 25 && $remainingPercent <= 30)
+        <strong style="color:#2e7d32;">Maintain Budget</strong>
+        <p class="small">
+            Remaining budget is within the ideal savings range. Current allocation is sufficient.
+        </p>
+
+    @elseif($remainingBudget >= 30000)
+        <strong style="color:#ef6c00;">Consider Decrease</strong>
+        <p class="small">
+            A significant portion of the budget remains unused. Reducing next year’s allocation may improve fiscal efficiency.
+        </p>
+
+    @else
+        <strong>Monitor Usage</strong>
+        <p class="small">
+            Budget utilization is within acceptable limits. Continued monitoring is advised.
+        </p>
+    @endif
+
+    <h2>Monthly Breakdown ({{ now()->year }})</h2>
+    <table class="monthly-table">
+        <thead>
+            <tr>
+                <th>Month</th>
+                <th class="text-right">Liters Used</th>
+                <th class="text-right">Cost (₱)</th>
+            </tr>
+        </thead>
+        <tbody>
+            @php($totalLiters = 0)
+            @php($totalCost = 0)
+
+            @foreach($monthlyData as $month)
+                @php($totalLiters += $month['liters'])
+                @php($totalCost += $month['cost'])
+                <tr>
+                    <td>{{ $month['month'] }}</td>
+                    <td class="text-right">{{ number_format($month['liters'],2) }}</td>
+                    <td class="text-right">₱{{ number_format($month['cost'],2) }}</td>
+                </tr>
+            @endforeach
+
+            <tr style="font-weight:600;background:#f5f5f5;">
+                <td>Total</td>
+                <td class="text-right">{{ number_format($totalLiters,2) }}</td>
+                <td class="text-right">₱{{ number_format($totalCost,2) }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h2>Summary Statistics</h2>
+    <div><strong>Average Monthly Usage:</strong> {{ number_format($totalLiters / 12, 2) }} liters</div>
+    <div><strong>Average Monthly Cost:</strong> ₱{{ number_format($totalCost / 12, 2) }}</div>
+
+</div>
+@else
+<p>No vehicle assigned.</p>
+@endif
+
+<div style="margin-top:30px;font-size:11px;color:#666;text-align:center;">
+    Official report generated by the BM Vehicle Monitoring System
+</div>
+
 </body>
 </html>
