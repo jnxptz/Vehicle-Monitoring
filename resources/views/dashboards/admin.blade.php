@@ -10,6 +10,24 @@
             <h1>Sangguniang Panlalawigan</h1>
         </div>
         
+        <div class="hamburger-menu-wrapper">
+            <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+            <label for="hamburger-toggle" class="hamburger-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+            <nav class="hamburger-dropdown">
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </nav>
+        </div>
     </div>
 
     <div class="dashboard-body">
@@ -20,9 +38,9 @@
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
             <form action="{{ route('logout') }}" method="POST" class="logout-form">
-            @csrf
-            <button type="submit" class="logout-btn">Logout</button>
-        </form>
+                @csrf
+                <button type="submit" class="logout-btn">Logout</button>
+            </form>
         </nav>
 
         <div class="dashboard-container">
@@ -121,5 +139,21 @@
             @endif
         </div> 
     </div> 
-</div> 
+</div>
+
+<script>
+    // Close hamburger menu when a link is clicked
+    document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('hamburger-toggle').checked = false;
+        });
+    });
+
+    // Also handle form submission (logout)
+    document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
+        form.addEventListener('submit', () => {
+            document.getElementById('hamburger-toggle').checked = false;
+        });
+    });
+</script>
 @endsection

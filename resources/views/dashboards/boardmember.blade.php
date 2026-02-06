@@ -11,6 +11,28 @@
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
             <h1>Sangguniang Panlalawigan</h1>
         </div>
+
+        {{-- Hamburger Menu (Mobile Only) --}}
+        <div class="hamburger-menu-wrapper">
+            <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+            <label for="hamburger-toggle" class="hamburger-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+            <nav class="hamburger-dropdown">
+                <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                @if(!$vehicle)
+                    <a href="{{ route('vehicles.create') }}" class="{{ request()->routeIs('vehicles.create') ? 'active' : '' }}">Register Vehicle</a>
+                @endif
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </nav>
+        </div>
     </div>
 
     
@@ -164,4 +186,20 @@
         </div> 
     </div> 
 </div>
+
+<script>
+    // Close hamburger menu when a link is clicked
+    document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('hamburger-toggle').checked = false;
+        });
+    });
+
+    // Also handle form submission (logout)
+    document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
+        form.addEventListener('submit', () => {
+            document.getElementById('hamburger-toggle').checked = false;
+        });
+    });
+</script>
 @endsection

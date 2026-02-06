@@ -75,7 +75,127 @@ html, body {
     overflow-x: hidden;
 }
 
-/* Sidebar */
+/* Hamburger Menu Styles */
+.hamburger-menu-wrapper {
+    position: relative;
+    display: none;
+    z-index: 1000;
+}
+
+.hamburger-toggle {
+    display: none;
+}
+
+.hamburger-btn {
+    display: none;
+    width: 40px;
+    height: 40px;
+    padding: 6px;
+    background: #1976d2;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+    transition: background 0.3s ease;
+}
+
+.hamburger-btn:hover {
+    background: #1565c0;
+}
+
+.hamburger-btn span {
+    display: block;
+    width: 24px;
+    height: 3px;
+    background: #fff;
+    border-radius: 2px;
+    transition: all 0.3s ease;
+}
+
+.hamburger-dropdown {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 6px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    min-width: 200px;
+    flex-direction: column;
+    z-index: 1001;
+}
+
+.hamburger-dropdown a {
+    padding: 12px 16px;
+    color: #1976d2;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    border-bottom: 1px solid #f0f0f0;
+    transition: background 0.2s, color 0.2s;
+}
+
+.hamburger-dropdown a:last-of-type {
+    border-bottom: none;
+}
+
+.hamburger-dropdown a:hover {
+    background: #f0f7ff;
+}
+
+.hamburger-dropdown a.active {
+    background: #1976d2;
+    color: #fff;
+    border-left: 4px solid #FF9B00;
+    padding-left: 12px;
+}
+
+.hamburger-dropdown .logout-form {
+    padding: 8px 0;
+    border-top: 1px solid #e2e8f0;
+}
+
+.hamburger-dropdown .logout-btn {
+    width: 100%;
+    padding: 12px 16px;
+    background: #FF9B00;
+    color: #fff;
+    border: none;
+    border-radius: 0;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+    font-size: 14px;
+}
+
+.hamburger-dropdown .logout-btn:hover {
+    background: #E58C00;
+}
+
+.hamburger-toggle:checked ~ .hamburger-btn {
+    background: #1565c0;
+}
+
+.hamburger-toggle:checked ~ .hamburger-btn span:nth-child(1) {
+    transform: rotate(45deg) translate(8px, 8px);
+}
+
+.hamburger-toggle:checked ~ .hamburger-btn span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-toggle:checked ~ .hamburger-btn span:nth-child(3) {
+    transform: rotate(-45deg) translate(7px, -7px);
+}
+
+.hamburger-toggle:checked ~ .hamburger-dropdown {
+    display: flex;
+}
+
+/* Dashboard Navigation */
 .dashboard-nav {
     flex: 0 0 160px;
     display: flex;
@@ -88,6 +208,7 @@ html, body {
     position: sticky;
     top: 0px;
     margin: 0;
+    max-height: none !important;
 }
 
 .dashboard-nav a {
@@ -393,191 +514,13 @@ html, body {
 
 /* Responsive */
 @media (max-width: 768px) {
-    .dashboard-header {
-        padding: 12px 16px;
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-        position: sticky;
-        top: 0;
-        z-index: 100;
-    }
-
-    .dashboard-title {
-        width: 100%;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-    }
-
-    .dashboard-title h1 {
-        font-size: 18px;
-        margin: 0;
-        word-break: break-word;
-    }
-
-    .dashboard-title img {
-        height: 40px;
-        flex-shrink: 0;
-    }
-
-    .dashboard-header .logout-form {
-        width: 100%;
-    }
-
-    .logout-btn {
-        width: 100%;
-        padding: 12px;
-        text-align: center;
-        font-size: 14px;
-    }
-
-    .dashboard-body {
-        flex-direction: column;
-        padding: 16px;
-        gap: 16px;
-        align-items: stretch;
-        margin: 0;
-    }
-
-    .dashboard-container {
-        padding: 20px 16px;
-        width: 100%;
-        border-radius: 8px;
-        margin: 0;
-    }
-
-    .dashboard-container h2 {
-        font-size: 1.1rem;
-        margin-bottom: 16px;
-    }
-
-    .dashboard-nav {
-        flex: 0 0 auto;
-        width: 100%;
-        flex-direction: row;
-        flex-wrap: wrap;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        gap: 8px;
-        padding: 12px;
-        border-radius: 8px;
-        position: static;
-        top: auto;
-    }
-
-    .dashboard-nav a {
-        flex: 0 0 auto;
-        padding: 10px 12px;
-        font-size: 13px;
-        white-space: nowrap;
-        border-radius: 6px;
-    }
-
-    .dashboard-sections {
-        flex-direction: column;
-        gap: 12px;
-    }
-
-    .dashboard-card {
-        min-width: auto;
-        width: 100%;
-        padding: 16px;
-        border-radius: 8px;
-    }
-
-    .dashboard-card h3 {
-        font-size: 14px;
-    }
-
-    .dashboard-card p {
-        font-size: 0.95rem;
-    }
-
-    .dashboard-container table,
-    .content-card table {
-        font-size: 13px;
-        display: block;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        white-space: nowrap;
-        width: 100%;
-    }
-
-    .dashboard-container table th,
-    .dashboard-container table td,
-    .content-card table th,
-    .content-card table td {
-        padding: 8px 10px;
-        font-size: 12px;
-    }
-
-    .form-layout {
-        max-width: 100%;
-        padding: 0 12px;
-    }
-
-    .page-header {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 10px;
-    }
-
-    .page-header h2 {
-        margin: 0;
-        font-size: 1.1rem;
-    }
-
-    .btn-primary {
-        padding: 12px 16px;
-        font-size: 14px;
-        width: 100%;
-        text-align: center;
-    }
-
-    .btn-sm {
-        padding: 8px 12px;
-        font-size: 12px;
-    }
-
-    .alerts-box {
-        padding: 12px;
-        border-radius: 6px;
-        margin-bottom: 16px;
-    }
-
-    .alerts-box h3 {
-        font-size: 13px;
-        margin-bottom: 8px;
-    }
-
-    .alerts-box ul {
-        font-size: 12px;
-        padding-left: 18px;
-    }
-}
-
-@media (max-width: 480px) {
+    /* Tap highlight for mobile */
     * {
         -webkit-tap-highlight-color: transparent;
     }
 
-    body {
-        padding: 0;
-        margin: 0;
-    }
-
-    html, body {
-        overflow-x: hidden;
-    }
-
-    .dashboard-page {
-        min-height: 100vh;
-        background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
-    }
-
     .dashboard-header {
-        padding: 12px;
+        padding: 12px 16px;
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
@@ -594,27 +537,32 @@ html, body {
         justify-content: flex-start;
     }
 
+    .dashboard-title h1 {
+        font-size: 16px;
+        margin: 0;
+        word-break: break-word;
+        font-weight: 600;
+        color: #fff;
+        line-height: 1.2;
+    }
+
     .dashboard-title img {
         height: 36px;
         flex-shrink: 0;
     }
 
-    .dashboard-title h1 {
-        font-size: 14px;
-        margin: 0;
-        font-weight: 600;
-        color: #fff;
-        word-break: break-word;
-        line-height: 1.2;
+    .dashboard-header .logout-form {
+        width: 100%;
     }
 
     .logout-btn {
         width: 100%;
         padding: 14px;
+        text-align: center;
         font-size: 14px;
-        border-radius: 6px;
         background: #FF9B00;
         border: none;
+        border-radius: 6px;
     }
 
     .logout-btn:hover {
@@ -627,15 +575,55 @@ html, body {
         gap: 12px;
         align-items: stretch;
         margin: 0;
+        position: relative;
+    }
+
+    /* Show hamburger menu on mobile */
+    .hamburger-menu-wrapper {
+        display: block;
+        width: auto;
+        margin-left: auto;
+        margin-bottom: 0;
+    }
+
+    .hamburger-btn {
+        display: flex;
+    }
+
+    /* Hide sidebar nav on mobile */
+    .dashboard-nav {
+        display: none !important;
+    }
+
+    /* Show hamburger dropdown */
+    .hamburger-dropdown {
+        display: none !important;
+        position: fixed;
+        top: 70px;
+        right: 12px;
+        left: auto;
+        width: 220px;
+        max-height: calc(100vh - 90px);
+        overflow-y: auto;
+        flex-direction: column;
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1001;
+    }
+
+    .hamburger-toggle:checked ~ .hamburger-dropdown {
+        display: flex !important;
     }
 
     .dashboard-container {
         padding: 16px 12px;
+        width: 100%;
         border-radius: 8px;
+        margin: 0;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         border-top: 3px solid #FF9B00;
-        width: 100%;
-        margin: 0;
     }
 
     .dashboard-container h2 {
@@ -649,31 +637,26 @@ html, body {
         margin: 12px 0 8px 0;
     }
 
-    .dashboard-nav {
-        width: 100%;
+    /* Hamburger menu dropdown positioning for mobile */
+    .hamburger-dropdown {
+        display: none !important;
+        position: fixed;
+        top: 70px;
+        right: 12px;
+        left: auto;
+        width: 220px;
+        max-height: calc(100vh - 80px);
+        overflow-y: auto;
         flex-direction: column;
-        gap: 6px;
-        padding: 10px;
+        background: #fff;
+        border: 1px solid #e2e8f0;
         border-radius: 6px;
-        position: static;
-        top: auto;
-        margin: 0;
-        background: #f5f5f5;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        z-index: 1001;
     }
 
-    .dashboard-nav a {
-        width: 100%;
-        padding: 12px;
-        text-align: left;
-        font-size: 13px;
-        border-radius: 6px;
-        display: block;
-    }
-
-    .dashboard-nav a.active {
-        border-left: 4px solid #FF9B00;
-        background: #1976d2;
-        color: #fff;
+    .hamburger-toggle:checked ~ .hamburger-dropdown {
+        display: flex !important;
     }
 
     /* Dashboard cards stack vertically */
@@ -701,25 +684,40 @@ html, body {
         margin: 4px 0;
     }
 
-    /* Tables: horizontal scroll on small screens */
+    /* Tables: horizontal scroll with proper alignment */
     .dashboard-container table,
     .content-card table {
-        font-size: 11px;
-        display: block;
+        font-size: 12px;
+        display: table;
         width: 100%;
-        overflow-x: auto;
-        -webkit-overflow-scrolling: touch;
-        white-space: nowrap;
+        border-collapse: collapse;
         margin-top: 12px;
         border: 1px solid #e2e8f0;
         border-radius: 4px;
+        table-layout: auto;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        border-radius: 4px;
+        margin: 12px -12px -12px -12px;
     }
 
     .dashboard-container table thead,
     .content-card table thead {
         background: #1565c0;
-        display: block;
-        width: 100%;
+        display: table-header-group;
+    }
+
+    .dashboard-container table tbody,
+    .content-card table tbody {
+        display: table-row-group;
+    }
+
+    .dashboard-container table tr,
+    .content-card table tr {
+        display: table-row;
     }
 
     .dashboard-container table th,
@@ -729,21 +727,16 @@ html, body {
         padding: 8px 6px;
         font-size: 11px;
         border: 1px solid #e0e0e0;
-        display: inline-block;
-        min-width: 60px;
+        display: table-cell;
+        white-space: nowrap;
+        vertical-align: middle;
     }
 
     .dashboard-container table th {
         font-weight: 600;
-        white-space: nowrap;
         color: #fff;
-    }
-
-    .dashboard-container table tbody tr {
-        display: block;
-        margin-bottom: 10px;
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
+        background: #1565c0;
+        text-align: left;
     }
 
     .dashboard-container table tbody tr:nth-child(even) {
@@ -943,5 +936,10 @@ html, body {
         animation-duration: 0.3s !important;
         transition-duration: 0.3s !important;
     }
+}
+
+@media (max-width: 480px) {
+    /* No additional rules needed - all mobile styles are handled in the 768px breakpoint above */
+    /* This keeps all mobile devices (390px to 768px) consistent */
 }
 

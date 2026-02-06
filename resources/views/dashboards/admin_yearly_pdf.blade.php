@@ -75,6 +75,39 @@
         <p>No vehicle fuel data available.</p>
     @endif
 
+    <h2 style="margin-top:20px;">Boardmember Budget Analysis</h2>
+<table class="monthly-table" style="font-size:11px;">
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>Boardmember</th>
+            <th>Vehicle</th>
+            <th class="text-right">Yearly Budget</th>
+            <th class="text-right">Used</th>
+            <th class="text-right">Remaining</th>
+            <th class="text-right">Used %</th>
+            <th>Recommendation</th>
+            <th class="text-right">Suggested Budget</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach($boardmembersData as $bm)
+            <tr>
+                <td>{{ $loop->iteration }}</td>
+                <td>{{ $bm['user']->name }}</td>
+                <td>{{ $bm['vehicle']?->plate_number ?? '—' }}</td>
+                <td class="text-right">{{ number_format($bm['yearlyBudget'], 2) }}</td>
+                <td class="text-right">{{ number_format($bm['totalUsed'], 2) }}</td>
+                <td class="text-right">{{ number_format($bm['remaining'], 2) }}</td>
+                <td class="text-right">{{ $bm['usedPercent'] }}%</td>
+                <td>{{ $bm['status'] }}</td>
+                <td class="text-right">{{ number_format($bm['suggestedBudget'], 2) }}</td>
+            </tr>
+        @endforeach
+    </tbody>
+</table>
+
+
     <div style="margin-top:30px; padding-top:20px; border-top:1px solid #e0e0e0; text-align:center; font-size:11px; color:#666;">
         <p>This is a fleet-wide yearly report generated from the BM Vehicle Monitoring System.</p>
         <p>Report generated on {{ now()->format('F d, Y') }} at {{ now()->format('h:i A') }}</p>

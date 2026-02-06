@@ -10,11 +10,30 @@
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
             <h1>Admin Dashboard</h1>
         </div>
+
+        {{-- Sidebar --}}
+        <div class="hamburger-menu-wrapper">
+            <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+            <label for="hamburger-toggle" class="hamburger-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+            <nav class="hamburger-dropdown">
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </nav>
+        </div>
     </div>
 
     <div class="dashboard-body">
 
-        {{-- Sidebar --}}
         <nav class="dashboard-nav">
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
@@ -81,4 +100,20 @@
         </div> {{-- dashboard-container --}}
     </div> {{-- dashboard-body --}}
 </div> {{-- dashboard-page --}}
+
+<script>
+    // Close hamburger menu when a link is clicked
+    document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
+        link.addEventListener('click', () => {
+            document.getElementById('hamburger-toggle').checked = false;
+        });
+    });
+
+    // Also handle form submission (logout)
+    document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
+        form.addEventListener('submit', () => {
+            document.getElementById('hamburger-toggle').checked = false;
+        });
+    });
+</script>
 @endsection

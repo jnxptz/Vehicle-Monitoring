@@ -5,15 +5,17 @@
     max-width: 100%;
 }
 
-/* Mobile responsive for boardmember dashboard */
+/* Mobile responsive for boardmember dashboard - tablet */
 @media (max-width: 768px) {
     .dashboard-title img {
-        height: 48px;
+        height: 44px;
     }
 }
 
+/* Mobile responsive for boardmember dashboard - phone */
 @media (max-width: 480px) {
     .dashboard-title img {
-        height: 36px;
+        height: 32px;
+        flex-shrink: 0;
     }
 }

@@ -19,10 +19,41 @@
     margin: 0;
 }
 
-/* Global mobile improvements */
+/* Mobile improvements */
+@media (max-width: 768px) {
+    html {
+        font-size: 15px;
+    }
+
+    body {
+        margin: 0;
+        padding: 0;
+        overflow-x: hidden;
+        width: 100%;
+    }
+
+    * {
+        box-sizing: border-box;
+    }
+
+    .app-header {
+        padding: 10px 12px;
+        gap: 8px;
+    }
+
+    .app-header img {
+        height: 30px;
+    }
+
+    .app-header-title {
+        font-size: 16px;
+        word-break: break-word;
+    }
+}
+
 @media (max-width: 480px) {
     html {
-        font-size: 14px;
+        font-size: 13px;
     }
 
     body {
@@ -39,16 +70,19 @@
     }
 
     .app-header {
-        padding: 8px 12px;
-        gap: 8px;
+        padding: 8px 10px;
+        gap: 6px;
+        flex-wrap: wrap;
     }
 
     .app-header img {
-        height: 28px;
+        height: 26px;
+        flex-shrink: 0;
     }
 
     .app-header-title {
-        font-size: 16px;
+        font-size: 14px;
+        margin: 0;
     }
 
     /* Ensure inputs don't zoom on iOS */
@@ -61,17 +95,20 @@
     textarea {
         font-size: 16px !important;
         border-radius: 6px;
+        padding: 12px;
     }
 
     /* Touch-friendly minimum sizes */
     a, button {
         min-height: 44px;
         min-width: 44px;
+        padding: 12px;
     }
 
     /* Better scrolling on mobile */
     .table-wrapper {
         -webkit-overflow-scrolling: touch;
+        -ms-overflow-style: -ms-autohiding-scrollbar;
     }
 }
 
