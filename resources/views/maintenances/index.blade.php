@@ -28,10 +28,12 @@
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                        @csrf
-                        <button type="submit" class="logout-btn">Logout</button>
-                    </form>
+                    <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                        <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                            @csrf
+                            <button type="submit" class="logout-btn">Logout</button>
+                        </form>
+                    </div>
                 </nav>
             </div>
         </div>
@@ -43,10 +45,12 @@
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                    @csrf
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
+                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                        @csrf
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
             </nav>
 
             {{-- Main Content --}}
@@ -64,7 +68,27 @@
                 <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
                 <h1>Sangguniang Panlalawigan</h1>
             </div>
-            
+
+            {{-- Sidebar --}}
+            <div class="hamburger-menu-wrapper">
+                <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+                <label for="hamburger-toggle" class="hamburger-btn">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </label>
+                <nav class="hamburger-dropdown">
+                    <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
+                    <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                    <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                    <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                        <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                            @csrf
+                            <button type="submit" class="logout-btn">Logout</button>
+                        </form>
+                    </div>
+                </nav>
+            </div>
         </div>
 
         <div class="dashboard-body">
@@ -74,11 +98,12 @@
                 <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                    @csrf
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
-            </nav>
+                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                        @csrf
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
             </nav>
 
             {{-- Main Content --}}
@@ -126,7 +151,7 @@
                                         <td>{{ $m->vehicle?->plate_number ?? 'N/A' }}</td>
                                         <td>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
                                         <td>{{ $m->maintenance_km ?? '—' }}</td>
-                                        <td style="max-width: 320px; white-space: normal;">{{ $m->operation }}</td>
+                                        <td style="max-width: 300px; white-space: normal;">{{ Str::limit($m->operation, 100, '...') }}</td>
                                         <td>₱{{ number_format((float) $m->cost, 2) }}</td>
                                         <td>{{ $m->conduct }}</td>
                                         <td>{{ $m->call_of_no }}</td>

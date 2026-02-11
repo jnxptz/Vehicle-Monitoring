@@ -600,8 +600,8 @@ html, body {
         display: none !important;
         position: fixed;
         top: 70px;
-        right: 12px;
-        left: auto;
+        left: 12px;
+        right: auto;
         width: 220px;
         max-height: calc(100vh - 90px);
         overflow-y: auto;
@@ -642,8 +642,8 @@ html, body {
         display: none !important;
         position: fixed;
         top: 70px;
-        right: 12px;
-        left: auto;
+        left: 12px;
+        right: auto;
         width: 220px;
         max-height: calc(100vh - 80px);
         overflow-y: auto;

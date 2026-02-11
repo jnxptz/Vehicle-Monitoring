@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\FuelSlip;
 use App\Models\Vehicle;
+use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -41,14 +42,29 @@ class FuelSlipController extends Controller
 
     public function create()
     {
-        return view('fuel_slips.create');
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
+
+        // Provide boardmembers with offices so admin can pick a boardmember then a vehicle
+        $boardmembers = \App\Models\User::where('role', 'boardmember')
+            ->whereNotNull('office_id')
+            ->with(['office.vehicles' => function($q){ $q->orderBy('plate_number'); }])
+            ->orderBy('name')
+            ->get();
+
+        return view('fuel_slips.create', compact('boardmembers'));
     }
 
     public function store(Request $request)
     {
+        if (auth()->user()->role !== 'admin') {
+            abort(403);
+        }
         $request->validate([
-            'vehicle_name' => 'required|string|max:255',
-            'plate_number' => 'required|string|max:50',
+            'vehicle_id' => 'nullable|exists:vehicles,id',
+            'vehicle_name' => 'required_without:vehicle_id|string|max:255',
+            'plate_number' => 'required_without:vehicle_id|string|max:50',
             'liters' => 'required|numeric|min:0',
             'cost' => 'required|numeric|min:0',
             'km_reading' => 'required|integer|min:0',
@@ -56,15 +72,16 @@ class FuelSlipController extends Controller
             'date' => 'required|date',
         ]);
 
-        
-        $vehicle = Vehicle::where('bm_id', Auth::id())->first();
+        $selectedVehicle = null;
+        if ($request->filled('vehicle_id')) {
+            $selectedVehicle = Vehicle::find($request->vehicle_id);
+        }
 
         FuelSlip::create([
             'user_id' => Auth::id(),
-            'vehicle_id' => $vehicle?->id, 
-            'vehicle_name' => $request->vehicle_name,
-           
-            'plate_number' => $vehicle?->plate_number ?? $request->plate_number,
+            'vehicle_id' => $selectedVehicle?->id,
+            'vehicle_name' => $selectedVehicle?->vehicle_name ?? $request->vehicle_name,
+            'plate_number' => $selectedVehicle?->plate_number ?? $request->plate_number,
             'liters' => $request->liters,
             'cost' => $request->cost,
             'km_reading' => $request->km_reading,
@@ -73,10 +90,9 @@ class FuelSlipController extends Controller
             'date' => $request->date,
         ]);
 
-        
-        return redirect()
-            ->route('boardmember.dashboard')
-            ->with('success', 'Fuel slip added successfully and your dashboard has been updated.');
+        $redirectRoute = auth()->user()->role === 'admin' ? 'admin.dashboard' : 'boardmember.dashboard';
+
+        return redirect()->route($redirectRoute)->with('success', 'Fuel slip added successfully.');
     }
 
     public function exportPDF($id)

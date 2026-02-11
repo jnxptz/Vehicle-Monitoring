@@ -13,70 +13,71 @@ use Carbon\Carbon;
 
 class DashboardController extends Controller
 {
-    
-   private function calculateBudgetRecommendation($userId, $vehicleId, $yearlyBudget)
-{
-    $year = now()->year;
+    private const YEARLY_BUDGET_DEFAULT = 100000;
 
-    
-    $fuelCost = FuelSlip::where('user_id', $userId)
-        ->whereYear('date', $year)
-        ->sum('cost');
+    /**
+     * Calculate budget recommendation based on usage
+     */
+    private function calculateBudgetRecommendation($userId, $vehicleId, $yearlyBudget)
+    {
+        $year = now()->year;
 
-    $maintenanceCost = Maintenance::where('vehicle_id', $vehicleId)
-        ->whereYear('date', $year)
-        ->sum('cost');
+        $fuelCost = FuelSlip::where('user_id', $userId)
+            ->whereYear('date', $year)
+            ->sum('cost');
 
-    $totalUsed = $fuelCost + $maintenanceCost;
-    $remaining = $yearlyBudget - $totalUsed;
+        $maintenanceCost = Maintenance::where('vehicle_id', $vehicleId)
+            ->whereYear('date', $year)
+            ->sum('cost');
 
-    
-    if ($yearlyBudget <= 0) {
+        $totalUsed = $fuelCost + $maintenanceCost;
+        $remaining = $yearlyBudget - $totalUsed;
+
+        if ($yearlyBudget <= 0) {
+            return [
+                'status' => 'maintain',
+                'suggestedBudget' => 0,
+                'remaining' => 0,
+                'remainingPercent' => 0
+            ];
+        }
+
+        $usedPercent = ($totalUsed / $yearlyBudget) * 100;
+        $remainingPercent = ($remaining / $yearlyBudget) * 100;
+
+        if ($usedPercent >= 90) {
+            $status = 'increase';
+            $suggestedBudget = $yearlyBudget * 1.05;
+        } elseif ($remainingPercent >= 40) {
+            $status = 'decrease';
+            $suggestedBudget = $yearlyBudget * 0.85;
+        } else {
+            $status = 'maintain';
+            $suggestedBudget = $yearlyBudget;
+        }
+
         return [
-            'status' => 'maintain',
-            'suggestedBudget' => 0,
-            'remaining' => 0,
-            'remainingPercent' => 0
+            'status' => $status,
+            'suggestedBudget' => round($suggestedBudget, 2),
+            'remaining' => round($remaining, 2),
+            'remainingPercent' => round($remainingPercent, 2)
         ];
     }
 
-    $usedPercent = ($totalUsed / $yearlyBudget) * 100;
-    $remainingPercent = ($remaining / $yearlyBudget) * 100;
-
-    
-    $status = 'maintain';
-    $suggestedBudget = $yearlyBudget;
-
-    if ($usedPercent >= 90) {
-        $status = 'increase';
-        $suggestedBudget = $yearlyBudget * 1.05; 
-    }
-
-    elseif ($remainingPercent >= 40) {
-        $status = 'decrease';
-        $suggestedBudget = $yearlyBudget * 0.85;
-    }
-
-
-    return [
-        'status' => $status,
-        'suggestedBudget' => round($suggestedBudget, 2),
-        'remaining' => round($remaining, 2),
-        'remainingPercent' => round($remainingPercent, 2)
-    ];
-}
-
-
-  
+    /**
+     * Admin dashboard showing all boardmembers and vehicles
+     */
     public function admin(Request $request)
     {
         $selectedMonth = (int) $request->input('month', now()->month);
         $selectedMonth = ($selectedMonth >= 1 && $selectedMonth <= 12) ? $selectedMonth : now()->month;
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
         $year = now()->year;
-        $yearlyBudgetDefault = 100000;
 
-        $boardmembers = User::where('role', 'boardmember')->with('vehicle')->orderBy('name')->get();
+        $boardmembers = User::where('role', 'boardmember')
+            ->with(['vehicle', 'office.vehicles'])
+            ->orderBy('name')
+            ->get();
         $ids = $boardmembers->pluck('id');
 
         $totalCostByUser = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
@@ -89,9 +90,10 @@ class DashboardController extends Controller
             ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
             ->selectRaw('user_id, SUM(liters) as total_liters')->groupBy('user_id')->pluck('total_liters', 'user_id');
 
-        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $yearlyBudgetDefault) {
-            $vehicle = $bm->vehicle;
-            $yearlyBudget = $vehicle ? $yearlyBudgetDefault : 0;
+        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser) {
+            // prefer user's direct vehicle, otherwise use first vehicle from their office
+            $vehicle = $bm->vehicle ?? ($bm->office?->vehicles->first() ?? null);
+            $yearlyBudget = $vehicle ? self::YEARLY_BUDGET_DEFAULT : 0;
 
             $fuelCost = (float) ($totalCostByUser[$bm->id] ?? 0);
             $maintenanceCost = $vehicle ? (float) ($maintenanceByVehicle[$vehicle->id] ?? 0) : 0;
@@ -120,11 +122,14 @@ class DashboardController extends Controller
         return view('dashboards.admin', compact('rows', 'selectedMonth', 'selectedMonthName', 'year'));
     }
 
-
+    /**
+     * Boardmember dashboard showing their vehicle and budget
+     */
     public function boardmember(Request $request)
     {
         $user = Auth::user();
-        $vehicle = Vehicle::where('bm_id', $user->id)->first();
+        // prefer user's direct vehicle, otherwise use the first vehicle from their office
+        $vehicle = $user->vehicle ?? ($user->office?->vehicles()->first());
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -140,7 +145,7 @@ class DashboardController extends Controller
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = 100000;
+            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $latestKm = (int) FuelSlip::where('user_id', $user->id)->max('km_reading');
@@ -158,7 +163,7 @@ class DashboardController extends Controller
                 ->whereMonth('date', $selectedMonth)
                 ->sum('liters');
 
-            
+            // Generate alerts
             if ($monthlyLitersUsed > $monthlyLimit) {
                 $alerts[] = "You have exceeded your monthly fuel limit of {$monthlyLimit} liters!";
             }
@@ -202,11 +207,14 @@ class DashboardController extends Controller
         ));
     }
 
-
+    /**
+     * Export boardmember dashboard as PDF
+     */
     public function exportPdf(Request $request)
     {
         $user = Auth::user();
-        $vehicle = Vehicle::where('bm_id', $user->id)->first();
+        // prefer user's direct vehicle, otherwise use first vehicle from their office
+        $vehicle = $user->vehicle ?? ($user->office?->vehicles()->first());
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -220,7 +228,7 @@ class DashboardController extends Controller
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = 100000;
+            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
@@ -235,6 +243,7 @@ class DashboardController extends Controller
                 ->whereMonth('date', $selectedMonth)
                 ->sum('liters');
 
+            // Generate alerts
             if ($monthlyLitersUsed > $monthlyLimit) {
                 $alerts[] = "You have exceeded your monthly fuel limit of {$monthlyLimit} liters!";
             }
@@ -267,11 +276,14 @@ class DashboardController extends Controller
         return $pdf->download($filename);
     }
 
-    
+    /**
+     * Export boardmember yearly PDF
+     */
     public function exportYearlyPdf()
     {
         $user = Auth::user();
-        $vehicle = Vehicle::where('bm_id', $user->id)->first();
+        // prefer user's direct vehicle, otherwise use first vehicle from their office
+        $vehicle = $user->vehicle ?? ($user->office?->vehicles()->first());
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -281,7 +293,7 @@ class DashboardController extends Controller
         $alerts = [];
 
         if ($vehicle) {
-            $yearlyBudget = 100000;
+            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
@@ -333,100 +345,104 @@ class DashboardController extends Controller
         return $pdf->download($filename);
     }
 
-    
+    /**
+     * Export admin yearly PDF with fleet-wide data
+     */
     public function exportAdminYearlyPdf()
-{
-    $year = now()->year;
+    {
+        $year = now()->year;
 
-    // Monthly fuel data for fleet-wide
-    $monthlyData = [];
-    $totalLiters = 0;
-    $totalCost = 0;
+        // Monthly fuel data for fleet-wide
+        $monthlyData = [];
+        $totalLiters = 0;
+        $totalCost = 0;
 
-    for ($month = 1; $month <= 12; $month++) {
-        $monthName = Carbon::createFromDate(null, $month, 1)->format('F');
-        $monthlyLiters = FuelSlip::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->sum('liters');
-        $monthlyCost = FuelSlip::whereYear('date', $year)
-            ->whereMonth('date', $month)
-            ->sum('cost');
+        for ($month = 1; $month <= 12; $month++) {
+            $monthName = Carbon::createFromDate(null, $month, 1)->format('F');
+            $monthlyLiters = FuelSlip::whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->sum('liters');
+            $monthlyCost = FuelSlip::whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->sum('cost');
 
-        $monthlyData[] = [
-            'month' => $monthName,
-            'liters' => $monthlyLiters,
-            'cost' => $monthlyCost,
-        ];
+            $monthlyData[] = [
+                'month' => $monthName,
+                'liters' => $monthlyLiters,
+                'cost' => $monthlyCost,
+            ];
 
-        $totalLiters += $monthlyLiters;
-        $totalCost += $monthlyCost;
-    }
-
-    // Highest consumption month
-    $highest = collect($monthlyData)->sortByDesc('liters')->first();
-
-    // Top 5 vehicles by liters
-    $vehicles = Vehicle::with('bm')->get();
-    $topVehicles = $vehicles->map(function ($v) use ($year) {
-        $vLiters = FuelSlip::where('vehicle_id', $v->id)
-            ->whereYear('date', $year)
-            ->sum('liters');
-        return ['vehicle' => $v, 'liters' => $vLiters];
-    })->filter(fn($v) => $v['liters'] > 0)
-      ->sortByDesc('liters')
-      ->take(5)
-      ->values();
-
-    // Boardmembers with vehicle and yearly budget analysis
-    $boardmembers = User::where('role', 'boardmember')->with('vehicle')->orderBy('name')->get();
-    $yearlyBudgetDefault = 100000; // default budget
-
-    $boardmembersData = $boardmembers->map(function ($bm) use ($year, $yearlyBudgetDefault) {
-        $vehicle = $bm->vehicle;
-        $yearlyBudget = $vehicle ? $yearlyBudgetDefault : 0;
-
-        $fuelCost = FuelSlip::where('user_id', $bm->id)->whereYear('date', $year)->sum('cost');
-        $maintenanceCost = $vehicle ? Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', $year)->sum('cost') : 0;
-        $totalUsed = $fuelCost + $maintenanceCost;
-        $remaining = $yearlyBudget - $totalUsed;
-        $usedPercent = $yearlyBudget > 0 ? ($totalUsed / $yearlyBudget) * 100 : 0;
-
-        if ($usedPercent >= 90) {
-            $status = 'Increase';
-            $suggestedBudget = $yearlyBudget * 1.05;
-        } elseif ($usedPercent < 60) {
-            $status = 'Decrease';
-            $suggestedBudget = $yearlyBudget * 0.85;
-        } else {
-            $status = 'Maintain';
-            $suggestedBudget = $yearlyBudget;
+            $totalLiters += $monthlyLiters;
+            $totalCost += $monthlyCost;
         }
 
-        return [
-            'user' => $bm,
-            'vehicle' => $vehicle,
-            'yearlyBudget' => $yearlyBudget,
-            'totalUsed' => $totalUsed,
-            'remaining' => $remaining,
-            'usedPercent' => round($usedPercent, 2),
-            'status' => $status,
-            'suggestedBudget' => round($suggestedBudget, 2),
-        ];
-    });
+        // Highest consumption month
+        $highest = collect($monthlyData)->sortByDesc('liters')->first();
 
-    // Generate PDF
-    $pdf = Pdf::loadView('dashboards.admin_yearly_pdf', compact(
-        'monthlyData',
-        'totalLiters',
-        'totalCost',
-        'highest',
-        'topVehicles',
-        'boardmembersData',
-        'year'
-    ));
+        // Top 5 vehicles by liters
+        $vehicles = Vehicle::with('bm')->get();
+        $topVehicles = $vehicles->map(function ($v) use ($year) {
+            $vLiters = FuelSlip::where('vehicle_id', $v->id)
+                ->whereYear('date', $year)
+                ->sum('liters');
+            return ['vehicle' => $v, 'liters' => $vLiters];
+        })->filter(fn($v) => $v['liters'] > 0)
+          ->sortByDesc('liters')
+          ->take(5)
+          ->values();
 
-    $filename = 'admin-dashboard-yearly-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
-    return $pdf->download($filename);
-}
+        // Boardmembers with vehicle and yearly budget analysis
+        $boardmembers = User::where('role', 'boardmember')
+            ->with(['vehicle', 'office.vehicles'])
+            ->orderBy('name')
+            ->get();
 
+        $boardmembersData = $boardmembers->map(function ($bm) use ($year) {
+            // prefer user's direct vehicle, otherwise fall back to their office's first vehicle
+            $vehicle = $bm->vehicle ?? ($bm->office?->vehicles->first() ?? null);
+            $yearlyBudget = $vehicle ? self::YEARLY_BUDGET_DEFAULT : 0;
+
+            $fuelCost = FuelSlip::where('user_id', $bm->id)->whereYear('date', $year)->sum('cost');
+            $maintenanceCost = $vehicle ? Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', $year)->sum('cost') : 0;
+            $totalUsed = $fuelCost + $maintenanceCost;
+            $remaining = $yearlyBudget - $totalUsed;
+            $usedPercent = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
+
+            if ($usedPercent >= 90) {
+                $status = 'Increase';
+                $suggestedBudget = $yearlyBudget * 1.05;
+            } elseif ($usedPercent < 60) {
+                $status = 'Decrease';
+                $suggestedBudget = $yearlyBudget * 0.85;
+            } else {
+                $status = 'Maintain';
+                $suggestedBudget = $yearlyBudget;
+            }
+
+            return [
+                'user' => $bm,
+                'vehicle' => $vehicle,
+                'yearlyBudget' => $yearlyBudget,
+                'totalUsed' => $totalUsed,
+                'remaining' => $remaining,
+                'usedPercent' => $usedPercent,
+                'status' => $status,
+                'suggestedBudget' => $suggestedBudget,
+            ];
+        });
+
+        // Generate PDF
+        $pdf = Pdf::loadView('dashboards.admin_yearly_pdf', compact(
+            'monthlyData',
+            'totalLiters',
+            'totalCost',
+            'highest',
+            'topVehicles',
+            'boardmembersData',
+            'year'
+        ));
+
+        $filename = 'admin-dashboard-yearly-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
+        return $pdf->download($filename);
+    }
 }

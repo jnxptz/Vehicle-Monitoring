@@ -16,14 +16,18 @@
     <div class="dashboard-body">
         {{-- Sidebar --}}
         <nav class="dashboard-nav">
-            <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-            <a href="{{ route('vehicles.create') }}" class="{{ request()->routeIs('vehicles.create') ? 'active' : '' }}">Register Vehicle</a>
-            <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
+            @if(auth()->user()->role === 'admin')
+                <a href="{{ route('vehicles.create') }}" class="{{ request()->routeIs('vehicles.create') ? 'active' : '' }}">Register Vehicle</a>
+            @endif
+            <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
         </nav>
 
         {{-- Main Content --}}
@@ -42,6 +46,26 @@
                 <form action="{{ route('vehicles.store') }}" method="POST">
                     @csrf
 
+                    @if(isset($boardmembers) && auth()->user()->role === 'admin')
+                        <label for="boardmember_id">Boardmember:</label>
+                        <select id="boardmember_id" name="boardmember_id" required>
+                            <option value="">-- Select Boardmember --</option>
+                            @foreach($boardmembers as $boardmember)
+                                <option value="{{ $boardmember->id }}">{{ $boardmember->name }} ({{ $boardmember->office->name ?? 'No Office' }})</option>
+                            @endforeach
+                        </select>
+                    @endif
+
+                    <label for="vehicle_name">Vehicle Name:</label>
+                    <input
+                        id="vehicle_name"
+                        type="text"
+                        name="vehicle_name"
+                        required
+                        value="{{ old('vehicle_name') }}"
+                        placeholder="e.g., Toyota Corolla"
+                    >
+
                     <label for="plate_number">Plate Number:</label>
                     <input
                         id="plate_number"
@@ -49,20 +73,17 @@
                         name="plate_number"
                         required
                         value="{{ old('plate_number') }}"
-                        placeholder="Enter plate number"
+                        placeholder="e.g., ABC 1234"
                     >
 
-                    <label for="monthly_fuel_limit">
-                        Monthly Fuel Limit (liters):
-                    </label>
+                    <label for="driver">Driver Name:</label>
                     <input
-                        id="monthly_fuel_limit"
-                        type="number"
-                        name="monthly_fuel_limit"
+                        id="driver"
+                        type="text"
+                        name="driver"
                         required
-                        min="1"
-                        step="0.01"
-                        value="{{ old('monthly_fuel_limit', 100) }}"
+                        value="{{ old('driver') }}"
+                        placeholder="Enter driver name"
                     >
 
                     <button type="submit">Register Vehicle</button>

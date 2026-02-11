@@ -10,29 +10,52 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        $vehicles = Vehicle::with('bm')->get();
+        $vehicles = Vehicle::with('bm', 'latestFuelSlip')->get();
         return view('vehicles.index', compact('vehicles'));
     }
 
     public function create()
     {
-        return view('vehicles.create');
+        $boardmembers = null;
+        if (auth()->user() && auth()->user()->role === 'admin') {
+            // Only show boardmembers that have an office assigned
+            $boardmembers = \App\Models\User::where('role', 'boardmember')
+                ->whereNotNull('office_id')
+                ->with('office')
+                ->orderBy('name')
+                ->get();
+        }
+
+        return view('vehicles.create', compact('boardmembers'));
     }
 
     public function store(Request $request)
     {
         $request->validate([
             'plate_number' => 'required|unique:vehicles',
-            'monthly_fuel_limit' => 'required|numeric',
+            'vehicle_name' => 'required|string|max:255',
+            'driver' => 'required|string|max:255',
+            'boardmember_id' => 'required|exists:users,id',
         ]);
+
+        $boardmember = \App\Models\User::findOrFail($request->input('boardmember_id'));
+        
+        if (!$boardmember->office_id) {
+            return redirect()->back()
+                ->withErrors(['boardmember_id' => 'The selected boardmember does not have an office assigned. Please assign an office first.'])
+                ->withInput();
+        }
 
         $vehicle = Vehicle::create([
-            'bm_id' => Auth::id(), 
+            'bm_id' => $boardmember->id,
+            'office_id' => $boardmember->office_id,
             'plate_number' => $request->plate_number,
-            'monthly_fuel_limit' => $request->monthly_fuel_limit,
+            'vehicle_name' => $request->vehicle_name,
+            'driver' => $request->driver,
+            'monthly_fuel_limit' => 100, // Default value set by admin later
         ]);
 
-        return redirect()->route('boardmember.dashboard')
+        return redirect()->route('vehicles.index')
             ->with('success', 'Vehicle registered successfully.');
     }
 

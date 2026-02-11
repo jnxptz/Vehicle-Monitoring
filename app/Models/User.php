@@ -17,6 +17,7 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'office_id',
     ];
 
     protected $hidden = [
@@ -27,6 +28,11 @@ class User extends Authenticatable
     public function vehicle(): HasOne
     {
         return $this->hasOne(Vehicle::class, 'bm_id');
+    }
+
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
     }
 
     public function fuelSlips(): HasMany

@@ -9,7 +9,13 @@ class Vehicle extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['bm_id', 'plate_number', 'monthly_fuel_limit', 'current_km'];
+    protected $fillable = ['bm_id', 'office_id', 'plate_number', 'vehicle_name', 'driver', 'monthly_fuel_limit', 'current_km'];
+
+    // Vehicle belongs to an office
+    public function office()
+    {
+        return $this->belongsTo(Office::class);
+    }
 
     public function bm()
     {
@@ -19,5 +25,16 @@ class Vehicle extends Model
     public function fuelSlips()
     {
         return $this->hasMany(FuelSlip::class);
+    }
+
+    public function latestFuelSlip()
+    {
+        return $this->hasOne(FuelSlip::class)->latest();
+    }
+
+    public function getLatestKm()
+    {
+        $latestFuelSlip = $this->latestFuelSlip()->first();
+        return $latestFuelSlip ? $latestFuelSlip->km_reading : $this->current_km;
     }
 }

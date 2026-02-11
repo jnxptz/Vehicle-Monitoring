@@ -7,6 +7,8 @@ use App\Http\Controllers\VehicleController;
 use App\Http\Controllers\FuelSlipController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\DashboardController; // Added for boardmember dashboard logic
+use App\Http\Controllers\OfficeController;
+
 
 // --------------------
 // Landing page
@@ -75,15 +77,25 @@ Route::get('/admin/dashboard/yearly-pdf', [DashboardController::class, 'exportAd
 // Admin-only routes
 // --------------------
 Route::middleware(['auth', 'role:admin'])->group(function () {
+    // Office management custom routes (must come BEFORE resource route)
+    Route::get('offices/manage-boardmembers', [OfficeController::class, 'manageBoardmembers'])->name('offices.manage-boardmembers');
+    Route::put('offices/assign-boardmember/{user}', [OfficeController::class, 'assignBoardmember'])->name('offices.assign-boardmember');
+    
+    // Office resource (CRUD)
+    Route::resource('offices', OfficeController::class);
+    
     Route::resource('vehicles', VehicleController::class);
+    
+    // Admin can create fuel slips
+    Route::get('fuel-slips/create', [FuelSlipController::class, 'create'])->name('fuel-slips.create');
+    Route::post('fuel-slips', [FuelSlipController::class, 'store'])->name('fuel-slips.store');
 });
 
 // --------------------
 // Boardmember-only routes
 // --------------------
 Route::middleware(['auth', 'role:boardmember'])->group(function () {
-    Route::get('fuel-slips/create', [FuelSlipController::class, 'create'])->name('fuel-slips.create');
-    Route::post('fuel-slips', [FuelSlipController::class, 'store'])->name('fuel-slips.store');
+    // Boardmembers can only view their fuel slips; creation is handled by admin
 });
 
 // --------------------
@@ -112,8 +124,4 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
 });
 
 
-// Boardmember vehicle registration
-Route::middleware(['auth', 'role:boardmember'])->group(function () {
-    Route::get('vehicles/create', [VehicleController::class, 'create'])->name('vehicles.create');
-    Route::post('vehicles', [VehicleController::class, 'store'])->name('vehicles.store');
-});
+// Note: vehicle creation/management is admin-only via the resource above

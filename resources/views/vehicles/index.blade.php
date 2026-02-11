@@ -24,10 +24,12 @@
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                    @csrf
-                    <button type="submit" class="logout-btn">Logout</button>
-                </form>
+                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                        @csrf
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
             </nav>
         </div>
     </div>
@@ -39,17 +41,19 @@
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-            <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                @csrf
-                <button type="submit" class="logout-btn">Logout</button>
-            </form>
+            <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn">Logout</button>
+                </form>
+            </div>
         </nav>
 
         {{-- Main Content --}}
         <div class="dashboard-container">
-            <div style="display:flex; justify-content:space-between; align-items:center; gap:12px;">
-                <h2 style="margin-top:0;">Vehicles</h2>
-                
+            <div class="page-header">
+                <h2>Vehicles</h2>
+                <a href="{{ route('vehicles.create') }}" class="btn-primary btn-sm">+ Register Vehicle</a>
             </div>
 
             @if(session('success'))
@@ -78,7 +82,7 @@
                                     <td>{{ $vehicle->bm->name ?? 'N/A' }}</td>
                                     <td>{{ $vehicle->plate_number }}</td>
                                     <td>{{ $vehicle->monthly_fuel_limit }} liters</td>
-                                    <td>{{ $vehicle->current_km ?? 0 }} km</td>
+                                    <td>{{ $vehicle->latestFuelSlip?->km_reading ?? $vehicle->current_km ?? 0 }} km</td>
                                     <td>
                                         <div class="action-buttons">
                                             <a href="{{ route('vehicles.edit', $vehicle->id) }}" class="btn-edit">Edit</a>
