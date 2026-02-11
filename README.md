@@ -1,63 +1,82 @@
-<<<<<<< HEAD
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# 🚘 Board Members Vehicle Monitoring System
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Executive Summary
+The **Board Members Vehicle Monitoring System (BMVMS)** is an enterprise-grade information system designed to monitor, manage, and analyze the utilization of official vehicles assigned to board members and executive officials. The system centralizes vehicle data, trip activity, and administrative oversight to ensure accountability, operational efficiency, and data-driven decision-making.
 
-## About Laravel
+This solution is suitable for **government agencies, academic institutions, and corporate organizations** that manage a fleet of official service vehicles.
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+---
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+## Problem Statement
+Organizations that manage executive vehicles often rely on manual logbooks or fragmented monitoring methods. These approaches commonly result in:
+- Limited visibility of vehicle usage  
+- Inefficient tracking of assignments and trips  
+- Weak accountability mechanisms  
+- Delayed and inaccurate reporting  
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+The **BMVMS** addresses these challenges by providing a **secure, centralized, and auditable vehicle monitoring platform**.
 
-## Learning Laravel
+---
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework. You can also check out [Laravel Learn](https://laravel.com/learn), where you will be guided through building a modern Laravel application.
+## System Objectives
+- Centralize monitoring of board members’ vehicles  
+- Track vehicle assignments, trips, and utilization  
+- Improve accountability in the use of official vehicles  
+- Support administrative decision-making through accurate reports  
+- Ensure system security through role-based access control  
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+---
 
-## Laravel Sponsors
+## Core Functionalities
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### Administrative Management
+- Manage board member and administrator accounts  
+- Register and assign official vehicles  
+- Manage drivers and vehicle assignments  
+- Control vehicle status (Active, Inactive, Under Maintenance)
 
-### Premium Partners
+### Vehicle Monitoring and Tracking
+- Real-time or simulated vehicle location tracking  
+- Trip history and route logging  
+- Timestamped vehicle activity records  
+- Vehicle utilization monitoring
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+### Maintenance and Compliance
+- Maintenance scheduling and logging  
+- Inspection and service records  
+- Downtime and availability monitoring  
 
-## Contributing
+### Reporting and Analytics
+- Vehicle usage and utilization reports  
+- Trip summaries and activity logs  
+- Maintenance and compliance reports  
+- Exportable reports for auditing and review  
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+### Security and Access Control
+- Role-based access (Administrator / Authorized User)  
+- Secure authentication and session handling  
+- Input validation and audit logging  
 
-## Code of Conduct
+---
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+## System Architecture
+The system follows a **layered architecture** to ensure scalability, maintainability, and security.
 
-## Security Vulnerabilities
+User Interface
+     ↓
+Application Logic
+     ↓
+Database Server
+     ↓
+Vehicle Monitoring / Tracking Module
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+## 👥 Contributors
 
-## License
+Project Master: Janial M. Bacani
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
-=======
-# BM-Vehicle-Monitoring
->>>>>>> 1542bc133d2fde93884ef81bbb16605860d8921f
+Assistant: Clarisahaina R. Gonting
+
+## 📄 License
+
+This project is for academic and institutional use.
+You may modify and reuse it with proper credit.
