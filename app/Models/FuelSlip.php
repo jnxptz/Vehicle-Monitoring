@@ -22,8 +22,22 @@ class FuelSlip extends Model
         'date'
     ];
 
+    /**
+     * Cast attributes to native types
+     */
+    protected $casts = [
+        'date' => 'date',
+        'cost' => 'decimal:2',
+        'liters' => 'decimal:2',
+    ];
+
     public function vehicle()
     {
         return $this->belongsTo(Vehicle::class);
+    }
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
     }
 }

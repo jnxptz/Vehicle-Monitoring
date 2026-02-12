@@ -10,8 +10,20 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        $vehicles = Vehicle::with('bm', 'latestFuelSlip')->get();
-        return view('vehicles.index', compact('vehicles'));
+        $vehicles = Vehicle::with('bm', 'latestFuelSlip')
+            ->orderBy('bm_id')
+            ->get()
+            ->groupBy(function($vehicle) {
+                return $vehicle->bm->name ?? 'Unknown';
+            });
+        
+        $boardmembers = \App\Models\User::where('role', 'boardmember')
+            ->whereNotNull('office_id')
+            ->with('office')
+            ->orderBy('name')
+            ->get();
+        
+        return view('vehicles.index', compact('vehicles', 'boardmembers'));
     }
 
     public function create()

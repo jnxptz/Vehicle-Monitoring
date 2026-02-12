@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Maintenance;
 use App\Models\Vehicle;
+use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -31,17 +32,30 @@ class MaintenanceController extends Controller
     {
         $user = Auth::user();
 
-        $query = Maintenance::with('vehicle');
-
-        
-        if ($user && $user->role === 'boardmember') {
-            $query->whereHas('vehicle', function ($q) use ($user) {
-                $q->where('bm_id', $user->id);
-            });
+        if ($user && $user->role === 'admin') {
+            // For admin: fetch boardmembers with their maintenances
+            $boardmembers = User::where('role', 'boardmember')
+                ->whereNotNull('office_id')
+                ->with(['office', 'vehicles' => function($q){ 
+                    $q->with(['maintenances' => function($mq){ $mq->latest(); }]); 
+                }])
+                ->orderBy('name')
+                ->get();
+            $maintenances = Maintenance::with('vehicle')->latest()->get(); // Keep for backward compatibility
+        } else {
+            // For boardmember: fetch only their vehicles' maintenances
+            $maintenances = Maintenance::with('vehicle')
+                ->whereHas('vehicle', function ($q) use ($user) {
+                    $q->where('bm_id', $user->id);
+                })
+                ->latest()
+                ->get();
+            $boardmembers = collect(); // Empty collection for boardmember view
         }
-
-        $maintenances = $query->latest()->get();
-        return view('maintenances.index', compact('maintenances'));
+        
+        $vehicles = Vehicle::orderBy('plate_number')->get();
+        
+        return view('maintenances.index', compact('maintenances', 'vehicles', 'boardmembers'));
     }
 
     public function create()

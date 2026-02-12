@@ -33,11 +33,21 @@ class FuelSlipController extends Controller
     {
         $user = Auth::user();
 
-        $fuelSlips = $user->role === 'admin'
-            ? FuelSlip::latest()->get()
-            : FuelSlip::where('user_id', $user->id)->latest()->get();
+        if ($user->role === 'admin') {
+            // For admin: fetch boardmembers with their fuel slips
+            $boardmembers = \App\Models\User::where('role', 'boardmember')
+                ->whereNotNull('office_id')
+                ->with(['office', 'fuelSlips' => function($q){ $q->latest(); }])
+                ->orderBy('name')
+                ->get();
+            $fuelSlips = FuelSlip::latest()->get(); // Keep for backward compatibility
+        } else {
+            // For boardmember: fetch only their fuel slips
+            $fuelSlips = FuelSlip::where('user_id', $user->id)->latest()->get();
+            $boardmembers = collect(); // Empty collection for boardmember view
+        }
 
-        return view('fuel_slips.index', compact('fuelSlips'));
+        return view('fuel_slips.index', compact('fuelSlips', 'boardmembers'));
     }
 
     public function create()
@@ -62,6 +72,7 @@ class FuelSlipController extends Controller
             abort(403);
         }
         $request->validate([
+            'boardmember_id' => 'required|exists:users,id',
             'vehicle_id' => 'nullable|exists:vehicles,id',
             'vehicle_name' => 'required_without:vehicle_id|string|max:255',
             'plate_number' => 'required_without:vehicle_id|string|max:50',
@@ -78,7 +89,7 @@ class FuelSlipController extends Controller
         }
 
         FuelSlip::create([
-            'user_id' => Auth::id(),
+            'user_id' => $request->boardmember_id,
             'vehicle_id' => $selectedVehicle?->id,
             'vehicle_name' => $selectedVehicle?->vehicle_name ?? $request->vehicle_name,
             'plate_number' => $selectedVehicle?->plate_number ?? $request->plate_number,

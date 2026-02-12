@@ -16,8 +16,8 @@ class BM extends Model
         return $this->belongsTo(User::class);
     }
 
-    public function vehicle()
+    public function vehicles()
     {
-        return $this->hasOne(Vehicle::class);
+        return $this->hasMany(Vehicle::class, 'bm_id');
     }
 }

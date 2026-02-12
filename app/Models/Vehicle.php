@@ -37,4 +37,9 @@ class Vehicle extends Model
         $latestFuelSlip = $this->latestFuelSlip()->first();
         return $latestFuelSlip ? $latestFuelSlip->km_reading : $this->current_km;
     }
+
+    public function maintenances()
+    {
+        return $this->hasMany(Maintenance::class);
+    }
 }

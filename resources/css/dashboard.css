@@ -1,0 +1,88 @@
+/* Dashboard & Vehicles styles
+	 Matches the dashboard header table and vehicle card layout shown in the attachment.
+*/
+
+:root{
+	--accent-blue: #0b77d6;
+	--muted-bg: #f3f7fb;
+	--card-bg: #ffffff;
+	--soft-border: #e6eef8;
+	--muted-text: #6b7280;
+	--accent-orange: #ff9800;
+}
+
+/* Page header */
+.page-header{ display:flex; justify-content:space-between; align-items:center; padding:12px 0; }
+.page-header h2{ color:var(--accent-blue); }
+
+/* Top table header style (blue band) */
+.table-wrapper table thead tr th{
+	background: var(--accent-blue);
+	color: #fff;
+	padding: 16px 12px;
+	text-align: left;
+	font-weight:700;
+}
+
+.table-wrapper table{
+	width:100%;
+	border-collapse:collapse;
+}
+
+.table-wrapper table tbody tr.main-row td{
+	padding: 18px 12px;
+	border-bottom: 1px solid var(--soft-border);
+	background: #fff;
+}
+
+.details-row td{
+	background: var(--muted-bg);
+	padding: 20px;
+}
+
+/* Vehicle cards container inside expanded row */
+.vehicle-cards{
+	display:flex;
+	gap:18px;
+	flex-wrap:wrap;
+}
+
+.vehicle-card{
+	background:var(--card-bg);
+	border-radius:10px;
+	box-shadow: 0 2px 6px rgba(15,23,42,0.06);
+	padding:18px;
+	min-width:300px;
+	flex:1 1 300px;
+	border:1px solid var(--soft-border);
+}
+
+.vehicle-header{
+	display:flex;
+	justify-content:space-between;
+	align-items:center;
+	margin-bottom:12px;
+}
+
+.vehicle-header strong{ font-size:16px; }
+.vehicle-header .plate{ color:var(--muted-text); font-weight:600; margin-left:8px; }
+
+.vehicle-body{ color:var(--muted-text); font-size:14px; }
+
+/* KPI style inside vehicle card */
+.vehicle-card .kpi-row{ display:flex; gap:12px; margin-top:14px; }
+.vehicle-card .kpi{ background:#f1f6fa; padding:18px; border-radius:8px; flex:1 1 150px; text-align:center; }
+.vehicle-card .kpi small{ display:block; color:var(--muted-text); }
+.vehicle-card .kpi .amount{ display:block; font-weight:700; margin-top:8px; }
+
+.empty-message{ color:var(--muted-text); padding:12px 0; }
+
+.btn-edit, .btn-delete{ display:inline-block; padding:6px 10px; border-radius:6px; text-decoration:none; font-size:13px; }
+.btn-edit{ color:var(--accent-blue); }
+.btn-delete{ color:#c53030; }
+
+/* Make register btn float right in header */
+.page-header .btn-primary{ background:var(--accent-orange); color:#fff; border-radius:6px; padding:8px 12px; }
+
+@media (max-width:720px){ .vehicle-cards{ flex-direction:column; } }
+

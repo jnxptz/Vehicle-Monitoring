@@ -33,7 +33,7 @@
         <div class="dashboard-container">
             <div class="page-header">
                 <h2>Offices</h2>
-                <a href="{{ route('offices.create') }}" class="btn-primary btn-sm">+ Create Office</a>
+                <button onclick="openOfficeModal()" class="btn-primary btn-sm">+ Create Office</button>
             </div>
 
             @if (session('success'))
@@ -52,41 +52,37 @@
 
             <div class="form-card" style="overflow-x: auto;">
                 @if($offices->count() > 0)
-                    <table style="width: 100%; border-collapse: collapse;">
+                    <table class="office-table">
                         <thead>
-                            <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                                <th style="padding: 12px; text-align: left;">Office Name</th>
-                                <th style="padding: 12px; text-align: left;">Address</th>
-                                <th style="padding: 12px; text-align: center;">Vehicles</th>
-                                <th style="padding: 12px; text-align: center;">Boardmembers</th>
-                                <th style="padding: 12px; text-align: center;">Actions</th>
+                            <tr>
+                                <th>Office Name</th>
+                                <th>Address</th>
+                                <th style="text-align:center;">Vehicles</th>
+                                <th style="text-align:center;">Boardmembers</th>
+                                <th style="text-align:center;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
                             @foreach($offices as $office)
-                                <tr style="border-bottom: 1px solid #dee2e6;">
-                                    <td style="padding: 12px;">
+                                <tr>
+                                    <td>
                                         <strong>{{ $office->name }}</strong>
                                     </td>
-                                    <td style="padding: 12px; color: #666;">
+                                    <td class="text-muted">
                                         {{ $office->address ?? '—' }}
                                     </td>
-                                    <td style="padding: 12px; text-align: center;">
-                                        <span style="background: #e7f3ff; color: #0056b3; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
-                                            {{ $office->vehicles_count }}
-                                        </span>
+                                    <td style="text-align:center;">
+                                        <span class="badge badge--info">{{ $office->vehicles_count }}</span>
                                     </td>
-                                    <td style="padding: 12px; text-align: center;">
-                                        <span style="background: #fff3cd; color: #856404; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
-                                            {{ $office->users_count }}
-                                        </span>
+                                    <td style="text-align:center;">
+                                        <span class="badge badge--warn">{{ $office->users_count }}</span>
                                     </td>
-                                    <td style="padding: 12px; text-align: center;">
-                                        <a href="{{ route('offices.edit', $office->id) }}" style="color: #007bff; text-decoration: none; margin-right: 12px;">Edit</a>
+                                    <td style="text-align:center;">
+                                        <a href="{{ route('offices.edit', $office->id) }}" class="link-edit">Edit</a>
                                         <form action="{{ route('offices.destroy', $office->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this office?');">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" style="color: #dc3545; text-decoration: none; background: none; border: none; cursor: pointer; padding: 0;">Delete</button>
+                                            <button type="submit" class="link-delete">Delete</button>
                                         </form>
                                     </td>
                                 </tr>
@@ -101,9 +97,56 @@
             </div>
 
             <div style="margin-top: 20px;">
-                <a href="{{ route('admin.dashboard') }}" class="btn-primary" style="text-decoration: none; display: inline-block;">← Back to Dashboard</a>
+                <a href="{{ route('admin.dashboard') }}" class="btn-primary">← Back to Dashboard</a>
             </div>
         </div>
+    </div>
+</div>
+
+<script>
+    function openOfficeModal() {
+        document.getElementById('officeModal').style.display = 'block';
+    }
+
+    function closeOfficeModal() {
+        document.getElementById('officeModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('officeModal');
+        if (event.target === modal) {
+            closeOfficeModal();
+        }
+    }
+</script>
+
+<!-- Office Modal -->
+<div id="officeModal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
+    <div style="background-color:#fefefe; margin:10% auto; padding:30px; border:1px solid #888; border-radius:8px; width:90%; max-width:500px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h2 style="margin:0;">Create Office</h2>
+            <span onclick="closeOfficeModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+        </div>
+
+        <form action="{{ route('offices.store') }}" method="POST">
+            @csrf
+
+            <label for="name" style="display:block; margin-bottom:12px; font-weight:600;">Office Name:</label>
+            <input id="name" type="text" name="name" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;" placeholder="e.g., Pangasinan Office">
+
+            <label for="address" style="display:block; margin-bottom:12px; font-weight:600;">Address (optional):</label>
+            <textarea id="address" name="address" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;" placeholder="Enter office address"></textarea>
+
+            <button type="submit" style="background:#007bff; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:600;">Create Office</button>
+        </form>
+
+        @if ($errors->any())
+            <div style="margin-top:20px; background:#f8d7da; border:1px solid #f5c6cb; color:#721c24; padding:12px; border-radius:4px;">
+                @foreach ($errors->all() as $error)
+                    <div>{{ $error }}</div>
+                @endforeach
+            </div>
+        @endif
     </div>
 </div>
 @endsection

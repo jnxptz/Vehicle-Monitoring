@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class User extends Authenticatable
 {
@@ -25,9 +24,9 @@ class User extends Authenticatable
         'remember_token',
     ];
 
-    public function vehicle(): HasOne
+    public function vehicles(): HasMany
     {
-        return $this->hasOne(Vehicle::class, 'bm_id');
+        return $this->hasMany(Vehicle::class, 'bm_id');
     }
 
     public function office()
@@ -38,5 +37,11 @@ class User extends Authenticatable
     public function fuelSlips(): HasMany
     {
         return $this->hasMany(FuelSlip::class);
+    }
+
+    public function maintenances()
+    {
+        // Maintenances through vehicles
+        return Maintenance::whereIn('vehicle_id', $this->vehicles()->pluck('id'))->latest();
     }
 }

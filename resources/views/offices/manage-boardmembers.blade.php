@@ -38,50 +38,53 @@
             </div>
 
             @if (session('success'))
-                <div style="background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
-                    {{ session('success') }}
+                <div style="background: #d1e7dd; border: 1px solid #badbcc; color: #0f5132; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px; font-size: 14px;">
+                    <strong>✓ Success:</strong> {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
-                <ul class="error-list">
-                    @foreach ($errors->all() as $error)
-                        <li>{{ $error }}</li>
-                    @endforeach
-                </ul>
+                <div style="background: #f8d7da; border: 1px solid #f5c2c7; color: #842029; padding: 12px 16px; border-radius: 6px; margin-bottom: 20px;">
+                    <strong>⚠ Error:</strong>
+                    <ul style="margin: 8px 0 0 0; padding-left: 20px;">
+                        @foreach ($errors->all() as $error)
+                            <li>{{ $error }}</li>
+                        @endforeach
+                    </ul>
+                </div>
             @endif
 
-            <div class="form-card" style="overflow-x: auto;">
-                <table style="width: 100%; border-collapse: collapse;">
+            <div style="overflow-x: auto; padding: 24px;">
+                <table style="width: 100%; border-collapse: collapse; font-size: 15px;">
                     <thead>
-                        <tr style="background: #f8f9fa; border-bottom: 2px solid #dee2e6;">
-                            <th style="padding: 12px; text-align: left;">Boardmember Name</th>
-                            <th style="padding: 12px; text-align: left;">Current Office</th>
-                            <th style="padding: 12px; text-align: left;">Assign Office</th>
-                            <th style="padding: 12px; text-align: center;">Action</th>
+                        <tr style="background: #0b77d6; border-bottom: 2px solid #0b77d6;">
+                            <th style="padding: 14px 16px; text-align: left; color: white; font-weight: 600;">Boardmember Name</th>
+                            <th style="padding: 14px 16px; text-align: left; color: white; font-weight: 600;">Current Office</th>
+                            <th style="padding: 14px 16px; text-align: left; color: white; font-weight: 600;">Assign Office</th>
+                            <th style="padding: 14px 16px; text-align: center; color: white; font-weight: 600;">Status</th>
                         </tr>
                     </thead>
                     <tbody>
                         @forelse($boardmembers as $boardmember)
-                            <tr style="border-bottom: 1px solid #dee2e6;">
-                                <td style="padding: 12px;">
-                                    <strong>{{ $boardmember->name }}</strong><br>
-                                    <small style="color: #666;">{{ $boardmember->email }}</small>
+                            <tr style="border-bottom: 1px solid #e6eef8; background: #fff; transition: background 0.2s;">
+                                <td style="padding: 14px 16px;">
+                                    <strong style="color: #1a202c;">{{ $boardmember->name }}</strong><br>
+                                    <small style="color: #999; font-size: 13px;">{{ $boardmember->email }}</small>
                                 </td>
-                                <td style="padding: 12px;">
+                                <td style="padding: 14px 16px;">
                                     @if($boardmember->office)
-                                        <span style="background: #e7f3ff; color: #0056b3; padding: 4px 8px; border-radius: 3px; font-size: 12px;">
+                                        <span style="background: #e7f3ff; color: #0056b3; padding: 6px 10px; border-radius: 4px; font-size: 13px; font-weight: 500;">
                                             {{ $boardmember->office->name }}
                                         </span>
                                     @else
-                                        <span style="color: #dc3545; font-weight: bold;">Not Assigned</span>
+                                        <span style="color: #999; font-style: italic;">—</span>
                                     @endif
                                 </td>
-                                <td style="padding: 12px;">
-                                    <form action="{{ route('offices.assign-boardmember', $boardmember->id) }}" method="POST" style="display: flex; gap: 8px;">
+                                <td style="padding: 14px 16px;">
+                                    <form action="{{ route('offices.assign-boardmember', $boardmember->id) }}" method="POST" style="display: flex; gap: 10px; align-items: center;">
                                         @csrf
                                         @method('PUT')
-                                        <select name="office_id" required style="flex: 1; padding: 6px 8px; border: 1px solid #ddd; border-radius: 4px;">
+                                        <select name="office_id" required style="flex: 1; min-width: 160px; padding: 8px 12px; border: 1px solid #d0d7de; border-radius: 4px; font-size: 14px; background: white; cursor: pointer;">
                                             <option value="">-- Select Office --</option>
                                             @foreach($offices as $office)
                                                 <option value="{{ $office->id }}" {{ $boardmember->office_id === $office->id ? 'selected' : '' }}>
@@ -89,23 +92,23 @@
                                                 </option>
                                             @endforeach
                                         </select>
-                                        <button type="submit" style="padding: 6px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                                        <button type="submit" style="padding: 8px 18px; background: #0b77d6; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 500; font-size: 14px; white-space: nowrap; transition: background 0.2s;" onmouseover="this.style.background='#0a5fa8'" onmouseout="this.style.background='#0b77d6'">
                                             Save
                                         </button>
                                     </form>
                                 </td>
-                                <td style="padding: 12px; text-align: center;">
+                                <td style="padding: 14px 16px; text-align: center;">
                                     @if($boardmember->office)
-                                        <span style="color: #28a745;">✓ Assigned</span>
+                                        <span style="color: #22863a; font-weight: 600; font-size: 13px;">✓ Assigned</span>
                                     @else
-                                        <span style="color: #dc3545;">✗ No Office</span>
+                                        <span style="color: #cb2431; font-weight: 600; font-size: 13px;">✗ Pending</span>
                                     @endif
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="4" style="padding: 20px; text-align: center; color: #666;">
-                                    No boardmembers found in the system.
+                                <td colspan="4" style="padding: 32px 16px; text-align: center; color: #999;">
+                                    <p style="font-size: 15px;">No boardmembers found in the system.</p>
                                 </td>
                             </tr>
                         @endforelse
@@ -113,8 +116,10 @@
                 </table>
             </div>
 
-            <div style="margin-top: 20px;">
-                <a href="{{ route('admin.dashboard') }}" class="btn-primary" style="text-decoration: none; display: inline-block;">← Back to Dashboard</a>
+            <div style="margin-top: 24px; display: flex; gap: 12px;">
+                <a href="{{ route('admin.dashboard') }}" style="padding: 10px 18px; background: #f3f4f6; color: #1a202c; border: 1px solid #d0d7de; border-radius: 4px; text-decoration: none; font-weight: 500; cursor: pointer; transition: all 0.2s;" onmouseover="this.style.background='#e5e7eb'" onmouseout="this.style.background='#f3f4f6'">
+                    ← Back to Dashboard
+                </a>
             </div>
         </div>
     </div>
