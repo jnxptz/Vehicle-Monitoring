@@ -75,7 +75,7 @@
                 </div>
 
                 <div class="kpi-card">
-                    <h4>Total Used (YTD)</h4>
+                    <h4>Total Used</h4>
                     <p>₱{{ number_format($rows->sum('totalUsed'),2) }}</p>
                 </div>
 

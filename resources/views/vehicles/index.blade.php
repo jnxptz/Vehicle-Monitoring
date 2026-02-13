@@ -11,7 +11,7 @@
             <h1>Admin Dashboard</h1>
         </div>
 
-        {{-- Sidebar --}}
+        {{-- Sidebar
         <div class="hamburger-menu-wrapper">
             <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
             <label for="hamburger-toggle" class="hamburger-btn">
@@ -31,16 +31,19 @@
                     </form>
                 </div>
             </nav>
-        </div>
+        </div> --}}
     </div>
 
     <div class="dashboard-body">
 
         <nav class="dashboard-nav">
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+            <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Boardmembers</a>
+
             <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
                 <form action="{{ route('logout') }}" method="POST" class="logout-form">
                     @csrf
@@ -90,11 +93,11 @@
                                                     <div class="vehicle-header">
                                                         <strong>{{ $vehicle->vehicle_name ?? $vehicle->plate_number }}</strong>
                                                         <div class="card-actions">
-                                                            <button onclick="openEditModal({{ $vehicle->id }}, '{{ addslashes($vehicle->plate_number) }}', {{ $vehicle->monthly_fuel_limit }}, {{ $vehicle->current_km ?? 0 }})" class="btn-edit" style="background:none; border:none; color:#0b77d6; cursor:pointer; padding:0; text-decoration:underline;">Edit</button>
+                                                            <button onclick="openEditModal({{ $vehicle->id }}, '{{ addslashes($vehicle->plate_number) }}', {{ $vehicle->monthly_fuel_limit }}, {{ $vehicle->current_km ?? 0 }})" style="background:#0b77d6; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600;">Edit</button>
                                                             <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST" style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" onclick="return confirm('Are you sure you want to delete this vehicle?')" class="btn-delete">Delete</button>
+                                                                <button type="submit" onclick="return confirm('Are you sure you want to delete this vehicle?')" style="background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; margin-left:8px;">Delete</button>
                                                             </form>
                                                         </div>
                                                     </div>
@@ -110,34 +113,6 @@
                                                             <div class="kpi">
                                                                 <small>Maintenance YTD</small>
                                                                 <span class="amount">{{ '₱' . number_format(($vehicle->maintenances->sum('cost') ?? 0), 2) }}</span>
-                                                            </div>
-                                                        </div>
-                                                        <div style="margin-top:12px;">
-                                                            <a href="javascript:void(0)" onclick="toggleFuelList({{ $vehicle->id }})" style="color:#0b77d6; text-decoration:underline; font-size:13px;">View recent fuel slips</a>
-                                                            <div id="fuel-{{ $vehicle->id }}" style="display:none; margin-top:8px;">
-                                                                @php $recentFuel = $vehicle->fuelSlips->sortByDesc('date')->take(10); @endphp
-                                                                @if($recentFuel->count() > 0)
-                                                                    <table style="width:100%; border-collapse:collapse; font-size:13px;">
-                                                                        <thead>
-                                                                            <tr style="background:#f1f5f9;">
-                                                                                <th style="padding:8px; text-align:left;">Date</th>
-                                                                                <th style="padding:8px; text-align:right;">Liters</th>
-                                                                                <th style="padding:8px; text-align:right;">Cost</th>
-                                                                            </tr>
-                                                                        </thead>
-                                                                        <tbody>
-                                                                            @foreach($recentFuel as $fs)
-                                                                                <tr>
-                                                                                    <td style="padding:8px;">{{ $fs->date->format('Y-m-d') }}</td>
-                                                                                    <td style="padding:8px; text-align:right;">{{ number_format($fs->liters,2) }}</td>
-                                                                                    <td style="padding:8px; text-align:right;">₱{{ number_format($fs->cost,2) }}</td>
-                                                                                </tr>
-                                                                            @endforeach
-                                                                        </tbody>
-                                                                    </table>
-                                                                @else
-                                                                    <div style="color:#6b7280; font-size:13px;">No fuel slips recorded.</div>
-                                                                @endif
                                                             </div>
                                                         </div>
                                                     </div>

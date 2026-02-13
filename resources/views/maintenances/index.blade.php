@@ -15,7 +15,7 @@
                 <h1>Admin Dashboard</h1>
             </div>
 
-            {{-- Sidebar --}}
+            {{-- Sidebar 
             <div class="hamburger-menu-wrapper">
                 <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
                 <label for="hamburger-toggle" class="hamburger-btn">
@@ -25,9 +25,11 @@
                 </label>
                 <nav class="hamburger-dropdown">
                     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                    <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Boardmembers</a>
                     <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
@@ -35,16 +37,18 @@
                         </form>
                     </div>
                 </nav>
-            </div>
+            </div>--}}
         </div>
 
         <div class="dashboard-body">
 
             <nav class="dashboard-nav">
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Boardmembers</a>
                 <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
                         @csrf
@@ -157,38 +161,27 @@
                                             <td colspan="3">
                                                 <div style="overflow-x:auto;">
                                                     @if($totalMaint > 0)
-                                                        <table style="width:100%; border-collapse:collapse; font-size:14px;">
-                                                            <thead>
-                                                                <tr style="background:#0b77d6; color:#fff;">
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">Vehicle</th>
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">Type</th>
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">KM</th>
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">Operation(s)</th>
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">Cost</th>
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">Date</th>
-                                                                    <th style="padding:12px; text-align:left; font-weight:600;">Actions</th>
-                                                                </tr>
-                                                            </thead>
-                                                            <tbody>
-                                                                @foreach($bm->vehicles as $vehicle)
-                                                                    @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
-                                                                        @foreach($vehicle->maintenances as $m)
-                                                                            <tr style="border-bottom:1px solid #e6eef8; background:#fff;">
-                                                                                <td style="padding:12px;">{{ $vehicle->plate_number }}</td>
-                                                                                <td style="padding:12px;">{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
-                                                                                <td style="padding:12px;">{{ $m->maintenance_km ?? '—' }}</td>
-                                                                                <td style="padding:12px; max-width:200px; white-space:normal;">{{ Str::limit($m->operation, 80, '...') }}</td>
-                                                                                <td style="padding:12px;">₱{{ number_format((float) $m->cost, 2) }}</td>
-                                                                                <td style="padding:12px;">{{ $m->date }}</td>
-                                                                                <td style="padding:12px;">
-                                                                                    <a href="{{ route('maintenances.exportPDF', $m->id) }}" class="btn-edit" style="color:#0b77d6; text-decoration:underline;">PDF</a>
-                                                                                </td>
-                                                                            </tr>
-                                                                        @endforeach
-                                                                    @endif
-                                                                @endforeach
-                                                            </tbody>
-                                                        </table>
+                                                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
+                                                            @foreach($bm->vehicles as $vehicle)
+                                                                @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
+                                                                    @foreach($vehicle->maintenances as $m)
+                                                                        <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                                                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                                                                <strong style="font-size:15px;">{{ $vehicle->plate_number }}</strong>
+                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background:#0b77d6; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
+                                                                            </div>
+                                                                            <div style="font-size:13px; line-height:1.8;">
+                                                                                <div><span style="color:#6b7280;">Type:</span> <strong>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</strong></div>
+                                                                                <div><span style="color:#6b7280;">KM:</span> {{ $m->maintenance_km ?? '—' }}</div>
+                                                                                <div><span style="color:#6b7280;">Operation(s):</span> {{ Str::limit($m->operation, 100, '...') }}</div>
+                                                                                <div><span style="color:#6b7280;">Cost:</span> <strong>₱{{ number_format((float) $m->cost, 2) }}</strong></div>
+                                                                                <div><span style="color:#6b7280;">Date:</span> {{ $m->date }}</div>
+                                                                            </div>
+                                                                        </div>
+                                                                    @endforeach
+                                                                @endif
+                                                            @endforeach
+                                                        </div>
                                                     @else
                                                         <div style="padding:12px; color:#6b7280;">No maintenances for this boardmember.</div>
                                                     @endif
