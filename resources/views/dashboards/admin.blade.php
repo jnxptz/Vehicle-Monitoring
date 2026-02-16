@@ -61,6 +61,10 @@
                         @endforeach
                     </select>
 
+                    <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn btn-primary">
+                        Export Monthly PDF
+                    </a>
+
                     <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn btn-primary">
                         Export Yearly PDF
                     </a>
@@ -131,8 +135,17 @@
                                 <td>{{ $index + 1 }}</td>
 
                                 <td>
-                                    <div class="name">{{ $row['user']->name }}</div>
-                                    <div class="email">{{ $row['user']->email }}</div>
+                                    <div style="display:flex;align-items:center;gap:8px;">
+                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleRow('{{ $rowId }}'); toggleIcon(this);" aria-expanded="false">
+                                            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M6 9l6 6 6-6" stroke="#0b2e66" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                            </svg>
+                                        </button>
+                                        <div>
+                                            <div class="name">{{ $row['user']->name }}</div>
+                                            <div class="email">{{ $row['user']->email }}</div>
+                                        </div>
+                                    </div>
                                 </td>
 
                                 <td>
@@ -181,14 +194,14 @@
 
                                                     <div class="vehicle-stats">
                                                         <div class="stat">
-                                                            <div class="label">Fuel YTD</div>
+                                                            <div class="label">Fuel</div>
                                                             <div class="value">
                                                                 ₱{{ number_format($v['fuelSlipCost'],2) }}
                                                             </div>
                                                         </div>
 
                                                         <div class="stat">
-                                                            <div class="label">Maintenance YTD</div>
+                                                            <div class="label">Maintenance</div>
                                                             <div class="value">
                                                                 ₱{{ number_format($v['maintenanceCost'],2) }}
                                                             </div>
@@ -248,6 +261,13 @@
 
 .stat .label { font-size:11px;color:#64748b; }
 .stat .value { font-weight:600;color:#0f172a; }
+.expand-btn{background:transparent;border:none;padding:4px;border-radius:6px;cursor:pointer}
+.expand-btn .chev{transition:transform .18s ease}
+.expand-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
+.clickable-row{cursor:pointer}
+.clickable-row:hover{background:#f8fafc}
+.expand-btn:hover{background:rgba(11,46,102,0.04)}
+.expand-btn:focus{outline:none;box-shadow:0 0 0 3px rgba(11,46,102,0.08)}
 </style>
 
 <script>
@@ -257,6 +277,11 @@ function toggleRow(rowId) {
 
     const isVisible = detailsRow.style.display === 'table-row';
     detailsRow.style.display = isVisible ? 'none' : 'table-row';
+}
+
+function toggleIcon(btn) {
+    const expanded = btn.getAttribute('aria-expanded') === 'true';
+    btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
 }
 </script>
 

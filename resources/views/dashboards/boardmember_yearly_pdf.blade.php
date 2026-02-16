@@ -69,7 +69,7 @@
 
     <h2>Yearly Budget Overview</h2>
     <div><strong>Yearly Budget:</strong> ₱{{ number_format($yearlyBudget, 2) }}</div>
-    <div><strong>Total Used (YTD):</strong> ₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</div>
+    <div><strong>Total Used:</strong> ₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</div>
     <div><strong>Remaining Budget:</strong> ₱{{ number_format($remainingBudget, 2) }}</div>
     <div><strong>Budget Used:</strong> {{ $budgetUsedPercentage }}%</div>
 

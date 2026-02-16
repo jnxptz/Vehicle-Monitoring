@@ -107,16 +107,15 @@ class FuelSlipController extends Controller
     }
 
     public function exportPDF($id)
-{
-    $fuelSlip = FuelSlip::findOrFail($id); 
+    {
+        $fuelSlip = FuelSlip::findOrFail($id);
 
-   
-    if (auth()->user()->role === 'boardmember' && $fuelSlip->user_id !== auth()->id()) {
-        abort(403);
+        if (auth()->user()->role === 'boardmember' && $fuelSlip->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView('fuel_slips.pdf_template', compact('fuelSlip'))
+            ->download('fuel-slip-' . $fuelSlip->control_number . '.pdf');
     }
-
-    return \Barryvdh\DomPDF\Facade\Pdf::loadView('fuel_slips.pdf', compact('fuelSlip'))
-        ->download('fuel-slip-' . $fuelSlip->control_number . '.pdf');
-}
 
 }

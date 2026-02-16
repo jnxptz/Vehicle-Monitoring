@@ -56,9 +56,8 @@
                         <thead>
                             <tr>
                                 <th>Office Name</th>
-                                <th>Address</th>
                                 <th style="text-align:center;">Vehicles</th>
-                                <th style="text-align:center;">Boardmembers</th>
+                                <th style="text-align:center;">Users</th>
                                 <th style="text-align:center;">Actions</th>
                             </tr>
                         </thead>
@@ -68,9 +67,6 @@
                                     <td>
                                         <strong>{{ $office->name }}</strong>
                                     </td>
-                                    <td class="text-muted">
-                                        {{ $office->address ?? '—' }}
-                                    </td>
                                     <td style="text-align:center;">
                                         <span class="badge badge--info">{{ $office->vehicles_count }}</span>
                                     </td>
@@ -78,7 +74,7 @@
                                         <span class="badge badge--warn">{{ $office->users_count }}</span>
                                     </td>
                                     <td style="text-align:center;">
-                                        <a href="{{ route('offices.edit', $office->id) }}" class="link-edit">Edit</a>
+                                        <a href="javascript:void(0)" onclick="openEditOfficeModal({{ $office->id }}, '{{ $office->name }}', '{{ addslashes($office->address) }}')" class="link-edit">Edit</a>
                                         <form action="{{ route('offices.destroy', $office->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete this office?');">
                                             @csrf
                                             @method('DELETE')
@@ -106,6 +102,32 @@
 <script>
     function openOfficeModal() {
         document.getElementById('officeModal').style.display = 'block';
+        document.getElementById('officeForm').reset();
+        document.getElementById('officeForm').action = '{{ route('offices.store') }}';
+        document.getElementById('formTitle').innerText = 'Create Office';
+        document.getElementById('submitBtn').innerText = 'Create Office';
+        document.querySelector('input[name="_method"]')?.remove();
+    }
+
+    function openEditOfficeModal(id, name, address) {
+        document.getElementById('officeModal').style.display = 'block';
+        document.getElementById('name').value = name;
+        document.getElementById('address').value = address;
+        document.getElementById('officeForm').action = '/offices/' + id;
+        document.getElementById('formTitle').innerText = 'Edit Office';
+        document.getElementById('submitBtn').innerText = 'Update Office';
+        
+        // Add method override for PUT request
+        let methodInput = document.querySelector('input[name="_method"]');
+        if (!methodInput) {
+            methodInput = document.createElement('input');
+            methodInput.type = 'hidden';
+            methodInput.name = '_method';
+            methodInput.value = 'PUT';
+            document.getElementById('officeForm').appendChild(methodInput);
+        } else {
+            methodInput.value = 'PUT';
+        }
     }
 
     function closeOfficeModal() {
@@ -124,11 +146,11 @@
 <div id="officeModal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
     <div style="background-color:#fefefe; margin:10% auto; padding:30px; border:1px solid #888; border-radius:8px; width:90%; max-width:500px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">Create Office</h2>
+            <h2 id="formTitle" style="margin:0;">Create Office</h2>
             <span onclick="closeOfficeModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
         </div>
 
-        <form action="{{ route('offices.store') }}" method="POST">
+        <form id="officeForm" action="{{ route('offices.store') }}" method="POST">
             @csrf
 
             <label for="name" style="display:block; margin-bottom:12px; font-weight:600;">Office Name:</label>
@@ -137,7 +159,7 @@
             <label for="address" style="display:block; margin-bottom:12px; font-weight:600;">Address (optional):</label>
             <textarea id="address" name="address" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;" placeholder="Enter office address"></textarea>
 
-            <button type="submit" style="background:#007bff; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:600;">Create Office</button>
+            <button id="submitBtn" type="submit" style="background:#007bff; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:600;">Create Office</button>
         </form>
 
         @if ($errors->any())

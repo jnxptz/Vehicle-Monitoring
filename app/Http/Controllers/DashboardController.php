@@ -176,11 +176,15 @@ class DashboardController extends Controller
             $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
-            $latestKm = (int) FuelSlip::where('user_id', $user->id)->max('km_reading');
+            // Use latest km for this specific vehicle (not user's across all vehicles)
+            $latestKm = (int) FuelSlip::where('vehicle_id', $vehicle->id)->max('km_reading');
             $currentKm = max((int) ($vehicle->current_km ?? 0), $latestKm);
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
-            $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', now()->year)->sum('cost');
+            // Sum maintenance costs across all vehicles for this boardmember so the
+            // boardmember view reflects total spend (matches admin view behavior).
+            $vehicleIds = $vehicles->pluck('id')->toArray();
+            $maintenanceCost = Maintenance::whereIn('vehicle_id', $vehicleIds)->whereYear('date', now()->year)->sum('cost');
 
             $totalUsed = $fuelCost + $maintenanceCost;
             $remainingBudget = $yearlyBudget - $totalUsed;
@@ -207,13 +211,26 @@ class DashboardController extends Controller
                 $alerts[] = "No fuel recorded for {$selectedMonthName}.";
             }
 
-            $lastPreventiveKm = (int) Maintenance::where('vehicle_id', $vehicle->id)
-                ->where('maintenance_type', 'preventive')
-                ->orderByDesc('maintenance_km')->value('maintenance_km');
+            // Treat the latest maintenance (any type) as the last preventive checkpoint.
+            // If the latest maintenance record lacks `maintenance_km`, fall back to the highest known maintenance_km.
+            $lastMaintenance = Maintenance::where('vehicle_id', $vehicle->id)
+                ->latest('date')
+                ->first();
 
-            $nextDueKm = ($lastPreventiveKm > 0) ? ($lastPreventiveKm + 5000) : 5000;
+            $lastMaintenanceKm = $lastMaintenance?->maintenance_km ? (int) $lastMaintenance->maintenance_km : null;
+
+            if (is_null($lastMaintenanceKm)) {
+                $maxKm = Maintenance::where('vehicle_id', $vehicle->id)
+                    ->whereNotNull('maintenance_km')
+                    ->max('maintenance_km');
+                $lastMaintenanceKm = $maxKm ? (int) $maxKm : 0;
+            }
+
+            $lastMaintenanceType = $lastMaintenance?->maintenance_type ?? 'N/A';
+
+            $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
             if ($currentKm >= $nextDueKm) {
-                $alerts[] = "Preventive maintenance due: last at {$lastPreventiveKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
+                $alerts[] = "Preventive maintenance due: last ({$lastMaintenanceType}) at {$lastMaintenanceKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
             }
 
             $maintenanceOverview = Maintenance::where('vehicle_id', $vehicle->id)->latest('date')->take(5)->get();
@@ -472,4 +489,117 @@ class DashboardController extends Controller
         $filename = 'admin-dashboard-yearly-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
         return $pdf->download($filename);
     }
+
+    /**
+     * Export admin monthly PDF
+     */
+    public function exportAdminMonthlyPdf(Request $request)
+    {
+        $selectedMonth = (int) $request->input('month', now()->month);
+        $selectedMonth = ($selectedMonth >= 1 && $selectedMonth <= 12) ? $selectedMonth : now()->month;
+        $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
+        $year = (int) $request->input('year', now()->year);
+        
+        $selectedOffice = $request->input('office', null);
+        $offices = Office::orderBy('name')->get();
+        $officeName = '';
+
+        $query = User::where('role', 'boardmember')
+            ->with(['vehicles', 'office.vehicles']);
+        
+        if ($selectedOffice) {
+            $query->where('office_id', $selectedOffice);
+            $officeName = Office::find($selectedOffice)?->name ?? '';
+        }
+        
+        $boardmembers = $query->orderBy('name')->get();
+        $ids = $boardmembers->pluck('id');
+
+        $totalCostByUser = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
+            ->selectRaw('user_id, SUM(cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
+
+        $maintenanceByVehicle = Maintenance::whereYear('date', $year)
+            ->selectRaw('vehicle_id, SUM(cost) as total_cost')->groupBy('vehicle_id')->pluck('total_cost', 'vehicle_id');
+
+        $monthlyLitersByUser = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
+            ->selectRaw('user_id, SUM(liters) as total_liters')->groupBy('user_id')->pluck('total_liters', 'user_id');
+
+        $monthlyCostByUser = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
+            ->selectRaw('user_id, SUM(cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
+
+        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $monthlyCostByUser, $selectedMonth) {
+            // Get all vehicles for this board member
+            $vehicles = $bm->vehicles()->get();
+            
+            $fuelCost = (float) ($totalCostByUser[$bm->id] ?? 0);
+            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            
+            // Get fuel slips per vehicle for this user
+            $year = now()->year;
+            $fuelSlipsByVehicle = FuelSlip::where('user_id', $bm->id)
+                ->whereYear('date', $year)
+                ->selectRaw('vehicle_id, SUM(cost) as total_cost, SUM(liters) as total_liters')
+                ->groupBy('vehicle_id')
+                ->pluck('total_cost', 'vehicle_id');
+            
+            // Calculate vehicle details
+            $vehiclesDetails = $vehicles->map(function($vehicle) use ($maintenanceByVehicle, $fuelSlipsByVehicle) {
+                $maintenanceCost = (float) ($maintenanceByVehicle[$vehicle->id] ?? 0);
+                $fuelSlipCost = (float) ($fuelSlipsByVehicle[$vehicle->id] ?? 0);
+                return [
+                    'vehicle' => $vehicle,
+                    'maintenanceCost' => $maintenanceCost,
+                    'fuelSlipCost' => $fuelSlipCost,
+                ];
+            })->toArray();
+            
+            // Calculate totals
+            $maintenanceCostTotal = collect($vehiclesDetails)->sum('maintenanceCost');
+            $totalUsed = $fuelCost + $maintenanceCostTotal;
+            $remainingBudget = $yearlyBudget - $totalUsed;
+            $budgetUsedPercentage = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
+
+            $monthlyLitersUsed = (float) ($monthlyLitersByUser[$bm->id] ?? 0);
+            $monthlyCostUsed = (float) ($monthlyCostByUser[$bm->id] ?? 0);
+
+            return [
+                'user' => $bm,
+                'vehicles' => $vehiclesDetails,
+                'yearlyBudget' => $yearlyBudget,
+                'totalUsed' => $totalUsed,
+                'remainingBudget' => $remainingBudget,
+                'budgetUsedPercentage' => $budgetUsedPercentage,
+                'monthlyLitersUsed' => $monthlyLitersUsed,
+                'monthlyCostUsed' => $monthlyCostUsed,
+                'fuelCost' => $fuelCost,
+                'maintenanceCostTotal' => $maintenanceCostTotal,
+            ];
+        });
+
+        // Get monthly statistics
+        $totalMonthlyLiters = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
+            ->sum('liters');
+        
+        $totalMonthlyCost = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
+            ->sum('cost');
+
+        // Generate PDF
+        $pdf = Pdf::loadView('dashboards.admin_monthly_pdf', compact(
+            'rows',
+            'selectedMonth',
+            'selectedMonthName',
+            'year',
+            'officeName',
+            'totalMonthlyLiters',
+            'totalMonthlyCost'
+        ));
+
+        $filename = 'admin-dashboard-' . $selectedMonthName . '-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
+        return $pdf->download($filename);
+    }
 }
+

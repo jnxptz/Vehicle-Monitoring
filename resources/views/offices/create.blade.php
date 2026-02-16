@@ -56,12 +56,7 @@
                         placeholder="e.g., Pangasinan Office"
                     >
 
-                    <label for="address">Address (optional):</label>
-                    <textarea
-                        id="address"
-                        name="address"
-                        placeholder="Enter office address"
-                    >{{ old('address') }}</textarea>
+
 
                     <button type="submit">Create Office</button>
                 </form>

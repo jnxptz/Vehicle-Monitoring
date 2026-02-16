@@ -107,7 +107,7 @@
                     </div>
 
                     <div class="kpi-card">
-                        <h4>Budget Used (YTD)</h4>
+                        <h4>Budget Used</h4>
                         <p>₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</p>
                     </div>
 

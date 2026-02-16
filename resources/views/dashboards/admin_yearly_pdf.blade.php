@@ -58,7 +58,7 @@
                 <tr>
                     <th>#</th>
                     <th>Vehicle</th>
-                    <th class="text-right">Liters (YTD)</th>
+                    <th class="text-right">Liters</th>
                 </tr>
             </thead>
             <tbody>

@@ -107,11 +107,11 @@
                                                         <div>Current KM: {{ $vehicle->latestFuelSlip?->km_reading ?? $vehicle->current_km ?? 0 }} km</div>
                                                         <div class="kpi-row">
                                                             <div class="kpi">
-                                                                <small>Fuel YTD</small>
+                                                                <small>Fuel</small>
                                                                 <span class="amount">{{ '₱' . number_format(($vehicle->fuelSlips->sum('cost') ?? 0), 2) }}</span>
                                                             </div>
                                                             <div class="kpi">
-                                                                <small>Maintenance YTD</small>
+                                                                <small>Maintenance</small>
                                                                 <span class="amount">{{ '₱' . number_format(($vehicle->maintenances->sum('cost') ?? 0), 2) }}</span>
                                                             </div>
                                                         </div>

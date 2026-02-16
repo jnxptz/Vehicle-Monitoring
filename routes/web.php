@@ -73,6 +73,11 @@ Route::get('/admin/dashboard/yearly-pdf', [DashboardController::class, 'exportAd
     ->middleware(['auth', 'role:admin'])
     ->name('admin.dashboard.yearly.pdf');
 
+// Admin monthly PDF export (fleet-wide)
+Route::get('/admin/dashboard/monthly-pdf', [DashboardController::class, 'exportAdminMonthlyPdf'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.dashboard.monthly.pdf');
+
 // --------------------
 // Admin-only routes
 // --------------------
