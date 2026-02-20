@@ -20,7 +20,7 @@
             <a href="{{ route('vehicles.index') }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}">Maintenances</a>
-            <a href="{{ route('offices.manage-boardmembers') }}">Manage Boardmembers</a>
+            <a href="{{ route('offices.manage-boardmembers') }}">Manage Users</a>
             <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
                 <form action="{{ route('logout') }}" method="POST" class="logout-form">
                     @csrf

@@ -86,6 +86,12 @@
                         <label for="date">Date:</label>
                         <input id="date" type="date" name="date" required value="{{ old('date') }}">
 
+                        <label for="prepared_by_name">Prepared by Name:</label>
+                        <input id="prepared_by_name" type="text" name="prepared_by_name" placeholder="Enter name of person who prepared" value="{{ old('prepared_by_name') }}">
+
+                        <label for="approved_by_name">Approved by Name:</label>
+                        <input id="approved_by_name" type="text" name="approved_by_name" placeholder="Enter name of person who approved" value="{{ old('approved_by_name') }}">
+
                         <button type="submit" class="btn-primary">Submit</button>
                     </form>
 

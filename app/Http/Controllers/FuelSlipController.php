@@ -81,6 +81,8 @@ class FuelSlipController extends Controller
             'km_reading' => 'required|integer|min:0',
             'driver' => 'required|string|max:255',
             'date' => 'required|date',
+            'prepared_by_name' => 'nullable|string|max:255',
+            'approved_by_name' => 'nullable|string|max:255',
         ]);
 
         $selectedVehicle = null;
@@ -99,6 +101,8 @@ class FuelSlipController extends Controller
             'driver' => $request->driver,
             'control_number' => $this->generateUniqueControlNumber(),
             'date' => $request->date,
+            'prepared_by_name' => $request->prepared_by_name,
+            'approved_by_name' => $request->approved_by_name,
         ]);
 
         $redirectRoute = auth()->user()->role === 'admin' ? 'admin.dashboard' : 'boardmember.dashboard';

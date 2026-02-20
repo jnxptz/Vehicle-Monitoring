@@ -31,15 +31,17 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logos">
-            <div style="flex:1; text-align:left;"><img src="{{ public_path('images/SP Seal.png') }}" alt="left-logo"></div>
-            <div style="flex:2; text-align:center;">
-                <div class="gov-title">Province of La Union</div>
-                <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
-                <div class="doc-title">FUEL/OIL SLIP</div>
-            </div>
-            <div style="flex:1; text-align:right;"><img src="{{ public_path('images/bmvslogo.png') }}" alt="right-logo"></div>
+    <div class="header" style="position:relative; padding-top:6px; margin-bottom:6px;">
+        <div class="logo-left" style="position:absolute; left:14px; top:0;">
+            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
+        </div>
+        <div class="logo-right" style="position:absolute; right:14px; top:0;">
+            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
+        </div>
+        <div style="text-align:center; max-width:720px; margin:0 auto;">
+            <div class="gov-title">Province of La Union</div>
+            <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
+            <div class="doc-title">FUEL/OIL SLIP</div>
         </div>
     </div>
 
@@ -96,32 +98,20 @@
                     <td style="width:50%; padding-right:20px; padding-bottom:12px; text-align:left; border:none;">
                         <strong>Prepared by:</strong>
                     </td>
-                    <td style="width:50%; padding-left:2px; padding-bottom:12px; text-align:right; border:none;">
+                    <td style="width:50%; padding-left:20px; padding-bottom:12px; text-align:left; border:none;">
                         <strong>Approved by:</strong>
                     </td>
                 </tr>
                 <tr>
-                    <td style="width:50%; padding-right:20px; padding-bottom:6px; text-align:left; border:none; font-size:12px;">
-                        SHERLY P. RABUT
+                    <td style="width:50%; padding-right:50px; padding-bottom:6px; text-align:center; border:none; font-size:12px; vertical-align:middle; padding-top:10px;">
+                        <div style="margin-bottom:6px;">{{ $fuelSlip->prepared_by_name ?? '' }}</div>
+                        <div style="border-top:2px solid #000; width:60%; margin:0 auto;"></div>
+                        <div style="margin-top:6px; font-size:11px;">Laborer I</div>
                     </td>
-                    <td style="width:50%; padding-left:20px; padding-bottom:6px; text-align:right; border:none; font-size:12px;">
-                        JANE T. FLORES, Ph.D.
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width:50%; padding-right:50px; padding-bottom:2px; text-align:center; border:none;">
-                        <div style="border-top:2px solid #000;"></div>
-                    </td>
-                    <td style="width:50%; padding-left:50px; padding-bottom:2px; text-align:center; border:none;">
-                        <div style="border-top:2px solid #000;"></div>
-                    </td>
-                </tr>
-                <tr>
-                    <td style="width:50%; padding-right:20px; padding-top:2px; text-align:left; border:none; font-size:11px;">
-                        <small>Laborer I</small>
-                    </td>
-                    <td style="width:50%; padding-left:20px; padding-top:2px; text-align:right; border:none; font-size:11px;">
-                        <small>Secretary to the Sangguniang</small>
+                    <td style="width:50%; padding-left:50px; padding-bottom:6px; text-align:center; border:none; font-size:12px; vertical-align:middle; padding-top:10px;">
+                        <div style="margin-bottom:6px;">{{ $fuelSlip->approved_by_name ?? '' }}</div>
+                        <div style="border-top:2px solid #000; width:60%; margin:0 auto;"></div>
+                        <div style="margin-top:6px; font-size:11px;">Secretary to the Sangguniang</div>
                     </td>
                 </tr>
             </table>

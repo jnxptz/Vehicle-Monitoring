@@ -2,6 +2,7 @@
 
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
 
 <div class="dashboard-page">
 
@@ -12,19 +13,41 @@
             <h1>Sangguniang Panlalawigan</h1>
         </div>
 
-        
+        {{-- Hamburger Menu (Mobile Only) --}}
+        <div class="hamburger-menu-wrapper">
+            <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+            <label for="hamburger-toggle" class="hamburger-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+            <nav class="hamburger-dropdown">
+                <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+                <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
+                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                        @csrf
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
+            </nav>
+        </div>
     </div>
 
     <div class="dashboard-body">
 
         <!-- SIDEBAR -->
         <nav class="dashboard-nav">
-            <a href="{{ route('admin.dashboard') }}">Dashboard</a>
-            <a href="{{ route('offices.index') }}">Offices</a>
-            <a href="{{ route('vehicles.index') }}">Vehicles</a>
-            <a href="{{ route('fuel-slips.index') }}">Fuel Slips</a>
-            <a href="{{ route('maintenances.index') }}">Maintenances</a>
-            <a href="{{ route('offices.manage-boardmembers') }}">Manage Boardmembers</a>
+            <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
+            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+            <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
+            <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+            <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+            <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
 
             <div style="margin-top:auto;border-top:1px solid #e2e8f0;padding-top:12px;">
                 <form action="{{ route('logout') }}" method="POST">
@@ -132,9 +155,9 @@
 
                             <!-- MAIN ROW -->
                             <tr onclick="toggleRow('{{ $rowId }}')" class="clickable-row">
-                                <td>{{ $index + 1 }}</td>
+                                <td data-label="#">{{ $index + 1 }}</td>
 
-                                <td>
+                                <td data-label="Boardmember">
                                     <div style="display:flex;align-items:center;gap:8px;">
                                         <button class="expand-btn" onclick="event.stopPropagation(); toggleRow('{{ $rowId }}'); toggleIcon(this);" aria-expanded="false">
                                             <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -148,7 +171,7 @@
                                     </div>
                                 </td>
 
-                                <td>
+                                <td data-label="Budget Usage">
                                     <div class="progress-wrapper">
                                         <div class="progress-bar">
                                             <div class="progress-fill"
@@ -163,10 +186,10 @@
                                     </div>
                                 </td>
 
-                                <td>₱{{ number_format($row['remainingBudget'],2) }}</td>
-                                <td>{{ number_format($row['monthlyLitersUsed'],2) }} L</td>
+                                <td data-label="Remaining">₱{{ number_format($row['remainingBudget'],2) }}</td>
+                                <td data-label="{{ $selectedMonthName }} Liters">{{ number_format($row['monthlyLitersUsed'],2) }} L</td>
 
-                                <td>
+                                <td data-label="Status">
                                     <span class="status-badge {{ $statusClass }}">
                                         {{ $status }}
                                     </span>
@@ -223,54 +246,21 @@
     </div>
 </div>
 
-<!-- STYLE -->
-<style>
-.details-row { display:none;background:#f8fafc; }
-.details-row td { padding:20px !important;border:none !important; }
-
-.vehicle-cards {
-    display:grid;
-    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
-    gap:16px;
-}
-
-.vehicle-card {
-    background:#fff;
-    border:1px solid #e5e7eb;
-    border-radius:12px;
-    padding:16px;
-    box-shadow:0 2px 6px rgba(0,0,0,0.05);
-    transition:0.2s;
-}
-
-.vehicle-card:hover { transform:translateY(-3px); }
-
-.vehicle-name { font-weight:600;color:#111827; }
-.vehicle-plate { font-size:13px;color:#6b7280;margin-left:6px; }
-.vehicle-limit { font-size:12px;color:#475569;margin-top:4px; }
-
-.vehicle-stats { display:flex;gap:10px;margin-top:12px; }
-
-.stat {
-    flex:1;
-    background:#f1f5f9;
-    padding:10px;
-    border-radius:8px;
-    text-align:center;
-}
-
-.stat .label { font-size:11px;color:#64748b; }
-.stat .value { font-weight:600;color:#0f172a; }
-.expand-btn{background:transparent;border:none;padding:4px;border-radius:6px;cursor:pointer}
-.expand-btn .chev{transition:transform .18s ease}
-.expand-btn[aria-expanded="true"] .chev{transform:rotate(180deg)}
-.clickable-row{cursor:pointer}
-.clickable-row:hover{background:#f8fafc}
-.expand-btn:hover{background:rgba(11,46,102,0.04)}
-.expand-btn:focus{outline:none;box-shadow:0 0 0 3px rgba(11,46,102,0.08)}
-</style>
-
 <script>
+// Close hamburger menu when a link is clicked
+document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
+    link.addEventListener('click', () => {
+        document.getElementById('hamburger-toggle').checked = false;
+    });
+});
+
+// Also handle form submission (logout)
+document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
+    form.addEventListener('submit', () => {
+        document.getElementById('hamburger-toggle').checked = false;
+    });
+});
+
 function toggleRow(rowId) {
     const detailsRow = document.getElementById(rowId + '-details');
     if (!detailsRow) return;

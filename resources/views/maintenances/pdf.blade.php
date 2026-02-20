@@ -29,15 +29,17 @@
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logos">
-            <div style="flex:1; text-align:left;"><img src="{{ public_path('images/SP Seal.png') }}" alt="left-logo"></div>
-            <div style="flex:2; text-align:center;">
-                <div class="gov-title">Province of La Union</div>
-                <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
-                <div class="doc-title">MAINTENANCE RECORD</div>
-            </div>
-            <div style="flex:1; text-align:right;"><img src="{{ public_path('images/bmvslogo.png') }}" alt="right-logo"></div>
+    <div class="header" style="position:relative; padding-top:6px; margin-bottom:6px;">
+        <div class="logo-left" style="position:absolute; left:14px; top:0;">
+            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
+        </div>
+        <div class="logo-right" style="position:absolute; right:14px; top:0;">
+            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
+        </div>
+        <div style="text-align:center; max-width:720px; margin:0 auto;">
+            <div class="gov-title">Province of La Union</div>
+            <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
+            <div class="doc-title">MAINTENANCE REPORT</div>
         </div>
     </div>
 

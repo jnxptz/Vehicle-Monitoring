@@ -17,10 +17,18 @@
     </style>
 </head>
 <body>
-    <div style="text-align:center; margin-bottom:6px;">
-        <img src="{{ public_path('images/SP Seal.png') }}" alt="Logo" style="height:96px; margin-bottom:4px;">
-        <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
-        <img src="{{ public_path('images/bmvslogo.png') }}" alt="Logo" style="height:64px; margin-bottom:4px;">
+    <div class="header" style="position:relative; padding-top:6px; margin-bottom:6px;">
+        <div class="logo-left" style="position:absolute; left:14px; top:0;">
+            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
+        </div>
+        <div class="logo-right" style="position:absolute; right:14px; top:0;">
+            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
+        </div>
+        <div style="text-align:center; max-width:720px; margin:0 auto;">
+            <div class="gov-title">Province of La Union</div>
+            <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
+            <div class="doc-title">FUEL/OIL SLIP</div>
+        </div>
     </div>
     <h1>Fuel Slip</h1>
 

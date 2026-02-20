@@ -48,7 +48,7 @@
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-            <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Boardmembers</a>
+            <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
             <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
                 <form action="{{ route('logout') }}" method="POST" class="logout-form">
                     @csrf
@@ -106,7 +106,7 @@
                                                             <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
                                                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                     <strong style="font-size:15px;">{{ $slip->vehicle_name }}</strong>
-                                                                    <a href="{{ route('fuel-slips.exportPDF', $slip->id) }}" class="btn-edit" style="color:#0b77d6; text-decoration:underline; font-size:13px;">PDF</a>
+                                                                    <a href="{{ route('fuel-slips.exportPDF', $slip->id) }}" style="background:#ff9b00; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
                                                                 </div>
                                                                 <div style="font-size:13px; line-height:1.8;">
                                                                     <div><span style="color:#6b7280;">Plate #:</span> <strong>{{ $slip->plate_number }}</strong></div>
@@ -335,6 +335,12 @@
 
             <label for="date" style="display:block; margin-bottom:12px; font-weight:600;">Date:</label>
             <input id="date" type="date" name="date" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
+
+            <label for="prepared_by_name" style="display:block; margin-bottom:12px; font-weight:600;">Prepared by Name:</label>
+            <input id="prepared_by_name" type="text" name="prepared_by_name" placeholder="Enter name of person who prepared" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
+
+            <label for="approved_by_name" style="display:block; margin-bottom:12px; font-weight:600;">Approved by Name:</label>
+            <input id="approved_by_name" type="text" name="approved_by_name" placeholder="Enter name of person who approved" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
 
             <button type="submit" style="background:#007bff; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:600;">Submit</button>
         </form>

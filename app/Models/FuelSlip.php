@@ -19,7 +19,9 @@ class FuelSlip extends Model
         'km_reading',
         'driver',
         'control_number',
-        'date'
+        'date',
+        'prepared_by_name',
+        'approved_by_name'
     ];
 
     /**
