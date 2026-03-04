@@ -70,6 +70,104 @@ Database Server
      ↓
 Vehicle Monitoring / Tracking Module
 
+
+---
+
+## 📘 User Manual
+
+### 1. Register User
+Create a new user account using the registration form.
+
+---
+
+### 2. User Dashboard (After Registration)
+After registration, the user dashboard displays:
+
+> **"No vehicle assigned to your account."**
+
+This indicates that the administrator has not yet assigned a vehicle.
+
+---
+
+### 3. Admin Dashboard
+The Admin Dashboard allows administrators to:
+
+- Export **Monthly** or **Yearly PDF Reports**
+- Filter offices
+- Monitor monthly budget expenses
+
+Users must first be assigned to an office.
+
+---
+
+### 4. Assign User to Office
+1. Open **Manage Users**
+2. Select a user
+3. Assign the appropriate office
+4. Save changes
+
+---
+
+### 5. Register a Vehicle
+1. Go to **Vehicles Tab**
+2. Click **Register Vehicle** (upper-right corner)
+3. Enter:
+   - Assigned User
+   - Vehicle Name
+   - Plate Number
+   - Driver
+4. Submit the form
+
+---
+
+### 6. Updated User Dashboard
+After vehicle assignment, the dashboard updates automatically.
+
+If no fuel records exist, the message appears:
+
+> **"No fuel recorded for the month."**
+
+---
+
+### 7. Fuel Slips and Maintenance Tabs
+These tabs are initially empty. Records appear after entries are created by the administrator.
+
+---
+
+### 8. Add Fuel Slip
+1. Open **Fuel Slips** tab
+2. Click **Add Fuel Slip**
+3. Fill out required information
+4. Save the record
+
+---
+
+### 9. Dashboard Updates
+After adding fuel or maintenance records, both **Admin** and **User dashboards** update automatically.
+
+---
+
+### 10. Maintenance Records
+Maintenance follows the same workflow as fuel slips:
+
+1. Open **Maintenance Tab**
+2. Add record
+3. Complete the form
+4. Save
+
+---
+
+## 👥 Contributors
+- **Project Master:** Janial M. Bacani  
+- **Assistant:** Clarisahaina R. Gonting  
+
+---
+
+## 📄 License
+This project is intended for **academic and institutional use**.
+
+You may modify and reuse this project with proper credit to the authors.
+
 ## 👥 Contributors
 
 Project Master: Janial M. Bacani
