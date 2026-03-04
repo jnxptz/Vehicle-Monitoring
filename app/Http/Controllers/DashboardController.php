@@ -25,7 +25,7 @@ class DashboardController extends Controller
 
         $fuelCost = FuelSlip::where('user_id', $userId)
             ->whereYear('date', $year)
-            ->sum('cost');
+            ->sum('total_cost');
 
         $maintenanceCost = Maintenance::where('vehicle_id', $vehicleId)
             ->whereYear('date', $year)
@@ -89,7 +89,7 @@ class DashboardController extends Controller
         $ids = $boardmembers->pluck('id');
 
         $totalCostByUser = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
-            ->selectRaw('user_id, SUM(cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
+            ->selectRaw('user_id, SUM(total_cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
         $maintenanceByVehicle = Maintenance::whereYear('date', $year)
             ->selectRaw('vehicle_id, SUM(cost) as total_cost')->groupBy('vehicle_id')->pluck('total_cost', 'vehicle_id');
@@ -109,7 +109,7 @@ class DashboardController extends Controller
             $year = now()->year;
             $fuelSlipsByVehicle = FuelSlip::where('user_id', $bm->id)
                 ->whereYear('date', $year)
-                ->selectRaw('vehicle_id, SUM(cost) as total_cost, SUM(liters) as total_liters')
+                ->selectRaw('vehicle_id, SUM(total_cost) as total_cost, SUM(liters) as total_liters')
                 ->groupBy('vehicle_id')
                 ->pluck('total_cost', 'vehicle_id');
             
@@ -157,7 +157,7 @@ class DashboardController extends Controller
         // fetch all vehicles for this boardmember so the view can list them
         $vehicles = $user->vehicles()->get();
         // prefer user's direct vehicle, otherwise use the first vehicle from their office
-        $vehicle = $user->vehicles()->first() ?? ($user->office?->vehicles()->first());
+        $vehicle = $user->vehicles()->first() ? $user->vehicles()->first() : ($user->office ? $user->office->vehicles()->first() : null);
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -180,7 +180,7 @@ class DashboardController extends Controller
             $latestKm = (int) FuelSlip::where('vehicle_id', $vehicle->id)->max('km_reading');
             $currentKm = max((int) ($vehicle->current_km ?? 0), $latestKm);
 
-            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
+            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
             // Sum maintenance costs across all vehicles for this boardmember so the
             // boardmember view reflects total spend (matches admin view behavior).
             $vehicleIds = $vehicles->pluck('id')->toArray();
@@ -217,7 +217,7 @@ class DashboardController extends Controller
                 ->latest('date')
                 ->first();
 
-            $lastMaintenanceKm = $lastMaintenance?->maintenance_km ? (int) $lastMaintenance->maintenance_km : null;
+            $lastMaintenanceKm = $lastMaintenance && $lastMaintenance->maintenance_km ? (int) $lastMaintenance->maintenance_km : null;
 
             if (is_null($lastMaintenanceKm)) {
                 $maxKm = Maintenance::where('vehicle_id', $vehicle->id)
@@ -226,7 +226,7 @@ class DashboardController extends Controller
                 $lastMaintenanceKm = $maxKm ? (int) $maxKm : 0;
             }
 
-            $lastMaintenanceType = $lastMaintenance?->maintenance_type ?? 'N/A';
+            $lastMaintenanceType = $lastMaintenance ? $lastMaintenance->maintenance_type : 'N/A';
 
             $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
             if ($currentKm >= $nextDueKm) {
@@ -260,7 +260,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         // prefer user's direct vehicle, otherwise use first vehicle from their office
-        $vehicle = $user->vehicles()->first() ?? ($user->office?->vehicles()->first());
+        $vehicle = $user->vehicles()->first() ? $user->vehicles()->first() : ($user->office ? $user->office->vehicles()->first() : null);
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -277,7 +277,7 @@ class DashboardController extends Controller
             $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
-            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
+            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
             $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', now()->year)->sum('cost');
 
             $totalUsed = $fuelCost + $maintenanceCost;
@@ -329,7 +329,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         // prefer user's direct vehicle, otherwise use first vehicle from their office
-        $vehicle = $user->vehicle ?? ($user->office?->vehicles()->first());
+        $vehicle = $user->vehicle ? $user->vehicle : ($user->office ? $user->office->vehicles()->first() : null);
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -342,7 +342,7 @@ class DashboardController extends Controller
             $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
-            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('cost');
+            $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
             $maintenanceCost = Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', now()->year)->sum('cost');
 
             $totalUsed = $fuelCost + $maintenanceCost;
@@ -359,7 +359,7 @@ class DashboardController extends Controller
                 $monthlyCost = FuelSlip::where('user_id', $user->id)
                     ->whereYear('date', now()->year)
                     ->whereMonth('date', $month)
-                    ->sum('cost');
+                    ->sum('total_cost');
 
                 $monthlyData[] = [
                     'month' => $monthName,
@@ -408,7 +408,7 @@ class DashboardController extends Controller
                 ->sum('liters');
             $monthlyCost = FuelSlip::whereYear('date', $year)
                 ->whereMonth('date', $month)
-                ->sum('cost');
+                ->sum('total_cost');
 
             $monthlyData[] = [
                 'month' => $monthName,
@@ -443,10 +443,10 @@ class DashboardController extends Controller
 
         $boardmembersData = $boardmembers->map(function ($bm) use ($year) {
             // prefer user's direct vehicle, otherwise fall back to their office's first vehicle
-            $vehicle = $bm->vehicle ?? ($bm->office?->vehicles->first() ?? null);
+            $vehicle = $bm->vehicle ? $bm->vehicle : ($bm->office ? $bm->office->vehicles->first() : null);
             $yearlyBudget = $vehicle ? self::YEARLY_BUDGET_DEFAULT : 0;
 
-            $fuelCost = FuelSlip::where('user_id', $bm->id)->whereYear('date', $year)->sum('cost');
+            $fuelCost = FuelSlip::where('user_id', $bm->id)->whereYear('date', $year)->sum('total_cost');
             $maintenanceCost = $vehicle ? Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', $year)->sum('cost') : 0;
             $totalUsed = $fuelCost + $maintenanceCost;
             $remaining = $yearlyBudget - $totalUsed;
@@ -509,14 +509,15 @@ class DashboardController extends Controller
         
         if ($selectedOffice) {
             $query->where('office_id', $selectedOffice);
-            $officeName = Office::find($selectedOffice)?->name ?? '';
+            $office = Office::find($selectedOffice);
+            $officeName = $office ? $office->name : '';
         }
         
         $boardmembers = $query->orderBy('name')->get();
         $ids = $boardmembers->pluck('id');
 
         $totalCostByUser = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
-            ->selectRaw('user_id, SUM(cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
+            ->selectRaw('user_id, SUM(total_cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
         $maintenanceByVehicle = Maintenance::whereYear('date', $year)
             ->selectRaw('vehicle_id, SUM(cost) as total_cost')->groupBy('vehicle_id')->pluck('total_cost', 'vehicle_id');
@@ -527,7 +528,7 @@ class DashboardController extends Controller
 
         $monthlyCostByUser = FuelSlip::whereIn('user_id', $ids)
             ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
-            ->selectRaw('user_id, SUM(cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
+            ->selectRaw('user_id, SUM(total_cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
         $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $monthlyCostByUser, $selectedMonth) {
             // Get all vehicles for this board member
@@ -540,7 +541,7 @@ class DashboardController extends Controller
             $year = now()->year;
             $fuelSlipsByVehicle = FuelSlip::where('user_id', $bm->id)
                 ->whereYear('date', $year)
-                ->selectRaw('vehicle_id, SUM(cost) as total_cost, SUM(liters) as total_liters')
+                ->selectRaw('vehicle_id, SUM(total_cost) as total_cost, SUM(liters) as total_liters')
                 ->groupBy('vehicle_id')
                 ->pluck('total_cost', 'vehicle_id');
             
@@ -585,11 +586,10 @@ class DashboardController extends Controller
         
         $totalMonthlyCost = FuelSlip::whereIn('user_id', $ids)
             ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
-            ->sum('cost');
+            ->sum('total_cost');
 
-        // Generate PDF
         $pdf = Pdf::loadView('dashboards.admin_monthly_pdf', compact(
-            'rows',
+            'boardmembersData',
             'selectedMonth',
             'selectedMonthName',
             'year',
@@ -598,7 +598,7 @@ class DashboardController extends Controller
             'totalMonthlyCost'
         ));
 
-        $filename = 'admin-dashboard-' . $selectedMonthName . '-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
+        $filename = 'admin-monthly-' . $selectedMonthName . '-' . $year . '.pdf';
         return $pdf->download($filename);
     }
 }

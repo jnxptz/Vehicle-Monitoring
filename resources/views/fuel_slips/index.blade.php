@@ -6,6 +6,24 @@
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 @endif
 
+<style>
+    /* Ensure hamburger menu is positioned correctly in header */
+    .dashboard-header .hamburger-menu-wrapper {
+        margin-left: auto;
+    }
+
+    /* Hide hamburger menu on desktop (larger screens) */
+    @media (min-width: 769px) {
+        .hamburger-menu-wrapper {
+            display: none !important;
+        }
+
+        .dashboard-nav {
+            display: flex !important;
+        }
+    }
+</style>
+
 @if(auth()->user()->role === 'admin')
     <div class="dashboard-page">
         {{-- Header --}}
@@ -15,7 +33,7 @@
                 <h1>Admin Dashboard</h1>
             </div>
 
-            {{-- Sidebar 
+            {{-- Hamburger Menu (Mobile/Tablet Only) --}}
             <div class="hamburger-menu-wrapper">
                 <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
                 <label for="hamburger-toggle" class="hamburger-btn">
@@ -29,15 +47,15 @@
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                    <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Boardmembers</a>
-                    <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
+                    <div style="border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 8px;">
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
                             <button type="submit" class="logout-btn">Logout</button>
                         </form>
                     </div>
                 </nav>
-            </div>--}}
+            </div>
         </div>
 
         <div class="dashboard-body">
@@ -111,7 +129,7 @@
                                                                 <div style="font-size:13px; line-height:1.8;">
                                                                     <div><span style="color:#6b7280;">Plate #:</span> <strong>{{ $slip->plate_number }}</strong></div>
                                                                     <div><span style="color:#6b7280;">Liters:</span> {{ $slip->liters }}</div>
-                                                                    <div><span style="color:#6b7280;">Cost:</span> <strong>₱{{ number_format($slip->cost, 2) }}</strong></div>
+                                                                    <div><span style="color:#6b7280;">Cost:</span> <strong>₱{{ number_format($slip->total_cost, 2) }}</strong></div>
                                                                     <div><span style="color:#6b7280;">KM:</span> {{ $slip->km_reading }}</div>
                                                                     <div><span style="color:#6b7280;">Driver:</span> {{ $slip->driver }}</div>
                                                                     <div><span style="color:#6b7280;">Date:</span> {{ $slip->date }}</div>
@@ -223,7 +241,7 @@
                                         <td>{{ $slip->vehicle_name }}</td>
                                         <td>{{ $slip->plate_number }}</td>
                                         <td>{{ $slip->liters }}</td>
-                                        <td>₱{{ number_format($slip->cost, 2) }}</td>
+                                        <td>₱{{ number_format($slip->total_cost, 2) }}</td>
                                         <td>{{ $slip->km_reading }}</td>
                                         <td>{{ $slip->driver }}</td>
                                         <td>{{ $slip->control_number }}</td>
@@ -248,14 +266,20 @@
     // Close hamburger menu when a link is clicked
     document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
         link.addEventListener('click', () => {
-            document.getElementById('hamburger-toggle').checked = false;
+            const hamburgerToggle = document.getElementById('hamburger-toggle');
+            if (hamburgerToggle) {
+                hamburgerToggle.checked = false;
+            }
         });
     });
 
     // Also handle form submission (logout)
     document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
         form.addEventListener('submit', () => {
-            document.getElementById('hamburger-toggle').checked = false;
+            const hamburgerToggle = document.getElementById('hamburger-toggle');
+            if (hamburgerToggle) {
+                hamburgerToggle.checked = false;
+            }
         });
     });
 
@@ -324,8 +348,11 @@
             <label for="liters" style="display:block; margin-bottom:12px; font-weight:600;">Liters:</label>
             <input id="liters" type="number" step="0.01" name="liters" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
 
-            <label for="cost" style="display:block; margin-bottom:12px; font-weight:600;">Cost:</label>
-            <input id="cost" type="number" step="0.01" name="cost" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
+            <label for="unit_cost" style="display:block; margin-bottom:12px; font-weight:600;">Unit Cost (₱ per liter):</label>
+            <input id="unit_cost" type="number" step="0.01" name="unit_cost" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
+
+            <label for="total_cost" style="display:block; margin-bottom:12px; font-weight:600;">Total Cost:</label>
+            <input id="total_cost" type="number" step="0.01" name="total_cost" readonly style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box; background-color:#f5f5f5;">
 
             <label for="km_reading" style="display:block; margin-bottom:12px; font-weight:600;">KM Reading:</label>
             <input id="km_reading" type="number" name="km_reading" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
@@ -360,6 +387,9 @@
     const vehicleSelect = document.getElementById('vehicle_id');
     const nameInput = document.getElementById('vehicle_name');
     const plateInput = document.getElementById('plate_number');
+    const litersInput = document.getElementById('liters');
+    const unitCostInput = document.getElementById('unit_cost');
+    const totalCostInput = document.getElementById('total_cost');
 
     function filterVehiclesByBoardmember(boardmemberId){
         const opts = vehicleSelect.querySelectorAll('option[data-boardmember]');
@@ -377,6 +407,13 @@
         plateInput.value = '';
     }
 
+    function calculateTotalCost() {
+        const liters = parseFloat(litersInput.value) || 0;
+        const unitCost = parseFloat(unitCostInput.value) || 0;
+        const totalCost = (liters * unitCost).toFixed(2);
+        totalCostInput.value = totalCost;
+    }
+
     boardmemberSelect && boardmemberSelect.addEventListener('change', function(){
         filterVehiclesByBoardmember(this.value);
     });
@@ -385,6 +422,11 @@
         nameInput.value = this.options[this.selectedIndex].getAttribute('data-name') || '';
         plateInput.value = this.options[this.selectedIndex].getAttribute('data-plate') || '';
     });
+
+    litersInput && litersInput.addEventListener('change', calculateTotalCost);
+    litersInput && litersInput.addEventListener('input', calculateTotalCost);
+    unitCostInput && unitCostInput.addEventListener('change', calculateTotalCost);
+    unitCostInput && unitCostInput.addEventListener('input', calculateTotalCost);
 
     // Populate vehicle options on page load
     const boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);

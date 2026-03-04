@@ -1,5 +1,6 @@
 <?php
 
+
 namespace App\Http\Controllers;
 
 use App\Models\FuelSlip;
@@ -77,7 +78,8 @@ class FuelSlipController extends Controller
             'vehicle_name' => 'required_without:vehicle_id|string|max:255',
             'plate_number' => 'required_without:vehicle_id|string|max:50',
             'liters' => 'required|numeric|min:0',
-            'cost' => 'required|numeric|min:0',
+            'unit_cost' => 'required|numeric|min:0',
+            'total_cost' => 'required|numeric|min:0',
             'km_reading' => 'required|integer|min:0',
             'driver' => 'required|string|max:255',
             'date' => 'required|date',
@@ -96,7 +98,8 @@ class FuelSlipController extends Controller
             'vehicle_name' => $selectedVehicle?->vehicle_name ?? $request->vehicle_name,
             'plate_number' => $selectedVehicle?->plate_number ?? $request->plate_number,
             'liters' => $request->liters,
-            'cost' => $request->cost,
+            'unit_cost' => $request->unit_cost,
+            'total_cost' => $request->total_cost,
             'km_reading' => $request->km_reading,
             'driver' => $request->driver,
             'control_number' => $this->generateUniqueControlNumber(),

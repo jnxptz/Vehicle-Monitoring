@@ -108,7 +108,7 @@
                                                         <div class="kpi-row">
                                                             <div class="kpi">
                                                                 <small>Fuel</small>
-                                                                <span class="amount">{{ '₱' . number_format(($vehicle->fuelSlips->sum('cost') ?? 0), 2) }}</span>
+                                                                <span class="amount">{{ '₱' . number_format(($vehicle->fuelSlips->sum('total_cost') ?? 0), 2) }}</span>
                                                             </div>
                                                             <div class="kpi">
                                                                 <small>Maintenance</small>

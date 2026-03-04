@@ -31,12 +31,12 @@
     </style>
 </head>
 <body>
-    <div class="header" style="position:relative; padding-top:6px; margin-bottom:6px;">
+    <div class="header" style="position:relative; padding-top:6px; margin-bottom:16vh;">
         <div class="logo-left" style="position:absolute; left:14px; top:0;">
-            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
+            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style=" height:110px; width: auto;">
         </div>
         <div class="logo-right" style="position:absolute; right:14px; top:0;">
-            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
+            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="height:110px; width: auto;">
         </div>
         <div style="text-align:center; max-width:720px; margin:0 auto;">
             <div class="gov-title">Province of La Union</div>
@@ -45,7 +45,7 @@
         </div>
     </div>
 
-    <div class="meta">
+    <div class="meta" stlye="margin-top: 30vh;">
         <div style="flex:1;">
             <div class="to-line"><strong>To:</strong> {{ $fuelSlip->user?->office?->name ?? 'N/A' }}</div>
             <div class="to-line"><strong>Please issue the following item to:</strong> <strong>{{ strtoupper($fuelSlip->driver) }}</strong></div>
@@ -68,15 +68,17 @@
                     <th style="width:18%; text-align:right;">Total Cost</th>
                 </tr>
             </thead>
+            ...
             <tbody>
                 <tr>
                     <td style="vertical-align:middle;">{{ number_format((float)$fuelSlip->liters, 2) }}</td>
                     <td style="vertical-align:middle;">LITERS</td>
                     <td style="vertical-align:middle;">DIESEL</td>
-                    <td style="text-align:right; vertical-align:middle;">{{ '₱' . number_format((float)$fuelSlip->cost / max(1, (float)$fuelSlip->liters), 2) }}</td>
-                    <td style="text-align:right; vertical-align:middle;">{{ '₱' . number_format((float)$fuelSlip->cost, 2) }}</td>
+                    <td style="text-align:right; vertical-align:middle;">{{ '₱' . number_format((float)$fuelSlip->unit_cost, 2) }}</td>
+                    <td style="text-align:right; vertical-align:middle;">{{ '₱' . number_format((float)$fuelSlip->total_cost, 2) }}</td>
                 </tr>
             </tbody>
+...
         </table>
     </div>
 
@@ -91,6 +93,14 @@
         <div style="margin-bottom:4px;">
             <div style="border-bottom:1px solid #000; height:14px;"></div>
         </div>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        <br>
+        
 
         <div class="sign-row" style="margin-top:28px;">
             <table style="width:100%; border-collapse:collapse;">
@@ -98,10 +108,13 @@
                     <td style="width:50%; padding-right:20px; padding-bottom:12px; text-align:left; border:none;">
                         <strong>Prepared by:</strong>
                     </td>
+                    
                     <td style="width:50%; padding-left:20px; padding-bottom:12px; text-align:left; border:none;">
                         <strong>Approved by:</strong>
                     </td>
+                    
                 </tr>
+                <br><br>
                 <tr>
                     <td style="width:50%; padding-right:50px; padding-bottom:6px; text-align:center; border:none; font-size:12px; vertical-align:middle; padding-top:10px;">
                         <div style="margin-bottom:6px;">{{ $fuelSlip->prepared_by_name ?? '' }}</div>
@@ -116,11 +129,15 @@
                 </tr>
             </table>
         </div>
-
+        <br>
+        <br>
+        <br>
+        
         <div style="display:flex; justify-content:space-between; margin-top:18px;">
             <div><strong>Accept by:</strong> ____________________<br><strong>Invoice No.:</strong> ____________________</div>
         </div>
     </div>
+
 
     <div class="km-reading">KM READING: {{ $fuelSlip->km_reading }}</div>
 

@@ -15,7 +15,8 @@ class FuelSlip extends Model
         'vehicle_name',
         'plate_number',
         'liters',
-        'cost',
+        'unit_cost',
+        'total_cost',
         'km_reading',
         'driver',
         'control_number',
@@ -29,7 +30,8 @@ class FuelSlip extends Model
      */
     protected $casts = [
         'date' => 'date',
-        'cost' => 'decimal:2',
+        'unit_cost' => 'decimal:2',
+        'total_cost' => 'decimal:2',
         'liters' => 'decimal:2',
     ];
 
