@@ -11,9 +11,11 @@ use App\Http\Controllers\OfficeController;
 
 
 // --------------------
-// Landing page
+// Landing page - redirect to login
 // --------------------
-Route::get('/', fn() => view('welcome'));
+Route::get('/', function () {
+    return redirect()->route('login.form');
+});
 
 // --------------------
 // Auth routes
