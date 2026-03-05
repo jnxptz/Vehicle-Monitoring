@@ -10,20 +10,29 @@ class VehicleController extends Controller
 {
     public function index()
     {
-        $vehicles = Vehicle::with('bm', 'latestFuelSlip')
-            ->orderBy('bm_id')
-            ->get()
-            ->groupBy(function($vehicle) {
-                return $vehicle->bm->name ?? 'Unknown';
-            });
-        
-        $boardmembers = \App\Models\User::where('role', 'boardmember')
+        // Get filtered boardmembers for display
+        $query = \App\Models\User::where('role', 'boardmember')
+            ->whereNotNull('office_id')
+            ->with('office', 'vehicles')
+            ->orderBy('name');
+
+        // Apply office filter if selected
+        if (request('office')) {
+            $query->where('office_id', request('office'));
+        }
+
+        $boardmembers = $query->get();
+
+        // Get all boardmembers for the registration modal (unfiltered)
+        $allBoardmembers = \App\Models\User::where('role', 'boardmember')
             ->whereNotNull('office_id')
             ->with('office')
             ->orderBy('name')
             ->get();
+
+        $offices = \App\Models\Office::orderBy('name')->get();
         
-        return view('vehicles.index', compact('vehicles', 'boardmembers'));
+        return view('vehicles.index', compact('boardmembers', 'allBoardmembers', 'offices'));
     }
 
     public function create()

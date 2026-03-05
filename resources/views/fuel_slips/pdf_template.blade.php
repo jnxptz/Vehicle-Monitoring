@@ -32,11 +32,11 @@
 </head>
 <body>
     <div class="header" style="position:relative; padding-top:6px; margin-bottom:16vh;">
-        <div class="logo-left" style="position:absolute; left:14px; top:0;">
-            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style=" height:110px; width: auto;">
+        <div class="logo-left" style="position:absolute; left:120px; top:0;">
+            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
         </div>
-        <div class="logo-right" style="position:absolute; right:14px; top:0;">
-            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="height:110px; width: auto;">
+        <div class="logo-right" style="position:absolute; right:120px; top:0;">
+            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
         </div>
         <div style="text-align:center; max-width:720px; margin:0 auto;">
             <div class="gov-title">Province of La Union</div>

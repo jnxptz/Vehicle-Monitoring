@@ -58,6 +58,100 @@
     box-sizing: border-box;
 }
 
+/* Hamburger Menu Styles */
+.hamburger-menu-wrapper {
+    display: none;
+}
+
+.hamburger-toggle {
+    display: none;
+}
+
+/* Desktop: Show sidebar nav, hide hamburger */
+@media (min-width: 769px) {
+    .dashboard-nav {
+        display: flex;
+    }
+    .hamburger-menu-wrapper {
+        display: none !important;
+    }
+}
+
+.hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    padding: 8px;
+    background: none;
+    border: none;
+}
+
+.hamburger-btn span {
+    width: 25px;
+    height: 3px;
+    background: #ffffff;
+    margin: 3px 0;
+    transition: 0.3s;
+    border-radius: 2px;
+}
+
+.hamburger-toggle:checked + .hamburger-btn span:nth-child(1) {
+    transform: rotate(-45deg) translate(-5px, 6px);
+}
+
+.hamburger-toggle:checked + .hamburger-btn span:nth-child(2) {
+    opacity: 0;
+}
+
+.hamburger-toggle:checked + .hamburger-btn span:nth-child(3) {
+    transform: rotate(45deg) translate(-5px, -6px);
+}
+
+.hamburger-dropdown {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    padding: 12px;
+    min-width: 200px;
+    display: none;
+    z-index: 1000;
+    margin-top: 8px;
+}
+
+.hamburger-toggle:checked ~ .hamburger-dropdown {
+    display: block;
+}
+
+.hamburger-dropdown a {
+    display: block;
+    padding: 12px 16px;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 8px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    margin-bottom: 4px;
+}
+
+.hamburger-dropdown a:hover {
+    background: #f1f5f9;
+    color: #1e293b;
+}
+
+.hamburger-dropdown a.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #ffffff;
+}
+
+.hamburger-dropdown .logout-btn {
+    width: 100%;
+    margin-top: 8px;
+}
+
 /* KPI Separator */
 .kpi-separator { height: 1px; background: #eef2f7; margin: 14px 0; border-radius: 1px; }
 
@@ -73,6 +167,13 @@ html, body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     background: linear-gradient(to bottom right, #e0f7fa, #ffffff);
     min-height: 100vh;
+    margin-top: 0;
+    padding-top: 0;
+}
+
+body {
+    margin: 0;
+    padding: 0;
 }
 
 /* Header */
@@ -107,20 +208,24 @@ html, body {
 }
 
 .logout-btn {
-    padding: 10px;
-    background: #FF9B00;
+    margin-top: auto;
+    padding: 12px 16px;
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
     color: #fff;
     border: none;
-    border-radius: 6px;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 500;
-    transition: background 0.2s, box-shadow 0.2s;
-    border-left: 4px solid transparent;
+    font-size: 14px;
+    transition: all 0.2s ease;
     cursor: pointer;
+    box-shadow: 0 2px 4px rgba(239, 68, 68, 0.2);
 }
 
 .logout-btn:hover {
-    background: #bbdefb;
+    background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
 }
 
 /* Dashboard Body: Sidebar + Content */
@@ -130,44 +235,52 @@ html, body {
     padding: 20px;
     align-items: flex-start;
     max-width: 100%;
-    overflow-x: hidden;
+    overflow: hidden;
+    height: calc(100vh - 80px);
 }
 
 /* Sidebar */
 .dashboard-nav {
-    flex: 0 0 160px;
+    flex: 0 0 200px;
     display: flex;
     flex-direction: column;
-    background: #f5f5f5;
-    padding: 15px;
-    border-radius: 10px;
-    gap: 8px;
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    padding: 20px;
+    border-radius: 16px;
+    gap: 4px;
     height: fit-content;
     position: sticky;
     top: 0px;
     margin: 0;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.04);
+    border: 1px solid #e2e8f0;
 }
 
 .dashboard-nav a {
-    padding: 10px;
-    background: #e3f2fd;
-    color: #1976d2;
-    border-radius: 6px;
+    padding: 12px 16px;
+    background: transparent;
+    color: #64748b;
+    border-radius: 8px;
     text-decoration: none;
     font-weight: 500;
-    transition: background 0.2s, box-shadow 0.2s;
-    border-left: 4px solid transparent;
+    font-size: 14px;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
+    position: relative;
 }
 
 .dashboard-nav a:hover {
-    background: #bbdefb;
+    background: #f1f5f9;
+    color: #1e293b;
+    transform: translateX(2px);
 }
 
 .dashboard-nav a.active {
-    background: #1976d2;
-    color: #fff;
-    border-left: 4px solid #FF9B00;
-    box-shadow: 0 2px 8px rgba(25, 118, 210, 0.2);
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: #ffffff;
+    border-left: 3px solid #1e40af;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
+    font-weight: 600;
 }
 
 /* Main Content */
@@ -180,6 +293,8 @@ html, body {
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
     border-top: 4px solid #FF9B00;
     margin: 0;
+    overflow-y: auto;
+    height: 100%;
 }
 
 .dashboard-container h2 {
@@ -530,9 +645,22 @@ html, body {
         flex-direction: column;
         align-items: stretch;
         gap: 10px;
-        position: sticky;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 100;
+    }
+
+    /* Show hamburger menu on mobile */
+    .hamburger-menu-wrapper {
+        display: block;
+        position: relative;
+    }
+
+    /* Hide sidebar nav on mobile */
+    .dashboard-nav {
+        display: none !important;
     }
 
     .dashboard-title {
@@ -566,17 +694,21 @@ html, body {
 
     .dashboard-body {
         flex-direction: column;
-        padding: 16px;
+        padding: 12px;
+        padding-top: 100px;
         gap: 16px;
         align-items: stretch;
         margin: 0;
+        height: calc(100vh - 100px);
     }
 
     .dashboard-container {
-        padding: 20px 16px;
+        padding: 16px 12px;
         width: 100%;
         border-radius: 8px;
         margin: 0;
+        overflow-y: auto;
+        height: 100%;
     }
 
     .dashboard-container h2 {
@@ -709,61 +841,184 @@ html, body {
     }
 
     .dashboard-header {
-        padding: 12px;
+        padding: 10px;
         flex-direction: column;
         align-items: stretch;
-        gap: 10px;
-        position: sticky;
+        gap: 8px;
+        position: fixed;
         top: 0;
+        left: 0;
+        right: 0;
         z-index: 100;
+    }
+
+    /* Show hamburger menu on mobile */
+    .hamburger-menu-wrapper {
+        display: block;
+        position: relative;
+    }
+
+    /* Hide sidebar nav on mobile */
+    .dashboard-nav {
+        display: none !important;
     }
 
     .dashboard-title {
         width: 100%;
         display: flex;
         align-items: center;
-        gap: 8px;
-        justify-content: flex-start;
-    }
-
-    .dashboard-title img {
-        height: 36px;
-        flex-shrink: 0;
+        gap: 6px;
     }
 
     .dashboard-title h1 {
-        font-size: 14px;
+        font-size: 16px;
         margin: 0;
-        font-weight: 600;
-        color: #fff;
         word-break: break-word;
-        line-height: 1.2;
     }
 
-    .logout-btn {
-        width: 100%;
-        padding: 14px;
-        font-size: 14px;
-        border-radius: 6px;
-        background: #FF9B00;
-        border: none;
-    }
-
-    .logout-btn:hover {
-        background: #E58C00;
+    .dashboard-title img {
+        height: 32px;
+        flex-shrink: 0;
     }
 
     .dashboard-body {
         flex-direction: column;
-        padding: 12px;
+        padding: 8px;
+        padding-top: 90px;
         gap: 12px;
         align-items: stretch;
         margin: 0;
+        height: calc(100vh - 90px);
     }
 
     .dashboard-container {
-        padding: 16px 12px;
+        padding: 12px 8px;
+        width: 100%;
+        border-radius: 6px;
+        margin: 0;
+        overflow-y: auto;
+        height: 100%;
+    }
+
+    .dashboard-container h2 {
+        font-size: 1rem;
+        margin-bottom: 12px;
+    }
+
+    .dashboard-nav {
+        width: 100%;
+        flex-direction: column;
+        gap: 6px;
+        padding: 8px;
+        border-radius: 6px;
+        position: static;
+        top: auto;
+    }
+
+    .dashboard-nav a {
+        width: 100%;
+        padding: 12px;
+        text-align: left;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    .dashboard-nav a.active {
+        border-left: 4px solid #FF9B00;
+        background: #1976d2;
+        color: #fff;
+    }
+
+    /* KPI Grid Responsive */
+    .kpi-grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+        margin-bottom: 16px;
+    }
+
+    .kpi-card {
+        padding: 16px;
         border-radius: 8px;
+    }
+
+    .kpi-card h4 {
+        font-size: 11px;
+        margin-bottom: 6px;
+    }
+
+    .kpi-card p {
+        font-size: 18px;
+        margin: 0;
+    }
+
+    /* Vehicle Pills Responsive */
+    .vehicle-list {
+        flex-direction: column;
+        gap: 8px;
+    }
+
+    .vehicle-pill {
+        width: 100%;
+        padding: 10px 12px;
+    }
+
+    /* Filter Bar Responsive */
+    .filter-bar {
+        flex-direction: column;
+        gap: 8px;
+        align-items: stretch;
+    }
+
+    .filter-bar select,
+    .filter-bar a {
+        width: 100%;
+        text-align: center;
+    }
+
+    /* Fuel Slips Table Mobile Responsive */
+    .table-wrapper {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .table-wrapper table {
+        min-width: 600px;
+    }
+
+    .table-wrapper th,
+    .table-wrapper td {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+
+    .details-row td {
+        padding: 8px;
+    }
+
+    .details-row .grid {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    /* Maintenance Table Mobile Responsive */
+    .maintenance-table {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .maintenance-table th,
+    .maintenance-table td {
+        padding: 8px 10px;
+        font-size: 12px;
+    }
+
+    .maintenance-table th {
+        font-size: 11px;
+    }
+
+    .dashboard-container {
+        padding: 12px 8px;
+        border-radius: 6px;
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
         border-top: 3px solid #FF9B00;
         width: 100%;

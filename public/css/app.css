@@ -2,7 +2,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 10px 16px;
+    padding: 0;
     background: #ffffff;
     border-bottom: 1px solid #e0e0e0;
 }
@@ -37,7 +37,7 @@
     }
 
     .app-header {
-        padding: 10px 12px;
+        padding: 0;
         gap: 8px;
     }
 
@@ -70,7 +70,7 @@
     }
 
     .app-header {
-        padding: 8px 10px;
+        padding: 0;
         gap: 6px;
         flex-wrap: wrap;
     }

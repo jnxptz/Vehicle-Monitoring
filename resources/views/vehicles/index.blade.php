@@ -55,8 +55,23 @@
         {{-- Main Content --}}
         <div class="dashboard-container">
             <div class="page-header">
-                <h2>Vehicles</h2>
-                <button onclick="openVehicleModal()" class="btn-primary btn-sm">+ Register Vehicle</button>
+                <div>
+                    <h2>Vehicles</h2>
+                    <p class="sub-text">Manage vehicle fleet</p>
+                </div>
+                
+                <form method="GET" action="{{ route('vehicles.index') }}" class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                    <select name="office" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; color: #1e293b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)';">
+                        <option value="">All Offices</option>
+                        @foreach($offices as $office)
+                            <option value="{{ $office->id }}" {{ request('office') == $office->id ? 'selected' : '' }}>
+                                {{ $office->name }}
+                            </option>
+                        @endforeach
+                    </select>
+
+                    <button type="button" onclick="openVehicleModal()" class="btn-primary btn-sm" style="padding: 10px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #059669 0%, #047857 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #10b981 0%, #059669 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(16, 185, 129, 0.2)';">+ Register Vehicle</button>
+                </form>
             </div>
 
             @if(session('success'))
@@ -66,27 +81,31 @@
             @endif
 
             @if(isset($boardmembers) && $boardmembers->count() > 0)
-                <div class="table-wrapper">
-                    <table>
+                <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                    <table style="width: 100%; border-collapse: collapse; border: none;">
                         <thead>
-                            <tr>
-                                <th>#</th>
-                                <th>Board Member</th>
-                                <th>Vehicles</th>
+                            <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+                                <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">#</th>
+                                <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Board Member</th>
+                                <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Vehicles</th>
                             </tr>
                         </thead>
                         <tbody>
                             @php $counter = 1; @endphp
                             @foreach($boardmembers as $bm)
 
-                                <tr class="main-row" onclick="toggleRow('bm-{{ $bm->id }}')" style="cursor:pointer;">
-                                    <td>{{ $counter }}</td>
-                                    <td>{{ $bm->name }}</td>
-                                    <td>{{ $bm->vehicles->count() }} vehicle(s)</td>
+                                <tr class="main-row" onclick="toggleRow('bm-{{ $bm->id }}')" style="cursor:pointer; background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
+                                    <td style="padding: 16px 20px; font-weight: 500; color: #1e40af; border: none;">{{ $counter }}</td>
+                                    <td style="padding: 16px 20px; font-weight: 500; color: #1e293b; border: none;">{{ $bm->name }}</td>
+                                    <td style="padding: 16px 20px; color: #64748b; border: none;">
+                                        <span style="background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                                            {{ $bm->vehicles->count() }} vehicle(s)
+                                        </span>
+                                    </td>
                                 </tr>
 
-                                <tr id="bm-{{ $bm->id }}-details" class="details-row" style="display:none;">
-                                    <td colspan="3">
+                                <tr id="bm-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
+                                    <td colspan="3" style="padding: 0; border: none;">
                                         <div class="vehicle-cards">
                                             @forelse($bm->vehicles as $vehicle)
                                                 <div class="vehicle-card">
@@ -193,13 +212,6 @@
     function closeEditModal() {
         document.getElementById('editVehicleModal').style.display = 'none';
     }
-
-    window.onclick = function(event) {
-        const modal = document.getElementById('editVehicleModal');
-        if (event.target === modal) {
-            closeEditModal();
-        }
-    }
 </script>
 
 <!-- Edit Vehicle Modal -->
@@ -230,21 +242,21 @@
 </div>
 
 <!-- Vehicle Modal -->
-<div id="vehicleModal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
-    <div style="background-color:#fefefe; margin:10% auto; padding:30px; border:1px solid #888; border-radius:8px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;">
+<div id="vehicleModal" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
+    <div style="background-color:#fefefe; margin:10% auto; padding:30px; border:1px solid #888; border-radius:8px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;" onclick="event.stopPropagation();">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
             <h2 style="margin:0;">Register Vehicle</h2>
             <span onclick="closeVehicleModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
         </div>
 
-        <form action="{{ route('vehicles.store') }}" method="POST">
+        <form action="{{ route('vehicles.store') }}" method="POST" onclick="event.stopPropagation();">
             @csrf
 
-            @if(isset($boardmembers))
+            @if(isset($allBoardmembers))
                 <label for="boardmember_id" style="display:block; margin-bottom:12px; font-weight:600;">Boardmember:</label>
                 <select id="boardmember_id" name="boardmember_id" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
                     <option value="">-- Select Boardmember --</option>
-                    @foreach($boardmembers as $boardmember)
+                    @foreach($allBoardmembers as $boardmember)
                         <option value="{{ $boardmember->id }}">{{ $boardmember->name }} ({{ $boardmember->office->name ?? 'No Office' }})</option>
                     @endforeach
                 </select>

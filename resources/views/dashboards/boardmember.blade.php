@@ -12,6 +12,26 @@
             <h1>Sangguniang Panlalawigan</h1>
         </div>
         
+        {{-- Hamburger Menu (Mobile/Tablet Only) --}}
+        <div class="hamburger-menu-wrapper">
+            <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
+            <label for="hamburger-toggle" class="hamburger-btn">
+                <span></span>
+                <span></span>
+                <span></span>
+            </label>
+            <nav class="hamburger-dropdown">
+                <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
+                <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
+                <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <div style="border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 8px;">
+                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                        @csrf
+                        <button type="submit" class="logout-btn">Logout</button>
+                    </form>
+                </div>
+            </nav>
+        </div>
     </div>
 
     
@@ -22,8 +42,9 @@
             <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-            <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+
+            <div style="margin-top:auto;border-top:1px solid #e2e8f0;padding-top:12px;">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
@@ -47,8 +68,8 @@
                 </div>
 
                 @if($vehicle)
-                    <form method="GET" action="{{ route('boardmember.dashboard') }}" class="filter-bar">
-                        <select name="month" onchange="this.form.submit()">
+                    <form method="GET" action="{{ route('boardmember.dashboard') }}" class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <select name="month" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; color: #1e293b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)';">
                             @foreach(range(1, 12) as $month)
                                 <option value="{{ $month }}" {{ isset($selectedMonth) && $month == $selectedMonth ? 'selected' : '' }}>
                                     {{ \Carbon\Carbon::create()->month($month)->format('F') }}
@@ -56,11 +77,11 @@
                             @endforeach
                         </select>
 
-                        <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="export-btn btn-primary">
+                        <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="export-btn btn-primary" style="padding: 10px 18px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.2)';">
                             Export Monthly PDF
                         </a>
 
-                        <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="export-btn btn-primary">
+                        <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="export-btn btn-primary" style="padding: 10px 18px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #059669 0%, #047857 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #10b981 0%, #059669 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(16, 185, 129, 0.2)';">
                             Export Yearly PDF
                         </a>
                     </form>
@@ -76,9 +97,12 @@
 
             {{-- Alerts (if any) --}}
             @if(!empty($alerts))
-                <div class="alerts-box" style="margin-bottom:12px; padding:12px 16px; background:#fff4e5; border:1px solid #f3d9b6; border-radius:6px;">
-                    <h4 style="margin:0 0 8px 0; font-size:15px;">Alerts</h4>
-                    <ul style="margin:0; padding-left:18px; color:#5b6168;">
+                <div class="alerts-box" style="margin-bottom: 20px; padding: 16px 20px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border: 1px solid #f59e0b; border-radius: 12px; box-shadow: 0 2px 8px rgba(245, 158, 11, 0.1);">
+                    <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 12px;">
+                        <div style="font-size: 20px;">⚠️</div>
+                        <h4 style="margin: 0; font-size: 16px; color: #92400e; font-weight: 600;">Alerts</h4>
+                    </div>
+                    <ul style="margin: 0; padding-left: 20px; color: #78350f; font-size: 14px; line-height: 1.6;">
                         @foreach($alerts as $alert)
                             <li>{{ $alert }}</li>
                         @endforeach
@@ -88,11 +112,11 @@
 
             {{-- Vehicle list (boardmember may have multiple vehicles) --}}
             @if(isset($vehicles) && $vehicles->count() > 0)
-                <div class="vehicle-list" style="display:flex; gap:12px; margin:8px 0 16px 0; flex-wrap:wrap;">
+                <div class="vehicle-list" style="display:flex; gap:12px; margin: 16px 0 24px 0; flex-wrap:wrap;">
                     @foreach($vehicles as $v)
-                        <div class="vehicle-pill" style="padding:10px 14px; border:1px solid #e6eef8; border-radius:8px; background: {{ (isset($vehicle) && $vehicle->id == $v->id) ? '#e7f3ff' : '#fff' }}; min-width:140px;">
-                            <strong style="display:block; color:#0b2e66;">{{ $v->plate_number }}</strong>
-                            <small style="color:#6b7280;">{{ $v->make ?? '' }} {{ $v->model ?? '' }}</small>
+                        <div class="vehicle-pill" style="padding: 12px 16px; border: 2px solid #e2e8f0; border-radius: 12px; background: #ffffff; box-shadow: 0 2px 4px rgba(0,0,0,0.04); transition: all 0.2s ease; cursor: pointer;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.04)';">
+                            <strong style="display:block; color: #1e293b; font-size: 15px; margin-bottom: 4px;">{{ $v->plate_number }}</strong>
+                            <small style="color: #64748b; font-size: 12px;">{{ $v->make ?? '' }} {{ $v->model ?? '' }}</small>
                         </div>
                     @endforeach
                 </div>
@@ -100,58 +124,67 @@
 
             {{-- KPI CARDS --}}
             @if(isset($vehicle) && $vehicle)
-                <div class="kpi-grid">
-                    <div class="kpi-card">
-                        <h4>Yearly Budget</h4>
-                        <p>₱{{ number_format($yearlyBudget, 2) }}</p>
+                <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Yearly Budget</h4>
+                        <p style="margin: 0; font-size: 24px; font-weight: 600; color: #1e293b;">₱{{ number_format($yearlyBudget, 2) }}</p>
                     </div>
 
-                    <div class="kpi-card">
-                        <h4>Budget Used</h4>
-                        <p>₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</p>
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Budget Used</h4>
+                        <p style="margin: 0; font-size: 24px; font-weight: 600; color: #dc2626;">₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</p>
                     </div>
 
-                    <div class="kpi-card">
-                        <h4>Remaining Budget</h4>
-                        <p>₱{{ number_format($remainingBudget, 2) }}</p>
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Remaining Budget</h4>
+                        <p style="margin: 0; font-size: 24px; font-weight: 600; color: #059669;">₱{{ number_format($remainingBudget, 2) }}</p>
                     </div>
 
-                    <div class="kpi-card">
-                        <h4>Fuel Used ({{ $selectedMonthName ?? \Carbon\Carbon::now()->format('F') }})</h4>
-                        <p>{{ $monthlyLitersUsed }} L</p>
+                    <div class="kpi-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
+                        <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Fuel Used ({{ $selectedMonthName ?? \Carbon\Carbon::now()->format('F') }})</h4>
+                        <p style="margin: 0; font-size: 24px; font-weight: 600; color: #1d4ed8;">{{ $monthlyLitersUsed }} L</p>
                     </div>
                 </div>
 
                 {{-- OVERVIEW CARDS --}}
-                <div class="dashboard-sections">
+                <div class="dashboard-sections" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; margin-top: 24px;">
                     
-                    <div class="dashboard-card">
-                        <h3>Budget Progress</h3>
-                        <p style="margin: 12px 0;"><strong>Used:</strong> {{ $budgetUsedPercentage }}%</p>
-                        <div class="budget-bar">
-                            <div class="budget-used {{ $budgetUsedPercentage >= 80 ? 'warning' : '' }}" style="width: {{ $budgetUsedPercentage }}%;"></div>
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.04)';">
+                        <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #1e293b; font-weight: 600;">Budget Progress</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="color: #64748b; font-size: 14px;">Used</span>
+                            <span style="color: #1e293b; font-size: 18px; font-weight: 600;">{{ $budgetUsedPercentage }}%</span>
                         </div>
+                        <div class="budget-bar" style="background: #e2e8f0; border-radius: 12px; height: 12px; overflow: hidden;">
+                            <div class="budget-used {{ $budgetUsedPercentage >= 80 ? 'warning' : '' }}" style="width: {{ $budgetUsedPercentage }}%; background: {{ $budgetUsedPercentage >= 80 ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)' }}; height: 100%; border-radius: 12px; transition: width 0.3s ease;"></div>
+                        </div>
+                        <p style="margin: 12px 0 0 0; font-size: 13px; color: #64748b;">₱{{ number_format($yearlyBudget - $remainingBudget, 2) }} used of ₱{{ number_format($yearlyBudget, 2) }}</p>
                     </div>
 
                     
-                    <div class="dashboard-card">
-                        <h3>Fuel Consumption</h3>
-                        <p style="margin: 12px 0;"><strong>Limit:</strong> {{ $monthlyLimit }} L | <strong>Used:</strong> {{ $monthlyLitersUsed }} L</p>
-                        @php
-                            $fuelPercent = $monthlyLimit > 0 ? round(($monthlyLitersUsed / $monthlyLimit) * 100, 2) : 0;
-                            if ($fuelPercent > 100) $fuelPercent = 100;
-                        @endphp
-                        <div class="fuel-bar">
-                            <div class="fuel-used {{ $monthlyLitersUsed > $monthlyLimit ? 'warning' : '' }}" style="width: {{ $fuelPercent }}%;"></div>
+                    <div class="dashboard-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 16px; padding: 24px; box-shadow: 0 4px 16px rgba(0,0,0,0.04); transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.08)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 16px rgba(0,0,0,0.04)';">
+                        <h3 style="margin: 0 0 16px 0; font-size: 18px; color: #1e293b; font-weight: 600;">Fuel Consumption</h3>
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                            <span style="color: #64748b; font-size: 14px;">{{ $monthlyLitersUsed }} L / {{ $monthlyLimit }} L</span>
+                            @php
+                                $fuelPercent = $monthlyLimit > 0 ? round(($monthlyLitersUsed / $monthlyLimit) * 100, 2) : 0;
+                                if ($fuelPercent > 100) $fuelPercent = 100;
+                            @endphp
+                            <span style="color: {{ $monthlyLitersUsed > $monthlyLimit ? '#dc2626' : '#1d4ed8' }}; font-size: 18px; font-weight: 600;">{{ $fuelPercent }}%</span>
+                        </div>
+                        <div class="fuel-bar" style="background: #e2e8f0; border-radius: 12px; height: 12px; overflow: hidden;">
+                            <div class="fuel-used {{ $monthlyLitersUsed > $monthlyLimit ? 'warning' : '' }}" style="width: {{ $fuelPercent }}%; background: {{ $monthlyLitersUsed > $monthlyLimit ? 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)' : 'linear-gradient(135deg, #10b981 0%, #059669 100%)' }}; height: 100%; border-radius: 12px; transition: width 0.3s ease;"></div>
                         </div>
                         @if($monthlyLitersUsed > $monthlyLimit)
-                            <p class="warning-text" style="margin-top: 8px;"><strong>⚠ Warning:</strong> Exceeded fuel limit!</p>
+                            <p class="warning-text" style="margin-top: 12px; padding: 8px 12px; background: #fee2e2; color: #dc2626; border-radius: 8px; font-size: 13px; font-weight: 500;"><strong>⚠ Warning:</strong> Exceeded fuel limit!</p>
                         @endif
                     </div>
                 </div>
             @else
-                <div style="padding: 32px; text-align: center; background: #f9fafb; border-radius: 6px; border: 1px solid #e5e7eb;">
-                    <p style="font-size: 15px; color: #6b7280;">No vehicle assigned to your account.</p>
+                <div style="padding: 48px 32px; text-align: center; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border-radius: 16px; border: 2px dashed #e2e8f0;">
+                    <div style="font-size: 48px; margin-bottom: 16px;">🚗</div>
+                    <p style="font-size: 18px; color: #64748b; font-weight: 500; margin: 0 0 8px 0;">No vehicle assigned</p>
+                    <p style="font-size: 14px; color: #94a3b8; margin: 0;">Please contact your administrator to assign a vehicle to your account.</p>
                 </div>
             @endif
 

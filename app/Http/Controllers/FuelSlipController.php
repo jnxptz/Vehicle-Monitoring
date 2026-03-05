@@ -35,20 +35,29 @@ class FuelSlipController extends Controller
         $user = Auth::user();
 
         if ($user->role === 'admin') {
-            // For admin: fetch boardmembers with their fuel slips
-            $boardmembers = \App\Models\User::where('role', 'boardmember')
+            // Get offices for filter dropdown
+            $offices = \App\Models\Office::orderBy('name')->get();
+            
+            // Apply office filter if selected
+            $query = \App\Models\User::where('role', 'boardmember')
                 ->whereNotNull('office_id')
                 ->with(['office', 'fuelSlips' => function($q){ $q->latest(); }])
-                ->orderBy('name')
-                ->get();
+                ->orderBy('name');
+                
+            if (request('office')) {
+                $query->where('office_id', request('office'));
+            }
+            
+            $boardmembers = $query->get();
             $fuelSlips = FuelSlip::latest()->get(); // Keep for backward compatibility
         } else {
             // For boardmember: fetch only their fuel slips
             $fuelSlips = FuelSlip::where('user_id', $user->id)->latest()->get();
             $boardmembers = collect(); // Empty collection for boardmember view
+            $offices = collect();
         }
 
-        return view('fuel_slips.index', compact('fuelSlips', 'boardmembers'));
+        return view('fuel_slips.index', compact('fuelSlips', 'boardmembers', 'offices'));
     }
 
     public function create()

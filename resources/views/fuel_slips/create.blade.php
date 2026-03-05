@@ -58,12 +58,12 @@
                             <option value="">-- Select registered vehicle --</option>
                             @foreach($boardmembers as $bm)
                                 @foreach($bm->office?->vehicles ?? [] as $v)
-                                    <option value="{{ $v->id }}" data-name="{{ $v->vehicle_name }}" data-plate="{{ $v->plate_number }}" data-boardmember="{{ $bm->id }}">{{ $v->plate_number }} — {{ $v->vehicle_name }}</option>
+                                    <option value="{{ $v->id }}" data-name="{{ $v->vehicle_name }}" data-plate="{{ $v->plate_number }}" data-driver="{{ $v->driver }}" data-km="{{ $v->current_km ?? 0 }}" data-boardmember="{{ $bm->id }}">{{ $v->plate_number }} — {{ $v->vehicle_name }}</option>
                                 @endforeach
                             @endforeach
                         </select>
 
-                        <p class="form-tip">Tip: Select a boardmember first to filter their vehicles, then choose a registered vehicle to auto-fill vehicle name and plate number, or leave blank to enter new details.</p>
+                        <p class="form-tip">Tip: Select a boardmember first to filter their vehicles, then choose a registered vehicle to auto-fill vehicle name, plate number, driver, and KM reading, or leave blank to enter new details.</p>
 
                         <label for="vehicle_name">Vehicle Name:</label>
                         <input id="vehicle_name" type="text" name="vehicle_name" placeholder="Enter vehicle name" value="{{ old('vehicle_name') }}">
@@ -101,6 +101,8 @@
                             const vehicleSelect = document.getElementById('vehicle_id');
                             const nameInput = document.getElementById('vehicle_name');
                             const plateInput = document.getElementById('plate_number');
+                            const driverInput = document.getElementById('driver');
+                            const kmInput = document.getElementById('km_reading');
 
                             function filterVehiclesByBoardmember(boardmemberId){
                                 const opts = vehicleSelect.querySelectorAll('option[data-boardmember]');
@@ -117,6 +119,8 @@
                                 vehicleSelect.value = '';
                                 nameInput.value = '';
                                 plateInput.value = '';
+                                driverInput.value = '';
+                                kmInput.value = '';
                             }
 
                             boardmemberSelect && boardmemberSelect.addEventListener('change', function(){
@@ -127,9 +131,13 @@
                                 const opt = this.options[this.selectedIndex];
                                 const name = opt.getAttribute('data-name') || '';
                                 const plate = opt.getAttribute('data-plate') || '';
+                                const driver = opt.getAttribute('data-driver') || '';
+                                const km = opt.getAttribute('data-km') || '';
 
                                 if(name) nameInput.value = name;
                                 if(plate) plateInput.value = plate;
+                                if(driver) driverInput.value = driver;
+                                if(km) kmInput.value = km;
                             });
                         })();
                     </script>

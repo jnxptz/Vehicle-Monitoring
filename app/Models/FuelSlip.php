@@ -44,4 +44,18 @@ class FuelSlip extends Model
     {
         return $this->belongsTo(User::class);
     }
+
+    /**
+     * Get total_cost, calculating it if not set
+     */
+    public function getTotalCostAttribute($value)
+    {
+        if ($value !== null && $value > 0) {
+            return $value;
+        }
+        // Calculate from liters and unit_cost if total_cost is 0 or null
+        $liters = $this->attributes['liters'] ?? 0;
+        $unitCost = $this->attributes['unit_cost'] ?? 0;
+        return $liters * $unitCost;
+    }
 }

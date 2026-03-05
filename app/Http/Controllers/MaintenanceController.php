@@ -33,14 +33,22 @@ class MaintenanceController extends Controller
         $user = Auth::user();
 
         if ($user && $user->role === 'admin') {
-            // For admin: fetch boardmembers with their maintenances
-            $boardmembers = User::where('role', 'boardmember')
+            // Get offices for filter dropdown
+            $offices = \App\Models\Office::orderBy('name')->get();
+            
+            // Apply office filter if selected
+            $query = User::where('role', 'boardmember')
                 ->whereNotNull('office_id')
                 ->with(['office', 'vehicles' => function($q){ 
                     $q->with(['maintenances' => function($mq){ $mq->latest(); }]); 
                 }])
-                ->orderBy('name')
-                ->get();
+                ->orderBy('name');
+                
+            if (request('office')) {
+                $query->where('office_id', request('office'));
+            }
+            
+            $boardmembers = $query->get();
             $maintenances = Maintenance::with('vehicle')->latest()->get(); // Keep for backward compatibility
         } else {
             // For boardmember: fetch only their vehicles' maintenances
@@ -51,11 +59,12 @@ class MaintenanceController extends Controller
                 ->latest()
                 ->get();
             $boardmembers = collect(); // Empty collection for boardmember view
+            $offices = collect();
         }
         
         $vehicles = Vehicle::orderBy('plate_number')->get();
         
-        return view('maintenances.index', compact('maintenances', 'vehicles', 'boardmembers'));
+        return view('maintenances.index', compact('maintenances', 'vehicles', 'boardmembers', 'offices'));
     }
 
     public function create()

@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login</title>
+    <title>Login - Vehicle Monitoring System</title>
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
 <body>
@@ -18,11 +18,11 @@
 
             <form method="POST" action="{{ route('login') }}">
                 @csrf
-                <label>Email</label>
-                <input type="email" name="email" value="{{ old('email') }}" required>
+                <label>Email Address</label>
+                <input type="email" name="email" value="{{ old('email') }}" placeholder="Enter your email" required>
 
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" placeholder="Enter your password" required>
 
                 <div class="auth-options">
                     <label class="remember-me">
@@ -33,8 +33,7 @@
                      <a href="{{ route('password.request') }}" class="forgot-link"> Forgot password?</a>
                 </div>
 
-
-                <button type="submit">Login</button>
+                <button type="submit">Sign In</button>
             </form>
 
             <div class="link">
@@ -45,7 +44,7 @@
 
         <!-- RIGHT: LOGO -->
         <div class="auth-logo-right">
-            <img src="{{ asset('images/vmbslogo.png') }}" class="auth-logo" alt="Logo">
+            <img src="{{ asset('images/carlogo.jpg') }}" class="auth-logo" alt="Logo">
         </div>
     </div>
 </body>

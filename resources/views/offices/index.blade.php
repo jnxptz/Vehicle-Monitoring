@@ -33,7 +33,7 @@
         <div class="dashboard-container">
             <div class="page-header">
                 <h2>Offices</h2>
-                <button onclick="openOfficeModal()" class="btn-primary btn-sm">+ Create Office</button>
+                <button onclick="openOfficeModal()" class="btn-primary btn-sm" style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.2)';">+ Create Office</button>
             </div>
 
             @if (session('success'))

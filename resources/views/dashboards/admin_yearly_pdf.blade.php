@@ -14,10 +14,10 @@
 </head>
 <body>
     <div class="header" style="position:relative; padding-top:6px; margin-bottom:6px;">
-        <div class="logo-left" style="position:absolute; left:14px; top:0;">
+        <div class="logo-left" style="position:absolute; left:120px; top:0;">
             <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
         </div>
-        <div class="logo-right" style="position:absolute; right:14px; top:0;">
+        <div class="logo-right" style="position:absolute; right:120px; top:0;">
             <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
         </div>
         <div style="text-align:center; max-width:720px; margin:0 auto;">
@@ -95,8 +95,6 @@
             <th class="text-right">Used</th>
             <th class="text-right">Remaining</th>
             <th class="text-right">Used %</th>
-            <th>Recommendation</th>
-            <th class="text-right">Suggested Budget</th>
         </tr>
     </thead>
     <tbody>
@@ -109,8 +107,6 @@
                 <td class="text-right">{{ number_format($bm['totalUsed'], 2) }}</td>
                 <td class="text-right">{{ number_format($bm['remaining'], 2) }}</td>
                 <td class="text-right">{{ $bm['usedPercent'] }}%</td>
-                <td>{{ $bm['status'] }}</td>
-                <td class="text-right">{{ number_format($bm['suggestedBudget'], 2) }}</td>
             </tr>
         @endforeach
     </tbody>

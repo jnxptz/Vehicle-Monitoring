@@ -442,8 +442,14 @@ class DashboardController extends Controller
             ->get();
 
         $boardmembersData = $boardmembers->map(function ($bm) use ($year) {
-            // prefer user's direct vehicle, otherwise fall back to their office's first vehicle
-            $vehicle = $bm->vehicle ? $bm->vehicle : ($bm->office ? $bm->office->vehicles->first() : null);
+            // Get vehicle directly assigned to this boardmember (via bm_id)
+            $vehicle = $bm->vehicles()->first();
+            
+            // Fallback to office vehicle only if boardmember has no assigned vehicle
+            if (!$vehicle && $bm->office) {
+                $vehicle = $bm->office->vehicles()->first();
+            }
+            
             $yearlyBudget = $vehicle ? self::YEARLY_BUDGET_DEFAULT : 0;
 
             $fuelCost = FuelSlip::where('user_id', $bm->id)->whereYear('date', $year)->sum('total_cost');
@@ -589,7 +595,7 @@ class DashboardController extends Controller
             ->sum('total_cost');
 
         $pdf = Pdf::loadView('dashboards.admin_monthly_pdf', compact(
-            'boardmembersData',
+            'rows',
             'selectedMonth',
             'selectedMonthName',
             'year',

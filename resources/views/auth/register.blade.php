@@ -1,7 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Register</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Vehicle Monitoring System</title>
     <link rel="stylesheet" href="{{ asset('css/auth.css') }}">
 </head>
 <body>
@@ -20,19 +22,19 @@
 
             <form method="POST" action="{{ route('register') }}">
                 @csrf
-                <label>Name</label>
-                <input type="text" name="name" required>
+                <label>Full Name</label>
+                <input type="text" name="name" placeholder="Enter your full name" required>
 
-                <label>Email</label>
-                <input type="email" name="email" required>
+                <label>Email Address</label>
+                <input type="email" name="email" placeholder="Enter your email" required>
 
                 <label>Password</label>
-                <input type="password" name="password" required>
+                <input type="password" name="password" placeholder="Create a password" required>
 
                 <label>Confirm Password</label>
-                <input type="password" name="password_confirmation" required>
+                <input type="password" name="password_confirmation" placeholder="Confirm your password" required>
 
-                <button type="submit">Register</button>
+                <button type="submit">Create Account</button>
             </form>
 
             <div class="link">
@@ -43,7 +45,7 @@
 
         <!-- RIGHT: LOGO -->
         <div class="auth-logo-right">
-            <img src="{{ asset('images/vmbslogo.png') }}" class="auth-logo" alt="Logo">
+            <img src="{{ asset('images/carlogo.jpg') }}" class="auth-logo" alt="Logo">
         </div>
     </div>
 </body>

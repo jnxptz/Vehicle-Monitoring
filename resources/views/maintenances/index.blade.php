@@ -60,8 +60,23 @@
             {{-- Main Content --}}
             <div class="dashboard-container">
                 <div class="page-header">
-                    <h2>Maintenances</h2>
-                    <button onclick="openMaintenanceModal()" class="btn-primary btn-sm">+ Add Maintenance</button>
+                    <div>
+                        <h2>Maintenances</h2>
+                        <p class="sub-text">Manage vehicle maintenance records</p>
+                    </div>
+                    
+                    <form method="GET" action="{{ route('maintenances.index') }}" class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+                        <select name="office" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; color: #1e293b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)';">
+                            <option value="">All Offices</option>
+                            @foreach($offices as $office)
+                                <option value="{{ $office->id }}" {{ request('office') == $office->id ? 'selected' : '' }}>
+                                    {{ $office->name }}
+                                </option>
+                            @endforeach
+                        </select>
+
+                        <button type="button" onclick="openMaintenanceModal()" class="btn-primary btn-sm" style="padding: 10px 20px; background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(139, 92, 246, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(139, 92, 246, 0.2)';">+ Add Maintenance</button>
+                    </form>
                 </div>
 
 @else
@@ -133,13 +148,13 @@
                 {{-- Admin View: Expandable Boardmembers with Maintenances --}}
                 @if(auth()->user()->role === 'admin')
                     @if($boardmembers->count() > 0)
-                        <div class="table-wrapper">
-                            <table>
+                        <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                            <table style="width: 100%; border-collapse: collapse; border: none;">
                                 <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Board Member</th>
-                                        <th>Maintenances</th>
+                                    <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+                                        <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">#</th>
+                                        <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Board Member</th>
+                                        <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Maintenances</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -151,14 +166,18 @@
                                                 $totalMaint += $v->maintenances ? count($v->maintenances) : 0;
                                             }
                                         @endphp
-                                        <tr class="main-row" onclick="toggleRow('maint-{{ $bm->id }}')" style="cursor:pointer;">
-                                            <td>{{ $counter }}</td>
-                                            <td>{{ $bm->name }}</td>
-                                            <td>{{ $totalMaint }} record(s)</td>
+                                        <tr class="main-row" onclick="toggleRow('maint-{{ $bm->id }}')" style="cursor:pointer; background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
+                                            <td style="padding: 16px 20px; font-weight: 500; color: #1e40af; border: none;">{{ $counter }}</td>
+                                            <td style="padding: 16px 20px; font-weight: 500; color: #1e293b; border: none;">{{ $bm->name }}</td>
+                                            <td style="padding: 16px 20px; color: #64748b; border: none;">
+                                                <span style="background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                                                    {{ $totalMaint }} record(s)
+                                                </span>
+                                            </td>
                                         </tr>
 
-                                        <tr id="maint-{{ $bm->id }}-details" class="details-row" style="display:none;">
-                                            <td colspan="3">
+                                        <tr id="maint-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
+                                            <td colspan="3" style="padding: 0; border: none;">
                                                 <div style="overflow-x:auto;">
                                                     @if($totalMaint > 0)
                                                         <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
@@ -200,30 +219,30 @@
                 @else
                     {{-- Boardmember View: Simple table of their own maintenances --}}
                     @if($maintenances->count() > 0)
-                        <div class="table-wrapper">
-                            <table>
+                        <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                            <table style="width: 100%; border-collapse: collapse; border: none;">
                                 <thead>
-                                    <tr>
-                                        <th>Vehicle</th>
-                                        <th>Type</th>
-                                        <th>KM</th>
-                                        <th>Operation(s)</th>
-                                        <th>Cost</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
+                                    <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Vehicle</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Type</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">KM</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Operation(s)</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Cost</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Date</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($maintenances as $m)
-                                        <tr>
-                                            <td>{{ $m->vehicle->plate_number }}</td>
-                                            <td>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
-                                            <td>{{ $m->maintenance_km ?? '—' }}</td>
-                                            <td>{{ Str::limit($m->operation, 80, '...') }}</td>
-                                            <td>₱{{ number_format((float) $m->cost, 2) }}</td>
-                                            <td>{{ $m->date }}</td>
-                                            <td>
-                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" class="btn-edit">PDF</a>
+                                        <tr style="background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
+                                            <td style="padding: 14px 16px; font-weight: 500; color: #1e293b; border: none;">{{ $m->vehicle->plate_number }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ $m->maintenance_km ?? '—' }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none; max-width: 200px;">{{ Str::limit($m->operation, 80, '...') }}</td>
+                                            <td style="padding: 14px 16px; font-weight: 600; color: #059669; border: none;">₱{{ number_format((float) $m->cost, 2) }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none; font-size: 13px;">{{ $m->date }}</td>
+                                            <td style="padding: 14px 16px; border: none;">
+                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background: #ff9b00; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">PDF</a>
                                             </td>
                                         </tr>
                                     @endforeach
