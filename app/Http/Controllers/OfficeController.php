@@ -13,7 +13,10 @@ class OfficeController extends Controller
      */
     public function index()
     {
-        $offices = Office::withCount('vehicles', 'users')->orderBy('name')->get();
+        $offices = Office::with(['vehicles.bm', 'users'])
+            ->withCount('vehicles', 'users')
+            ->orderBy('name')
+            ->get();
         return view('offices.index', compact('offices'));
     }
 

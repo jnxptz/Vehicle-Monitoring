@@ -262,16 +262,91 @@
         // Close hamburger menu when a link is clicked
         document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
             link.addEventListener('click', () => {
-                document.getElementById('hamburger-toggle').checked = false;
+                const hamburgerToggle = document.getElementById('hamburger-toggle');
+                if (hamburgerToggle) {
+                    hamburgerToggle.checked = false;
+                }
             });
         });
 
         // Also handle form submission (logout)
         document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
             form.addEventListener('submit', () => {
-                document.getElementById('hamburger-toggle').checked = false;
+                const hamburgerToggle = document.getElementById('hamburger-toggle');
+                if (hamburgerToggle) {
+                    hamburgerToggle.checked = false;
+                }
             });
         });
+
+        // Maintenance Modal functions
+        function openMaintenanceModal() {
+            document.getElementById('maintenanceModal').style.display = 'block';
+        }
+
+        function closeMaintenanceModal() {
+            document.getElementById('maintenanceModal').style.display = 'none';
+        }
+
+        // Photo upload drag and drop functionality
+        const photoUploadArea = document.querySelector('[onclick*="photo"]');
+        const photoInput = document.getElementById('photo');
+        const photoName = document.getElementById('modal-photo-name');
+
+        if (photoUploadArea && photoInput && photoName) {
+            // Prevent default drag behaviors
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                photoUploadArea.addEventListener(eventName, (e) => {
+                    e.preventDefault();
+                    e.stopPropagation();
+                });
+            });
+
+            // Handle drag enter and over
+            ['dragenter', 'dragover'].forEach(eventName => {
+                photoUploadArea.addEventListener(eventName, () => {
+                    photoUploadArea.style.borderColor = '#3b82f6';
+                    photoUploadArea.style.backgroundColor = '#eff6ff';
+                });
+            });
+
+            // Handle drag leave
+            ['dragleave'].forEach(eventName => {
+                photoUploadArea.addEventListener(eventName, () => {
+                    photoUploadArea.style.borderColor = '#cbd5e1';
+                    photoUploadArea.style.backgroundColor = '#f8fafc';
+                });
+            });
+
+            // Handle drop
+            photoUploadArea.addEventListener('drop', (e) => {
+                const files = e.dataTransfer.files;
+                if (files.length > 0) {
+                    const file = files[0];
+                    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                    
+                    if (file.size > maxSize) {
+                        // Show error message instead of displaying the photo
+                        photoName.textContent = 'Error: File too large (Max 5MB)';
+                        photoName.style.color = '#dc2626';
+                        photoInput.value = ''; // Clear the input
+                    } else {
+                        photoInput.files = files;
+                        photoName.textContent = file.name;
+                        photoName.style.color = '#1e293b';
+                    }
+                }
+                photoUploadArea.style.borderColor = '#cbd5e1';
+                photoUploadArea.style.backgroundColor = '#f8fafc';
+            });
+        }
+
+        window.onclick = function(event) {
+            const modal = document.getElementById('maintenanceModal');
+            if (event.target === modal) {
+                closeMaintenanceModal();
+            }
+        }
 
         const boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
 
@@ -362,75 +437,233 @@
 </script>
 
 <!-- Maintenance Modal -->
-<div id="maintenanceModal" style="display:none; position:fixed; z-index:1; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
-    <div style="background-color:#fefefe; margin:5% auto; padding:30px; border:1px solid #888; border-radius:8px; width:90%; max-width:600px; max-height:80vh; overflow-y:auto;">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">Add Maintenance</h2>
-            <span onclick="closeMaintenanceModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+<div id="maintenanceModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); padding: 32px; border: 1px solid #e2e8f0; width:90%; max-width:600px; max-height:80vh; overflow-y:auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+            <h2 style="margin:0; color: #1e40af; font-size: 20px; font-weight: 600;">Add Maintenance Record</h2>
+            <span onclick="closeMaintenanceModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer; position: absolute; top: 16px; right: 16px;">&times;</span>
         </div>
 
         <form action="{{ route('maintenances.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Boardmember Selection -->
+                <div>
+                    <label for="boardmember_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Select Boardmember</label>
+                    <div style="position: relative;">
+                        <select id="boardmember_id" name="boardmember_id" style="
+                            width: 100%;
+                            padding: 12px 16px;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 8px;
+                            background: #ffffff;
+                            font-size: 14px;
+                            color: #1e293b;
+                            appearance: none;
+                            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205%205z%22%20fill%3D%22%236b7280%22/%3E%3C/svg%3E');
+                            background-repeat: no-repeat;
+                            background-position: right 12px center;
+                            background-size: 20px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        ">
+                            <option value="">Choose a boardmember...</option>
+                            @if(isset($boardmembers))
+                                @foreach($boardmembers as $bm)
+                                    <option value="{{ $bm->id }}">{{ $bm->name }} ({{ $bm->office?->name ?? 'No Office' }})</option>
+                                @endforeach
+                            @endif
+                        </select>
+                    </div>
+                </div>
 
-            <label for="boardmember_id" style="display:block; margin-bottom:12px; font-weight:600;">Boardmember (select to see their vehicles):</label>
-            <select id="boardmember_id" name="boardmember_id" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-                <option value="">-- Select boardmember --</option>
-                @if(isset($boardmembers))
-                    @foreach($boardmembers as $bm)
-                        <option value="{{ $bm->id }}">{{ $bm->name }} ({{ $bm->office?->name ?? 'No Office' }})</option>
-                    @endforeach
-                @endif
-            </select>
-
-            <label for="vehicle_id" style="display:block; margin-bottom:12px; font-weight:600;">Registered Vehicle (optional):</label>
-            <select id="vehicle_id" name="vehicle_id" disabled style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-                <option value="">-- Select registered vehicle --</option>
-            </select>
-
-            <p style="font-size:12px; color:#666; margin-bottom:20px;">Tip: Select a boardmember first to filter their vehicles, then choose a registered vehicle to auto-fill vehicle name and plate number, or leave blank to enter new details.</p>
-
-            <label for="vehicle_name" style="display:block; margin-bottom:12px; font-weight:600;">Vehicle Name:</label>
-            <input id="vehicle_name" type="text" name="vehicle_name" placeholder="Enter vehicle name" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-
-            <label for="plate_number" style="display:block; margin-bottom:12px; font-weight:600;">Plate Number:</label>
-            <input id="plate_number" type="text" name="plate_number" placeholder="Enter plate number" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-
-            <label for="maintenance_type" style="display:block; margin-bottom:12px; font-weight:600;">Maintenance Type:</label>
-            <select id="maintenance_type" name="maintenance_type" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-                <option value="preventive">Preventive</option>
-                <option value="repair">Repair</option>
-            </select>
-
-            <label for="maintenance_km" style="display:block; margin-bottom:12px; font-weight:600;">Odometer KM (at maintenance):</label>
-            <input id="maintenance_km" type="number" name="maintenance_km" min="0" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;" placeholder="e.g., 15000">
-
-            <label for="operation" style="display:block; margin-bottom:12px; font-weight:600;">Operation(s) Done:</label>
-            <textarea id="operation" name="operation" rows="3" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;" placeholder="e.g., Change oil, Replace brake pads"></textarea>
-
-            <label for="cost" style="display:block; margin-bottom:12px; font-weight:600;">Cost:</label>
-            <input id="cost" type="number" step="0.01" name="cost" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-
-            <label for="conduct" style="display:block; margin-bottom:12px; font-weight:600;">Conduct:</label>
-            <input id="conduct" type="text" name="conduct" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;" placeholder="e.g., Conducted by / Shop name">
-
-            <label for="date" style="display:block; margin-bottom:12px; font-weight:600;">Date:</label>
-            <input id="date" type="date" name="date" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-
-            <label for="photo" style="display:block; margin-bottom:12px; font-weight:600;">Photo (optional):</label>
-            <input id="photo" type="file" name="photo" accept="image/*" style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px; box-sizing:border-box;">
-
-            <p style="font-size:12px; color:#666; margin-bottom:20px;">Note: Call of No. will be generated automatically after saving.</p>
-
-            <button type="submit" style="background:#007bff; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:600;">Submit</button>
-        </form>
-
-        @if ($errors->any())
-            <div style="margin-top:20px; background:#f8d7da; border:1px solid #f5c6cb; color:#721c24; padding:12px; border-radius:4px;">
-                @foreach ($errors->all() as $error)
-                    <div>{{ $error }}</div>
-                @endforeach
+                <!-- Vehicle Selection -->
+                <div>
+                    <label for="vehicle_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Select Vehicle</label>
+                    <div style="position: relative;">
+                        <select id="vehicle_id" name="vehicle_id" style="
+                            width: 100%;
+                            padding: 12px 16px;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 8px;
+                            background: #ffffff;
+                            font-size: 14px;
+                            color: #1e293b;
+                            appearance: none;
+                            background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205%205z%22%20fill%3D%22%236b7280%22/%3E%3C/svg%3E');
+                            background-repeat: no-repeat;
+                            background-position: right 12px center;
+                            background-size: 20px;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        ">
+                            <option value="">Choose a vehicle...</option>
+                        </select>
+                    </div>
+                </div>
             </div>
-        @endif
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Maintenance Type -->
+                <div>
+                    <label for="maintenance_type" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Maintenance Type</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                        <label style="display: flex; align-items: center; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.backgroundColor='#f8fafc';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='#ffffff';">
+                            <input type="radio" name="maintenance_type" value="preventive" style="margin-right: 8px;">
+                            <span style="font-weight: 500;">Preventive</span>
+                        </label>
+                        <label style="display: flex; align-items: center; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; cursor: pointer; transition: all 0.2s ease;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.backgroundColor='#f8fafc';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.backgroundColor='#ffffff';">
+                            <input type="radio" name="maintenance_type" value="repair" style="margin-right: 8px;">
+                            <span style="font-weight: 500;">Repair</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Odometer Reading -->
+                <div>
+                    <label for="maintenance_km" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Odometer Reading</label>
+                    <div style="position: relative;">
+                        <input id="maintenance_km" type="number" name="maintenance_km" min="0" required style="
+                            width: 100%;
+                            padding: 12px 16px;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            font-weight: 500;
+                            background: #ffffff;
+                            transition: all 0.2s ease;
+                        " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    </div>
+                </div>
+
+                <!-- Cost -->
+                <div>
+                    <label for="cost" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Cost</label>
+                    <div style="position: relative;">
+                        <input id="cost" type="number" step="0.01" name="cost" required style="
+                            width: 100%;
+                            padding: 12px 16px;
+                            border: 2px solid #e2e8f0;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            font-weight: 500;
+                            background: #ffffff;
+                            transition: all 0.2s ease;
+                        " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Operations Done -->
+            <div style="margin-bottom: 20px;">
+                <label for="operation" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Operations Performed</label>
+                <textarea id="operation" name="operation" rows="4" required placeholder="Describe the maintenance operations performed..." style="
+                    width: 100%;
+                    padding: 12px 16px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    font-family: inherit;
+                    resize: vertical;
+                    background: #ffffff;
+                    transition: all 0.2s ease;
+                " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';"></textarea>
+            </div>
+
+            <!-- Conduct Details -->
+            <div style="margin-bottom: 20px;">
+                <label for="conduct" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Conducted By</label>
+                <input id="conduct" type="text" name="conduct" required placeholder="Mechanic name or service center" style="
+                    width: 100%;
+                    padding: 12px 16px;
+                    border: 2px solid #e2e8f0;
+                    border-radius: 8px;
+                    font-size: 14px;
+                    background: #ffffff;
+                    transition: all 0.2s ease;
+                " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                <!-- Date -->
+                <div>
+                    <label for="date" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Date</label>
+                    <input id="date" type="date" name="date" required value="{{ old('date') ?? now()->format('Y-m-d') }}" style="
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        background: #ffffff;
+                        transition: all 0.2s ease;
+                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                </div>
+
+                <!-- Photo Upload -->
+                <div>
+                    <label for="photo" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Photo (Optional)</label>
+                    <div style="
+                        border: 2px dashed #cbd5e1;
+                        border-radius: 8px;
+                        padding: 24px;
+                        text-align: center;
+                        background: #f8fafc;
+                        transition: all 0.2s ease;
+                        cursor: pointer;
+                    " onmouseover="this.style.borderColor='#3b82f6'; this.style.backgroundColor='#eff6ff';" onmouseout="this.style.borderColor='#cbd5e1'; this.style.backgroundColor='#f8fafc';" onclick="document.getElementById('photo').click()">
+                        <input id="photo" type="file" name="photo" accept="image/*" style="display: none;" onchange="
+                            const file = this.files[0];
+                            if (file) {
+                                const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+                                
+                                if (file.size > maxSize) {
+                        // Show error message instead of displaying the photo
+                        document.getElementById('modal-photo-name').textContent = 'Error: File too large (Max 5MB)';
+                        document.getElementById('modal-photo-name').style.color = '#dc2626';
+                        this.value = ''; // Clear the input
+                    } else {
+                        document.getElementById('modal-photo-name').textContent = file.name;
+                        document.getElementById('modal-photo-name').style.color = '#1e293b';
+                    }
+                            }
+                        ">
+                        <div style="margin-bottom: 8px;">
+                            <div id="modal-photo-name" style="color: #1e293b; font-weight: 500;">Choose a photo or drag & drop</div>
+                        </div>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 8px;">
+                            Supported formats: JPG, PNG, GIF (Max 5MB)
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Submit Button -->
+            <div style="display: flex; align-items: center; justify-content: space-between;">
+                <div style="color: #64748b; font-size: 14px;">
+                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                        <span style="color: #059669; margin-right: 4px;">Info:</span>
+                        Call of No. will be automatically generated
+                    </div>
+                    <div style="font-size: 12px;">
+                        Format: MN-YYYYMMDD-XXXXXX
+                    </div>
+                </div>
+                <button type="submit" class="btn-primary" style="
+                    padding: 14px 32px;
+                    font-size: 16px;
+                    font-weight: 600;
+                    background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
+                    border: none;
+                    border-radius: 8px;
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                    box-shadow: 0 4px 12px rgba(139, 92, 246, 0.2);
+                " onmouseover="this.style.background='linear-gradient(135deg, #7c3aed 0%, #6d28d9 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(139, 92, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(139, 92, 246, 0.2)';">
+                    Create Maintenance Record
+                </button>
+            </div>
+        </form>
     </div>
 </div>
 

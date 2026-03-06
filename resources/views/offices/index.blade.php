@@ -81,7 +81,8 @@
                                 padding: 20px;
                                 transition: all 0.3s ease;
                                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
-                            " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)';">
+                                cursor: pointer;
+                            " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)';" onclick="toggleOfficeDetails({{ $office->id }})">
                                 <div style="
                                     background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
                                     margin: -20px -20px 16px -20px;
@@ -143,6 +144,61 @@
                                                 letter-spacing: 0.5px;
                                             ">Users</div>
                                         </div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Expandable Details Section -->
+                                <div id="office-details-{{ $office->id }}" style="display: none; margin-top: 20px; padding-top: 16px; border-top: 1px solid #e2e8f0;">
+                                    <!-- Vehicles Section -->
+                                    <div style="margin-bottom: 20px;">
+                                        <h4 style="margin: 0 0 12px 0; color: #1e40af; font-size: 14px; font-weight: 600;">🚗 Vehicles ({{ $office->vehicles_count }})</h4>
+                                        @if($office->vehicles && $office->vehicles->count() > 0)
+                                            <div style="background: #f8fafc; border-radius: 8px; padding: 12px;">
+                                                @foreach($office->vehicles as $vehicle)
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #e2e8f0; {{ $loop->last ? 'border-bottom: none' : '' }}">
+                                                        <div>
+                                                            <div style="font-weight: 500; color: #1e293b;">{{ $vehicle->plate_number }}</div>
+                                                            <div style="color: #64748b; font-size: 13px; margin-top: 2px;">{{ $vehicle->vehicle_name }}</div>
+                                                            <div style="color: #059669; font-size: 12px; margin-top: 2px;">
+                                                                👤 {{ $vehicle->bm->name ?? 'No Owner' }}
+                                                            </div>
+                                                        </div>
+                                                        <div style="text-align: right;">
+                                                            <div style="font-size: 12px; color: #64748b;">Fuel Limit</div>
+                                                            <div style="font-weight: 600; color: #059669;">{{ $vehicle->monthly_fuel_limit }}L</div>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div style="text-align: center; padding: 20px; color: #64748b; font-size: 14px;">
+                                                No vehicles assigned to this office
+                                            </div>
+                                        @endif
+                                    </div>
+                                    
+                                    <!-- Users Section -->
+                                    <div>
+                                        <h4 style="margin: 0 0 12px 0; color: #d97706; font-size: 14px; font-weight: 600;">👥 Users ({{ $office->users_count }})</h4>
+                                        @if($office->users && $office->users->count() > 0)
+                                            <div style="background: #fffbeb; border-radius: 8px; padding: 12px;">
+                                                @foreach($office->users as $user)
+                                                    <div style="display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #fde68a; {{ $loop->last ? 'border-bottom: none' : '' }}">
+                                                        <div>
+                                                            <span style="font-weight: 500; color: #1e293b;">{{ $user->name }}</span>
+                                                            <span style="color: #64748b; margin-left: 8px; font-size: 12px;">{{ $user->email }}</span>
+                                                        </div>
+                                                        <div style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
+                                                            {{ $user->role }}
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
+                                        @else
+                                            <div style="text-align: center; padding: 20px; color: #64748b; font-size: 14px;">
+                                                No users assigned to this office
+                                            </div>
+                                        @endif
                                     </div>
                                 </div>
                                  
@@ -246,6 +302,15 @@
 
         document.getElementById('editOfficeModal').style.display = 'none';
 
+    }
+
+    function toggleOfficeDetails(officeId) {
+        const details = document.getElementById('office-details-' + officeId);
+        if (details.style.display === 'none' || details.style.display === '') {
+            details.style.display = 'block';
+        } else {
+            details.style.display = 'none';
+        }
     }
 
 
