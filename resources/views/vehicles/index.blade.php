@@ -3,12 +3,13 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
+<link rel="stylesheet" href="{{ asset('css/vehicles-styles.css') }}">
 
 <div class="dashboard-page">
     <div class="dashboard-header">
         <div class="dashboard-title">
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-            <h1>Admin Dashboard</h1>
+            <h1>Sangguniang Panlalawigan</h1>
         </div>
 
         {{-- Sidebar
@@ -24,7 +25,7 @@
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <div class="logout-form">
                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">Logout</button>
@@ -38,14 +39,15 @@
 
         <nav class="dashboard-nav">
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+            
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
             <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
 
-            <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
-                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+            <div class="logout-form">
+                <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="logout-btn">Logout</button>
                 </form>
@@ -60,8 +62,8 @@
                     <p class="sub-text">Manage vehicle fleet</p>
                 </div>
                 
-                <form method="GET" action="{{ route('vehicles.index') }}" class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <select name="office" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; color: #1e293b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)';">
+                <form method="GET" action="{{ route('vehicles.index') }}" class="filter-bar">
+                    <select name="office" onchange="this.form.submit()">
                         <option value="">All Offices</option>
                         @foreach($offices as $office)
                             <option value="{{ $office->id }}" {{ request('office') == $office->id ? 'selected' : '' }}>
@@ -70,7 +72,7 @@
                         @endforeach
                     </select>
 
-                    <button type="button" onclick="openVehicleModal()" class="btn-primary btn-sm" style="padding: 10px 20px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #059669 0%, #047857 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #10b981 0%, #059669 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(16, 185, 129, 0.2)';">+ Register Vehicle</button>
+                    <button type="button" onclick="openVehicleModal()" class="add-vehicle-btn">+ Register Vehicle</button>
                 </form>
             </div>
 
@@ -155,64 +157,7 @@
     </div> {{-- dashboard-body --}}
 </div> {{-- dashboard-page --}}
 
-<script>
-    // Close hamburger menu when a link is clicked
-    document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
-        link.addEventListener('click', () => {
-            document.getElementById('hamburger-toggle').checked = false;
-        });
-    });
-
-    // Also handle form submission (logout)
-    document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
-        form.addEventListener('submit', () => {
-            document.getElementById('hamburger-toggle').checked = false;
-        });
-    });
-
-    // Modal functions
-    function openVehicleModal() {
-        document.getElementById('vehicleModal').style.display = 'block';
-    }
-
-    function closeVehicleModal() {
-        document.getElementById('vehicleModal').style.display = 'none';
-    }
-
-    // Toggle details row for a boardmember
-    function toggleRow(id) {
-        const details = document.getElementById(id + '-details');
-        if (!details) return;
-        if (details.style.display === 'none' || details.style.display === '') {
-            details.style.display = 'table-row';
-        } else {
-            details.style.display = 'none';
-        }
-    }
-
-    // Toggle recent fuel slips list inside a vehicle card
-    function toggleFuelList(vehicleId) {
-        const el = document.getElementById('fuel-' + vehicleId);
-        if (!el) return;
-        el.style.display = (el.style.display === 'none' || el.style.display === '') ? 'block' : 'none';
-    }
-
-    // Edit modal functions
-    function openEditModal(vehicleId, plateNumber, monthlyLimit, currentKm) {
-        document.getElementById('editVehicleId').value = vehicleId;
-        document.getElementById('edit_plate_number').value = plateNumber;
-        document.getElementById('edit_monthly_fuel_limit').value = monthlyLimit;
-        document.getElementById('edit_current_km').value = currentKm;
-        // Set the form action dynamically
-        document.getElementById('editVehicleForm').action = '/vehicles/' + vehicleId;
-        document.getElementById('editVehicleForm').style.display = 'block';
-        document.getElementById('editVehicleModal').style.display = 'block';
-    }
-
-    function closeEditModal() {
-        document.getElementById('editVehicleModal').style.display = 'none';
-    }
-</script>
+<script src="{{ asset('js/vehicles.js') }}"></script>
 
 <!-- Edit Vehicle Modal -->
 <div id="editVehicleModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">

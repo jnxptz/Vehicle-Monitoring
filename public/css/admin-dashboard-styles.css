@@ -1,0 +1,264 @@
+/* Admin Dashboard Specific Styles */
+
+/* Logout form styling */
+.logout-form {
+    margin-top: auto;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+}
+
+/* Filter bar styling */
+.filter-bar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+/* Select dropdown styling */
+.filter-bar select {
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: #ffffff;
+    color: #1e293b;
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.filter-bar select:hover {
+    border-color: #cbd5e1;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+/* Export button styling */
+.export-btn {
+    padding: 10px 18px;
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.export-btn:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1e40af 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.export-btn.btn-success {
+    background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);
+}
+
+.export-btn.btn-success:hover {
+    background: linear-gradient(135deg, #059669 0%, #047857 100%);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+}
+
+/* KPI Grid styling */
+.kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 16px;
+    margin-bottom: 24px;
+}
+
+/* KPI Card styling */
+.kpi-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+    transition: transform 0.2s ease;
+}
+
+.kpi-card:hover {
+    transform: translateY(-2px);
+}
+
+.kpi-card h4 {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.kpi-card p {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: #1e293b;
+}
+
+/* Table wrapper styling */
+.table-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+/* Modern table styling */
+.modern-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: none;
+}
+
+.modern-table thead tr {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.modern-table th {
+    padding: 16px 20px;
+    text-align: left;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+}
+
+.modern-table td {
+    padding: 14px 20px;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.modern-table tbody tr {
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.modern-table tbody tr:hover {
+    background: #f8fafc;
+}
+
+.modern-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.modern-table tbody tr:nth-child(even):hover {
+    background: #f1f5f9;
+}
+
+/* Progress bar styling */
+.progress-bar {
+    background: #e2e8f0;
+    border-radius: 12px;
+    height: 12px;
+    overflow: hidden;
+}
+
+.progress-fill {
+    height: 100%;
+    border-radius: 12px;
+    transition: width 0.3s ease;
+}
+
+.progress-fill.warning {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+.progress-fill.normal {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+}
+
+/* Status badge styling */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.status-badge.warning {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+.status-badge.normal {
+    background: #dcfce7;
+    color: #16a34a;
+}
+
+.status-badge.info {
+    background: #dbeafe;
+    color: #2563eb;
+}
+
+/* Details row styling */
+.details-row {
+    display: none;
+    background: #ffffff;
+}
+
+.details-row td {
+    padding: 0;
+    border: none;
+}
+
+.details-content {
+    padding: 20px;
+    background: #f8fafc;
+}
+
+/* Toggle button styling */
+.toggle-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 16px;
+    color: #64748b;
+    transition: all 0.2s ease;
+    padding: 4px;
+    border-radius: 4px;
+}
+
+.toggle-btn:hover {
+    color: #1e293b;
+    background: #f1f5f9;
+}
+
+.toggle-btn:focus {
+    outline: 2px solid #3b82f6;
+    outline-offset: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .kpi-grid {
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 12px;
+    }
+    
+    .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .filter-bar select,
+    .export-btn {
+        width: 100%;
+    }
+    
+    .modern-table th,
+    .modern-table td {
+        padding: 12px 16px;
+        font-size: 13px;
+    }
+}

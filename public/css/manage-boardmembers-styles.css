@@ -1,0 +1,364 @@
+/* Manage Boardmembers Page Specific Styles */
+
+/* Logout form styling */
+.logout-form {
+    margin-top: auto;
+    border-top: 1px solid #e2e8f0;
+    padding-top: 12px;
+}
+
+/* Page description styling */
+.page-description {
+    color: #666;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+/* Success message styling */
+.success-message {
+    background: #d1e7dd;
+    border: 1px solid #badbcc;
+    color: #0f5132;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    font-size: 14px;
+}
+
+/* Error message styling */
+.error-message {
+    background: #f8d7da;
+    border: 1px solid #f5c2c7;
+    color: #842029;
+    padding: 12px 16px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+}
+
+.error-message ul {
+    margin: 8px 0 0 0;
+    padding-left: 20px;
+}
+
+.error-message li {
+    margin-bottom: 4px;
+}
+
+.error-message li:last-child {
+    margin-bottom: 0;
+}
+
+/* Table container styling */
+.table-container {
+    overflow-x: auto;
+}
+
+.table-wrapper {
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    overflow: hidden;
+}
+
+/* Table styling */
+.boardmembers-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 15px;
+    border: none;
+    table-layout: fixed;
+}
+
+.boardmembers-table thead tr {
+    background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);
+}
+
+.boardmembers-table th {
+    padding: 16px 20px;
+    text-align: left;
+    color: #ffffff;
+    font-weight: 600;
+    font-size: 14px;
+    border: none;
+}
+
+.boardmembers-table th:nth-child(1) {
+    width: 35%; /* Boardmember Name */
+}
+
+.boardmembers-table th:nth-child(2) {
+    width: 25%; /* Current Office */
+}
+
+.boardmembers-table th:nth-child(3) {
+    width: 30%; /* Assign Office */
+}
+
+.boardmembers-table th:nth-child(4) {
+    width: 10%; /* Status */
+    text-align: center;
+}
+
+.boardmembers-table td {
+    padding: 16px 20px;
+    border: none;
+    border-bottom: 1px solid #e2e8f0;
+    color: #64748b;
+    vertical-align: middle;
+}
+
+.boardmembers-table .status-column {
+    text-align: center;
+}
+
+/* Table row styling */
+.boardmembers-table tbody tr {
+    background: #ffffff;
+    transition: all 0.2s ease;
+}
+
+.boardmembers-table tbody tr:nth-child(even) {
+    background: #f8fafc;
+}
+
+.boardmembers-table tbody tr:hover {
+    background: #eff6ff !important;
+}
+
+.boardmembers-table tbody tr:hover td {
+    color: #374151;
+}
+
+/* Boardmember name styling */
+.boardmember-name {
+    color: #1e293b;
+    font-weight: 600;
+    font-size: 13px;
+    display: block;
+    margin-bottom: 0;
+    line-height: 1.1;
+}
+
+.boardmember-email {
+    color: #64748b;
+    font-size: 11px;
+    display: block;
+    word-break: break-all;
+    line-height: 1.1;
+    margin-top: 1px;
+}
+
+/* Office badge styling */
+.office-badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+    display: inline-block;
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.no-office {
+    color: #94a3b8;
+    font-style: italic;
+    font-size: 13px;
+}
+
+/* Assignment form styling */
+.assignment-form {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: nowrap;
+}
+
+.assignment-select {
+    flex: 1;
+    min-width: 120px;
+    max-width: 180px;
+    padding: 10px 14px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 14px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.assignment-select:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+}
+
+.assignment-btn {
+    padding: 10px 20px;
+    background: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    font-size: 14px;
+    white-space: nowrap;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);
+}
+
+.assignment-btn:hover {
+    background: #2563eb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Status badge styling */
+.status-badge {
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.status-assigned {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.status-pending {
+    background: #fee2e2;
+    color: #dc2626;
+}
+
+/* Empty state styling */
+.empty-state {
+    text-align: center;
+    color: #64748b;
+    padding: 32px 20px;
+}
+
+.empty-state p {
+    font-size: 15px;
+    margin: 0;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .boardmembers-table {
+        font-size: 13px;
+    }
+    
+    .boardmembers-table th,
+    .boardmembers-table td {
+        padding: 12px 16px;
+    }
+    
+    .boardmembers-table th:nth-child(1) {
+        width: 40%;
+    }
+    
+    .boardmembers-table th:nth-child(2) {
+        width: 20%;
+    }
+    
+    .boardmembers-table th:nth-child(3) {
+        width: 25%;
+    }
+    
+    .boardmembers-table th:nth-child(4) {
+        width: 15%;
+    }
+    
+    .assignment-form {
+        flex-direction: column;
+        gap: 6px;
+        align-items: stretch;
+    }
+    
+    .assignment-select {
+        min-width: auto;
+        max-width: none;
+    }
+    
+    .assignment-btn {
+        min-width: auto;
+        height: 32px;
+    }
+    
+    .boardmember-name {
+        font-size: 13px;
+    }
+    
+    .boardmember-email {
+        font-size: 11px;
+    }
+    
+    .office-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+    
+    .status-badge {
+        font-size: 11px;
+        padding: 3px 8px;
+    }
+}
+
+@media (max-width: 480px) {
+    .boardmembers-table th,
+    .boardmembers-table td {
+        padding: 8px 12px;
+        font-size: 12px;
+    }
+    
+    .boardmembers-table th:nth-child(1) {
+        width: 45%;
+    }
+    
+    .boardmembers-table th:nth-child(2) {
+        width: 18%;
+    }
+    
+    .boardmembers-table th:nth-child(3) {
+        width: 22%;
+    }
+    
+    .boardmembers-table th:nth-child(4) {
+        width: 15%;
+    }
+    
+    .assignment-select {
+        height: 32px;
+        padding: 6px 8px;
+        font-size: 12px;
+    }
+    
+    .assignment-btn {
+        height: 32px;
+        padding: 6px 12px;
+        font-size: 12px;
+    }
+    
+    .boardmember-name {
+        font-size: 12px;
+    }
+    
+    .boardmember-email {
+        font-size: 10px;
+    }
+    
+    .office-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+    
+    .status-badge {
+        font-size: 10px;
+        padding: 2px 6px;
+    }
+}

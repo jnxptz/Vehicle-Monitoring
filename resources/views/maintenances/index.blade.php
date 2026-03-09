@@ -5,6 +5,7 @@
 @if(auth()->user()->role === 'admin')
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 @endif
+<link rel="stylesheet" href="{{ asset('css/maintenances-styles.css') }}">
 
 @if(auth()->user()->role === 'admin')
     <div class="dashboard-page">
@@ -12,7 +13,7 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-                <h1>Admin Dashboard</h1>
+                <h1>Sangguniang Panlalawigan</h1>
             </div>
 
             {{-- Sidebar 
@@ -25,12 +26,13 @@
                 </label>
                 <nav class="hamburger-dropdown">
                     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+                    
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                     <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Boardmembers</a>
-                    <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <div class="logout-form">
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
                             <button type="submit" class="logout-btn">Logout</button>
@@ -44,12 +46,13 @@
 
             <nav class="dashboard-nav">
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-                <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+                
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                 <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
-                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <div class="logout-form">
                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">Logout</button>
@@ -100,7 +103,7 @@
                     <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                    <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                    <div class="logout-form">
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
                             <button type="submit" class="logout-btn">Logout</button>
@@ -117,7 +120,7 @@
                 <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}">Dashboard</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
-                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <div class="logout-form">
                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">Logout</button>
@@ -166,35 +169,35 @@
                                                 $totalMaint += $v->maintenances ? count($v->maintenances) : 0;
                                             }
                                         @endphp
-                                        <tr class="main-row" onclick="toggleRow('maint-{{ $bm->id }}')" style="cursor:pointer; background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
-                                            <td style="padding: 16px 20px; font-weight: 500; color: #1e40af; border: none;">{{ $counter }}</td>
-                                            <td style="padding: 16px 20px; font-weight: 500; color: #1e293b; border: none;">{{ $bm->name }}</td>
-                                            <td style="padding: 16px 20px; color: #64748b; border: none;">
-                                                <span style="background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;">
+                                        <tr class="main-row" onclick="toggleRow('maint-{{ $bm->id }}')" data-loop-even="{{ $loop->even }}">
+                                            <td class="counter-cell">{{ $counter }}</td>
+                                            <td class="boardmember-cell">{{ $bm->name }}</td>
+                                            <td class="maintenance-count-cell">
+                                                <span class="maintenance-count-badge">
                                                     {{ $totalMaint }} record(s)
                                                 </span>
                                             </td>
                                         </tr>
 
-                                        <tr id="maint-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
-                                            <td colspan="3" style="padding: 0; border: none;">
-                                                <div style="overflow-x:auto;">
+                                        <tr id="maint-{{ $bm->id }}-details" class="details-row">
+                                            <td colspan="3">
+                                                <div class="maintenance-cards-container">
                                                     @if($totalMaint > 0)
-                                                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
+                                                        <div class="maintenance-cards-grid">
                                                             @foreach($bm->vehicles as $vehicle)
                                                                 @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
                                                                     @foreach($vehicle->maintenances as $m)
-                                                                        <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
-                                                                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-                                                                                <strong style="font-size:15px;">{{ $vehicle->plate_number }}</strong>
-                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background:#ff9b00; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
+                                                                        <div class="maintenance-card">
+                                                                            <div class="maintenance-card-header">
+                                                                                <strong>{{ $vehicle->plate_number }}</strong>
+                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" class="pdf-btn">PDF</a>
                                                                             </div>
-                                                                            <div style="font-size:13px; line-height:1.8;">
-                                                                                <div><span style="color:#6b7280;">Type:</span> <strong>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</strong></div>
-                                                                                <div><span style="color:#6b7280;">KM:</span> {{ $m->maintenance_km ?? '—' }}</div>
-                                                                                <div><span style="color:#6b7280;">Operation(s):</span> {{ Str::limit($m->operation, 100, '...') }}</div>
-                                                                                <div><span style="color:#6b7280;">Cost:</span> <strong>₱{{ number_format((float) $m->cost, 2) }}</strong></div>
-                                                                                <div><span style="color:#6b7280;">Date:</span> {{ $m->date }}</div>
+                                                                            <div class="maintenance-details">
+                                                                                <div><span class="detail-label">Type:</span> <strong>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</strong></div>
+                                                                                <div><span class="detail-label">KM:</span> {{ $m->maintenance_km ?? '—' }}</div>
+                                                                                <div><span class="detail-label">Operation(s):</span> {{ Str::limit($m->operation, 100, '...') }}</div>
+                                                                                <div><span class="detail-label">Cost:</span> <strong>₱{{ number_format((float) $m->cost, 2) }}</strong></div>
+                                                                                <div><span class="detail-label">Date:</span> {{ $m->date }}</div>
                                                                             </div>
                                                                         </div>
                                                                     @endforeach
@@ -202,7 +205,7 @@
                                                             @endforeach
                                                         </div>
                                                     @else
-                                                        <div style="padding:12px; color:#6b7280;">No maintenances for this boardmember.</div>
+                                                        <div class="no-maintenances-message">No maintenances for this boardmember.</div>
                                                     @endif
                                                 </div>
                                             </td>
@@ -219,30 +222,30 @@
                 @else
                     {{-- Boardmember View: Simple table of their own maintenances --}}
                     @if($maintenances->count() > 0)
-                        <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
-                            <table style="width: 100%; border-collapse: collapse; border: none;">
+                        <div class="table-wrapper">
+                            <table class="boardmember-maintenances-table">
                                 <thead>
-                                    <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Vehicle</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Type</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">KM</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Operation(s)</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Cost</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Date</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Actions</th>
+                                    <tr>
+                                        <th>Vehicle</th>
+                                        <th>Type</th>
+                                        <th>KM</th>
+                                        <th>Operation(s)</th>
+                                        <th>Cost</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($maintenances as $m)
-                                        <tr style="background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
-                                            <td style="padding: 14px 16px; font-weight: 500; color: #1e293b; border: none;">{{ $m->vehicle->plate_number }}</td>
-                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
-                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ $m->maintenance_km ?? '—' }}</td>
-                                            <td style="padding: 14px 16px; color: #64748b; border: none; max-width: 200px;">{{ Str::limit($m->operation, 80, '...') }}</td>
-                                            <td style="padding: 14px 16px; font-weight: 600; color: #059669; border: none;">₱{{ number_format((float) $m->cost, 2) }}</td>
-                                            <td style="padding: 14px 16px; color: #64748b; border: none; font-size: 13px;">{{ $m->date }}</td>
-                                            <td style="padding: 14px 16px; border: none;">
-                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background: #ff9b00; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">PDF</a>
+                                        <tr class="boardmember-maintenance-row" data-loop-even="{{ $loop->even }}">
+                                            <td class="vehicle-cell">{{ $m->vehicle->plate_number }}</td>
+                                            <td class="type-cell">{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
+                                            <td class="km-cell">{{ $m->maintenance_km ?? '—' }}</td>
+                                            <td class="operation-cell">{{ Str::limit($m->operation, 80, '...') }}</td>
+                                            <td class="cost-cell">₱{{ number_format((float) $m->cost, 2) }}</td>
+                                            <td class="date-cell">{{ $m->date }}</td>
+                                            <td class="actions-cell">
+                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" class="pdf-btn">PDF</a>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -258,183 +261,9 @@
     </div> {{-- dashboard-page --}}
 
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Close hamburger menu when a link is clicked
-        document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
-            link.addEventListener('click', () => {
-                const hamburgerToggle = document.getElementById('hamburger-toggle');
-                if (hamburgerToggle) {
-                    hamburgerToggle.checked = false;
-                }
-            });
-        });
-
-        // Also handle form submission (logout)
-        document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
-            form.addEventListener('submit', () => {
-                const hamburgerToggle = document.getElementById('hamburger-toggle');
-                if (hamburgerToggle) {
-                    hamburgerToggle.checked = false;
-                }
-            });
-        });
-
-        // Maintenance Modal functions
-        function openMaintenanceModal() {
-            document.getElementById('maintenanceModal').style.display = 'block';
-        }
-
-        function closeMaintenanceModal() {
-            document.getElementById('maintenanceModal').style.display = 'none';
-        }
-
-        // Photo upload drag and drop functionality
-        const photoUploadArea = document.querySelector('[onclick*="photo"]');
-        const photoInput = document.getElementById('photo');
-        const photoName = document.getElementById('modal-photo-name');
-
-        if (photoUploadArea && photoInput && photoName) {
-            // Prevent default drag behaviors
-            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-                photoUploadArea.addEventListener(eventName, (e) => {
-                    e.preventDefault();
-                    e.stopPropagation();
-                });
-            });
-
-            // Handle drag enter and over
-            ['dragenter', 'dragover'].forEach(eventName => {
-                photoUploadArea.addEventListener(eventName, () => {
-                    photoUploadArea.style.borderColor = '#3b82f6';
-                    photoUploadArea.style.backgroundColor = '#eff6ff';
-                });
-            });
-
-            // Handle drag leave
-            ['dragleave'].forEach(eventName => {
-                photoUploadArea.addEventListener(eventName, () => {
-                    photoUploadArea.style.borderColor = '#cbd5e1';
-                    photoUploadArea.style.backgroundColor = '#f8fafc';
-                });
-            });
-
-            // Handle drop
-            photoUploadArea.addEventListener('drop', (e) => {
-                const files = e.dataTransfer.files;
-                if (files.length > 0) {
-                    const file = files[0];
-                    const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-                    
-                    if (file.size > maxSize) {
-                        // Show error message instead of displaying the photo
-                        photoName.textContent = 'Error: File too large (Max 5MB)';
-                        photoName.style.color = '#dc2626';
-                        photoInput.value = ''; // Clear the input
-                    } else {
-                        photoInput.files = files;
-                        photoName.textContent = file.name;
-                        photoName.style.color = '#1e293b';
-                    }
-                }
-                photoUploadArea.style.borderColor = '#cbd5e1';
-                photoUploadArea.style.backgroundColor = '#f8fafc';
-            });
-        }
-
-        window.onclick = function(event) {
-            const modal = document.getElementById('maintenanceModal');
-            if (event.target === modal) {
-                closeMaintenanceModal();
-            }
-        }
-
-        const boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
-
-        // Expose modal functions globally so the inline onclick works
-        window.openMaintenanceModal = function() {
-            initializeVehicleOptions();
-            document.getElementById('maintenanceModal').style.display = 'block';
-        };
-
-        window.closeMaintenanceModal = function() {
-            document.getElementById('maintenanceModal').style.display = 'none';
-        };
-
-        const boardmemberSelect = document.getElementById('boardmember_id');
-        const vehicleSelect = document.getElementById('vehicle_id');
-        const nameInput = document.getElementById('vehicle_name');
-        const plateInput = document.getElementById('plate_number');
-
-        function initializeVehicleOptions() {
-            if (!vehicleSelect) return;
-            vehicleSelect.innerHTML = '<option value="">-- Select registered vehicle --</option>';
-
-            Object.keys(boardmembersData).forEach(bmId => {
-                (boardmembersData[bmId] || []).forEach(v => {
-                    const option = document.createElement('option');
-                    option.value = v.id;
-                    option.setAttribute('data-name', v.vehicle_name || '');
-                    option.setAttribute('data-plate', v.plate_number || '');
-                    option.setAttribute('data-boardmember', bmId);
-                    option.textContent = (v.plate_number || '') + ' — ' + (v.vehicle_name || '');
-                    vehicleSelect.appendChild(option);
-                });
-            });
-        }
-
-        function filterVehiclesByBoardmember(boardmemberId){
-            if (!vehicleSelect) return;
-            const opts = vehicleSelect.querySelectorAll('option');
-            opts.forEach(o => {
-                if (o.value === '') {
-                    o.style.display = 'block';
-                } else if (boardmemberId && o.getAttribute('data-boardmember') !== boardmemberId) {
-                    o.style.display = 'none';
-                } else {
-                    o.style.display = '';
-                }
-            });
-
-            vehicleSelect.disabled = !boardmemberId;
-            vehicleSelect.value = '';
-            if (nameInput) nameInput.value = '';
-            if (plateInput) plateInput.value = '';
-        }
-
-        boardmemberSelect && boardmemberSelect.addEventListener('change', function(){
-            filterVehiclesByBoardmember(this.value);
-        });
-
-        vehicleSelect && vehicleSelect.addEventListener('change', function(){
-            if (!nameInput || !plateInput) return;
-            const opt = this.options[this.selectedIndex];
-            nameInput.value = opt ? (opt.getAttribute('data-name') || '') : '';
-            plateInput.value = opt ? (opt.getAttribute('data-plate') || '') : '';
-        });
-
-        // Initialize vehicle options on page load
-        initializeVehicleOptions();
-
-        // Toggle details row for a boardmember
-        window.toggleRow = function(id) {
-            const details = document.getElementById(id + '-details');
-            if (!details) return;
-            if (details.style.display === 'none' || details.style.display === '') {
-                details.style.display = 'table-row';
-            } else {
-                details.style.display = 'none';
-            }
-        };
-
-        // Close modal when clicking outside
-        window.addEventListener('click', function(event) {
-            const modal = document.getElementById('maintenanceModal');
-            if (event.target === modal) {
-                window.closeMaintenanceModal();
-            }
-        });
-    });
+    window.boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
 </script>
+<script src="{{ asset('js/maintenances.js') }}"></script>
 
 <!-- Maintenance Modal -->
 <div id="maintenanceModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
@@ -668,4 +497,3 @@
 </div>
 
 @endsection
-

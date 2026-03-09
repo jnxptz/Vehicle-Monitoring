@@ -5,13 +5,9 @@
 @if(auth()->user()->role === 'admin')
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 @endif
+<link rel="stylesheet" href="{{ asset('css/fuel-slips-styles.css') }}">
 
 <style>
-    /* Ensure hamburger menu is positioned correctly in header */
-    .dashboard-header .hamburger-menu-wrapper {
-        margin-left: auto;
-    }
-
     /* Hide hamburger menu on desktop (larger screens) */
     @media (min-width: 769px) {
         .hamburger-menu-wrapper {
@@ -22,6 +18,49 @@
             display: flex !important;
         }
     }
+
+    /* Mobile responsive table styles */
+    @media (max-width: 768px) {
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        table {
+            width: 100%;
+            min-width: 600px;
+            font-size: 12px;
+        }
+
+        th {
+            padding: 8px 4px !important;
+            font-size: 11px !important;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 6px 4px !important;
+            font-size: 11px !important;
+            word-wrap: break-word;
+        }
+
+        .details-row div[style*="display:grid"] {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+        }
+
+        .details-row div[style*="display:grid"] > div {
+            min-width: 0 !important;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            font-size: 10px !important;
+        }
+
+        .details-row div[style*="display:grid"] > div div {
+            margin-bottom: 1px !important;
+            font-size: 10px !important;
+        }
+    }
 </style>
 
 @if(auth()->user()->role === 'admin')
@@ -30,7 +69,7 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-                <h1>Admin Dashboard</h1>
+                <h1>Sangguniang Panlalawigan</h1>
             </div>
 
             {{-- Hamburger Menu (Mobile/Tablet Only) --}}
@@ -43,12 +82,13 @@
                 </label>
                 <nav class="hamburger-dropdown">
                     <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+                    
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                     <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
-                    <div style="border-top: 1px solid #e2e8f0; padding-top: 8px; margin-top: 8px;">
+                    <div class="logout-form">
                         <form action="{{ route('logout') }}" method="POST" class="logout-form">
                             @csrf
                             <button type="submit" class="logout-btn">Logout</button>
@@ -62,12 +102,13 @@
 
         <nav class="dashboard-nav">
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+            
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
             <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
-            <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+            <div class="logout-form-desktop">
                 <form action="{{ route('logout') }}" method="POST" class="logout-form">
                     @csrf
                     <button type="submit" class="logout-btn">Logout</button>
@@ -336,7 +377,7 @@
 
 <!-- Fuel Slip Modal -->
 <div id="fuelSlipModal" style="display:none; position:fixed; z-index:1000; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
-    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); padding: 32px; border: 1px solid #e2e8f0; width:90%; max-width:600px; max-height:80vh; overflow-y:auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+    <div style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border-radius: 16px; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); padding: 32px; border: 1px solid #e2e8f0; width:90%; max-width:600px; max-height:95vh; overflow-y:auto; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
             <h2 style="margin:0; color: #1e40af; font-size: 20px; font-weight: 600;">Add Fuel Slip</h2>
             <span onclick="closeFuelSlipModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer; position: absolute; top: 16px; right: 16px;">&times;</span>
@@ -403,36 +444,6 @@
             </div>
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                <!-- Vehicle Name -->
-                <div>
-                    <label for="vehicle_name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Vehicle Name</label>
-                    <input id="vehicle_name" type="text" name="vehicle_name" placeholder="" value="{{ old('vehicle_name') }}" style="
-                        width: 100%;
-                        padding: 12px 16px;
-                        border: 2px solid #e2e8f0;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        background: #ffffff;
-                        transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
-                </div>
-
-                <!-- Plate Number -->
-                <div>
-                    <label for="plate_number" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Plate Number</label>
-                    <input id="plate_number" type="text" name="plate_number" placeholder="" value="{{ old('plate_number') }}" style="
-                        width: 100%;
-                        padding: 12px 16px;
-                        border: 2px solid #e2e8f0;
-                        border-radius: 8px;
-                        font-size: 14px;
-                        background: #ffffff;
-                        transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
-                </div>
-            </div>
-
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <!-- Liters -->
                 <div>
                     <label for="liters" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Liters</label>
@@ -492,7 +503,7 @@
                         font-weight: 500;
                         background: #ffffff;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    ">
                 </div>
 
                 <!-- Driver -->
@@ -506,7 +517,7 @@
                         font-size: 14px;
                         background: #ffffff;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    ">
                 </div>
             </div>
 
@@ -522,7 +533,7 @@
                         font-size: 14px;
                         background: #ffffff;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    ">
                 </div>
 
                 <!-- Prepared By -->
@@ -536,7 +547,7 @@
                         font-size: 14px;
                         background: #ffffff;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    ">
                 </div>
 
                 <!-- Approved By -->
@@ -550,32 +561,29 @@
                         font-size: 14px;
                         background: #ffffff;
                         transition: all 0.2s ease;
-                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                    ">
                 </div>
             </div>
 
             <!-- Submit Button -->
-            <div style="display: flex; align-items: center; justify-content: space-between;">
+            <div style="display: flex; align-items: center; justify-content: center;">
                 <div style="color: #64748b; font-size: 14px;">
                     <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                        <span style="color: #059669; margin-right: 4px;">Info:</span>
-                        Select a boardmember first to filter their vehicles, then choose a registered vehicle to auto-fill details.
+                        
                     </div>
-                    <div style="font-size: 12px;">
-                        Vehicle name, plate number, driver, and KM reading will be auto-filled.
-                    </div>
+                    
                 </div>
                 <button type="submit" class="btn-primary" style="
-                    padding: 14px 32px;
+                    padding: 6px 17px;
                     font-size: 16px;
                     font-weight: 600;
                     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
                     border: none;
-                    border-radius: 8px;
+                    border-radius: 23px;
                     cursor: pointer;
                     transition: all 0.2s ease;
                     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);
-                " onmouseover="this.style.background='linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'; this.style.transform='translateY(-2px)'; this.style.boxShadow='0 8px 20px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.2)';">
+                ">
                     Create Fuel Slip
                 </button>
             </div>
@@ -594,65 +602,8 @@
 </div>
 
 <script>
-    const boardmemberSelect = document.getElementById('boardmember_id');
-    const vehicleSelect = document.getElementById('vehicle_id');
-    const nameInput = document.getElementById('vehicle_name');
-    const plateInput = document.getElementById('plate_number');
-    const litersInput = document.getElementById('liters');
-    const unitCostInput = document.getElementById('unit_cost');
-    const totalCostInput = document.getElementById('total_cost');
-
-    function filterVehiclesByBoardmember(boardmemberId){
-        const opts = vehicleSelect.querySelectorAll('option[data-boardmember]');
-        opts.forEach(o => {
-            if(boardmemberId && o.getAttribute('data-boardmember') !== boardmemberId) {
-                o.style.display = 'none';
-            } else {
-                o.style.display = '';
-            }
-        });
-
-        vehicleSelect.disabled = !boardmemberId;
-        vehicleSelect.value = '';
-        nameInput.value = '';
-        plateInput.value = '';
-    }
-
-    function calculateTotalCost() {
-        const liters = parseFloat(litersInput.value) || 0;
-        const unitCost = parseFloat(unitCostInput.value) || 0;
-        const totalCost = (liters * unitCost).toFixed(2);
-        totalCostInput.value = totalCost;
-    }
-
-    boardmemberSelect && boardmemberSelect.addEventListener('change', function(){
-        filterVehiclesByBoardmember(this.value);
-    });
-
-    vehicleSelect && vehicleSelect.addEventListener('change', function(){
-        nameInput.value = this.options[this.selectedIndex].getAttribute('data-name') || '';
-        plateInput.value = this.options[this.selectedIndex].getAttribute('data-plate') || '';
-    });
-
-    litersInput && litersInput.addEventListener('change', calculateTotalCost);
-    litersInput && litersInput.addEventListener('input', calculateTotalCost);
-    unitCostInput && unitCostInput.addEventListener('change', calculateTotalCost);
-    unitCostInput && unitCostInput.addEventListener('input', calculateTotalCost);
-
-    // Populate vehicle options on page load
-    const boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
-    
-    Object.keys(boardmembersData).forEach(bmId => {
-        boardmembersData[bmId].forEach(v => {
-            const option = document.createElement('option');
-            option.value = v.id;
-            option.setAttribute('data-name', v.vehicle_name);
-            option.setAttribute('data-plate', v.plate_number);
-            option.setAttribute('data-boardmember', bmId);
-            option.textContent = v.plate_number + ' — ' + v.vehicle_name;
-            vehicleSelect.appendChild(option);
-        });
-    });
+    window.boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
 </script>
+<script src="{{ asset('js/fuel-slips.js') }}"></script>
 
 @endsection

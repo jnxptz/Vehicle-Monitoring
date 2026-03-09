@@ -3,6 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
+<link rel="stylesheet" href="{{ asset('css/admin-dashboard-styles.css') }}">
 
 <div class="dashboard-page">
 
@@ -23,12 +24,12 @@
             </label>
             <nav class="hamburger-dropdown">
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-                <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                 <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
-                <div style="margin-top: auto; border-top: 1px solid #e2e8f0; padding-top: 12px;">
+                <div class="logout-form">
                     <form action="{{ route('logout') }}" method="POST" class="logout-form">
                         @csrf
                         <button type="submit" class="logout-btn">Logout</button>
@@ -43,13 +44,14 @@
         <!-- SIDEBAR -->
         <nav class="dashboard-nav">
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">Dashboard</a>
-            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
+            
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+            <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
             <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
 
-            <div style="margin-top:auto;border-top:1px solid #e2e8f0;padding-top:12px;">
+            <div class="logout-form">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
                     <button type="submit" class="logout-btn">Logout</button>
@@ -66,8 +68,8 @@
                     <p class="sub-text">{{ $selectedMonthName }} {{ $year }}</p>
                 </div>
 
-                <form method="GET" action="{{ route('admin.dashboard') }}" class="filter-bar" style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
-                    <select name="office" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; color: #1e293b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)';">
+                <form method="GET" action="{{ route('admin.dashboard') }}" class="filter-bar">
+                    <select name="office" onchange="this.form.submit()">
                         <option value="">All Offices</option>
                         @foreach($offices as $office)
                             <option value="{{ $office->id }}" {{ $selectedOffice == $office->id ? 'selected' : '' }}>
@@ -76,7 +78,7 @@
                         @endforeach
                     </select>
 
-                    <select name="month" onchange="this.form.submit()" style="padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; background: #ffffff; color: #1e293b; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='0 1px 3px rgba(0,0,0,0.1)';">
+                    <select name="month" onchange="this.form.submit()">
                         @foreach(range(1,12) as $month)
                             <option value="{{ $month }}" {{ $month == $selectedMonth ? 'selected' : '' }}>
                                 {{ \Carbon\Carbon::create()->month($month)->format('F') }}
@@ -84,11 +86,11 @@
                         @endforeach
                     </select>
 
-                    <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn btn-primary" style="padding: 10px 18px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(59, 130, 246, 0.2)';">
+                    <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn btn-primary">
                         Export Monthly PDF
                     </a>
 
-                    <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn btn-primary" style="padding: 10px 18px; background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; border: none; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 14px; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(16, 185, 129, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #059669 0%, #047857 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(16, 185, 129, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #10b981 0%, #059669 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(16, 185, 129, 0.2)';">
+                    <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn btn-primary">
                         Export Yearly PDF
                     </a>
                 </form>
@@ -139,10 +141,36 @@
                                     ? ($row['totalUsed'] / $row['yearlyBudget']) * 100
                                     : 0;
 
+                                // Check if user has exceeded fuel limit
+                                $hasExceededFuelLimit = false;
+                                if(isset($row['vehicles']) && count($row['vehicles']) > 0) {
+                                    foreach($row['vehicles'] as $vehicle) {
+                                        $vehicleData = $vehicle['vehicle'];
+                                        if(isset($vehicleData->monthly_fuel_limit) && $vehicleData->monthly_fuel_limit > 0) {
+                                            // Get monthly fuel usage for this vehicle for the selected month
+                                            $monthlyVehicleFuelSlips = \App\Models\FuelSlip::where('user_id', $row['user']->id)
+                                                ->where('vehicle_id', $vehicleData->id)
+                                                ->whereMonth('date', $selectedMonth)
+                                                ->whereYear('date', $year)
+                                                ->get();
+                                            
+                                            $monthlyVehicleLitersUsed = $monthlyVehicleFuelSlips->sum('liters');
+                                            
+                                            if($monthlyVehicleLitersUsed > $vehicleData->monthly_fuel_limit) {
+                                                $hasExceededFuelLimit = true;
+                                                break;
+                                            }
+                                        }
+                                    }
+                                }
+
                                 $status = 'Normal';
                                 $statusClass = 'status-green';
 
-                                if ($percent >= 80) {
+                                if ($hasExceededFuelLimit) {
+                                    $status = 'Exceeded Fuel Limit';
+                                    $statusClass = 'status-red';
+                                } elseif ($percent >= 80) {
                                     $status = 'Critical';
                                     $statusClass = 'status-red';
                                 } elseif ($percent >= 50) {
@@ -242,33 +270,6 @@
     </div>
 </div>
 
-<script>
-// Close hamburger menu when a link is clicked
-document.querySelectorAll('.hamburger-dropdown a').forEach(link => {
-    link.addEventListener('click', () => {
-        document.getElementById('hamburger-toggle').checked = false;
-    });
-});
-
-// Also handle form submission (logout)
-document.querySelectorAll('.hamburger-dropdown form').forEach(form => {
-    form.addEventListener('submit', () => {
-        document.getElementById('hamburger-toggle').checked = false;
-    });
-});
-
-function toggleRow(rowId) {
-    const detailsRow = document.getElementById(rowId + '-details');
-    if (!detailsRow) return;
-
-    const isVisible = detailsRow.style.display === 'table-row';
-    detailsRow.style.display = isVisible ? 'none' : 'table-row';
-}
-
-function toggleIcon(btn) {
-    const expanded = btn.getAttribute('aria-expanded') === 'true';
-    btn.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-}
-</script>
+<script src="{{ asset('js/admin-dashboard.js') }}"></script>
 
 @endsection

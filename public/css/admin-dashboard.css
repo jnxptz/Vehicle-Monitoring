@@ -734,6 +734,32 @@
 
 
 
+    /* Status color classes */
+    .modern-table .status-badge.status-green {
+        background: #10b981;
+        color: white;
+    }
+
+    .modern-table .status-badge.status-yellow {
+        background: #f59e0b;
+        color: white;
+    }
+
+    .modern-table .status-badge.status-red {
+        background: #dc2626;
+        color: white;
+        font-weight: 700;
+        border: 2px solid #dc2626;
+        box-shadow: 0 2px 4px rgba(220, 38, 38, 0.3);
+        animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+        0% { opacity: 1; }
+        50% { opacity: 0.7; }
+        100% { opacity: 1; }
+    }
+
     .details-row.active {
 
         display: grid !important;
