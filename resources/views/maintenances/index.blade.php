@@ -48,8 +48,7 @@
                 <h1>Vehicle Monitoring System</h1>
             </div>
 
-            @include('partials.user-profile-dropdown')
-
+            
             {{-- Sidebar 
             <div class="hamburger-menu-wrapper">
                 <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
@@ -79,6 +78,8 @@
         <div class="dashboard-body">
 
             <nav class="dashboard-nav">
+                @include('partials.sidebar-profile')
+                
                 <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
                 
                 <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M5 17h14M5 17a2 2 0 01-2-2V7a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v8a2 2 0 01-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>Vehicles</a>
@@ -129,8 +130,7 @@
                 <h1>Vehicle Monitoring System</h1>
             </div>
 
-            @include('partials.user-profile-dropdown')
-
+            
             {{-- Sidebar --}}
             <div class="hamburger-menu-wrapper">
                 <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
@@ -157,6 +157,8 @@
 
             {{-- Sidebar --}}
             <nav class="dashboard-nav">
+                @include('partials.sidebar-profile')
+                
                 <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 22V5a2 2 0 012-2h6a2 2 0 012 2v17"/><path d="M13 10h4l2 2v10"/><path d="M7 11v2"/><path d="M17 14v2"/></svg>Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Maintenances</a>
@@ -231,8 +233,8 @@
                                                                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                                 <strong style="font-size:15px;">{{ $vehicle->plate_number }}</strong>
                                                                                 <div style="display:flex; gap:6px;">
-                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background:#ff9b00; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
-                                                                                <a href="javascript:void(0)" onclick="openPDFModal({{ $m->id }})" style="background:#3b82f6; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">View</a>
+                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" title="Download PDF" style="background:#ff9b00; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></a>
+                                                                                <a href="javascript:void(0)" onclick="openPDFModal({{ $m->id }})" title="View PDF" style="background:#3b82f6; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></a>
                                                                             </div>
                                                                             </div>
                                                                             <div style="font-size:13px; line-height:1.8;">
@@ -273,13 +275,13 @@
                             <table style="width: 100%; border-collapse: collapse; border: none;">
                                 <thead>
                                     <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Vehicle</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Type</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">KM</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Operation(s)</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Cost</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Date</th>
-                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Actions</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Vehicle</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Type</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">KM</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Operation(s)</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Cost</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Date</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -293,8 +295,8 @@
                                             <td style="padding: 14px 16px; color: #64748b; border: none; font-size: 13px;">{{ $m->date }}</td>
                                             <td style="padding: 14px 16px; border: none;">
                                                 <div style="display:flex; gap:6px;">
-                                                    <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background: #ff9b00; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">PDF</a>
-                                                    <a href="javascript:void(0)" onclick="openPDFModal({{ $m->id }})" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">View</a>
+                                                    <a href="{{ route('maintenances.exportPDF', $m->id) }}" title="Download PDF" style="background:#ff9b00; color:white; border:none; padding:6px; border-radius:6px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg></a>
+                                                    <a href="javascript:void(0)" onclick="openPDFModal({{ $m->id }})" title="View PDF" style="background:#3b82f6; color:white; border:none; padding:6px; border-radius:6px; cursor:pointer; text-decoration:none; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></a>
                                                 </div>
                                             </td>
                                         </tr>

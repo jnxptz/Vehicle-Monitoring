@@ -12,8 +12,7 @@
             <h1>Vehicle Monitoring System</h1>
         </div>
 
-        @include('partials.user-profile-dropdown')
-
+        
         {{-- Sidebar
         <div class="hamburger-menu-wrapper">
             <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
@@ -40,6 +39,8 @@
     <div class="dashboard-body">
 
         <nav class="dashboard-nav">
+            @include('partials.sidebar-profile')
+            
             <a href="{{ route('admin.dashboard') }}" class="{{ request()->routeIs('admin.dashboard') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
             
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M5 17h14M5 17a2 2 0 01-2-2V7a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v8a2 2 0 01-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>Vehicles</a>
@@ -50,7 +51,7 @@
                 <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>Offices</a>
                 <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Manage Users</a>
             </div>
-
+            
             <div class="logout-form">
                 <form action="{{ route('logout') }}" method="POST">
                     @csrf
@@ -119,11 +120,11 @@
                                                     <div class="vehicle-header">
                                                         <strong>{{ $vehicle->vehicle_name ?? $vehicle->plate_number }}</strong>
                                                         <div class="card-actions">
-                                                            <button onclick="openEditModal({{ $vehicle->id }}, '{{ addslashes($vehicle->plate_number) }}', {{ $vehicle->monthly_fuel_limit }}, {{ $vehicle->current_km ?? 0 }})" style="background:#0b77d6; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600;">Edit</button>
+                                                            <button onclick="openEditModal({{ $vehicle->id }}, '{{ addslashes($vehicle->plate_number) }}', {{ $vehicle->monthly_fuel_limit }}, {{ $vehicle->current_km ?? 0 }})" title="Edit" style="background:#0b77d6; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                                                             <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST" style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
-                                                                <button type="submit" onclick="return confirm('Are you sure you want to delete this vehicle?')" style="background:#dc3545; color:white; border:none; padding:6px 12px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; margin-left:8px;">Delete</button>
+                                                                <button type="submit" onclick="return confirm('Are you sure you want to delete this vehicle?')" title="Delete" style="background:#dc3545; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center; margin-left:4px;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg></button>
                                                             </form>
                                                         </div>
                                                     </div>

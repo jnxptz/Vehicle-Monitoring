@@ -15,8 +15,7 @@ use Carbon\Carbon;
             <h1>Vehicle Monitoring System</h1>
         </div>
 
-        @include('partials.user-profile-dropdown')
-        
+                
         {{-- Hamburger Menu (Mobile/Tablet Only) --}}
         <div class="hamburger-menu-wrapper">
             <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
@@ -46,6 +45,8 @@ use Carbon\Carbon;
 
     <div class="dashboard-body">
         <nav class="dashboard-nav">
+            @include('partials.sidebar-profile')
+            
             <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 22V5a2 2 0 012-2h6a2 2 0 012 2v17"/><path d="M13 10h4l2 2v10"/><path d="M7 11v2"/><path d="M17 14v2"/></svg>Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Maintenances</a>
@@ -65,8 +66,6 @@ use Carbon\Carbon;
             <div class="page-header">
 
                 <div>
-
-                    <h2>Welcome, {{ Auth::user()->name }}!</h2>
 
                     <p class="sub-text">
 
