@@ -8,6 +8,7 @@ use App\Http\Controllers\FuelSlipController;
 use App\Http\Controllers\MaintenanceController;
 use App\Http\Controllers\DashboardController; // Added for boardmember dashboard logic
 use App\Http\Controllers\OfficeController;
+use App\Http\Controllers\ProfileController;
 
 
 // --------------------
@@ -111,6 +112,10 @@ Route::middleware(['auth', 'role:boardmember'])->group(function () {
 // - create/store: boardmember only (above)
 // --------------------
 Route::middleware(['auth'])->group(function () {
+    Route::get('profile/settings', [ProfileController::class, 'show'])->name('profile.settings');
+    Route::put('profile/update-name', [ProfileController::class, 'updateName'])->name('profile.updateName');
+    Route::put('profile/update-password', [ProfileController::class, 'updatePassword'])->name('profile.updatePassword');
+
     Route::get('fuel-slips', [FuelSlipController::class, 'index'])->name('fuel-slips.index');
     Route::get('fuel-slips/{id}/pdf', [FuelSlipController::class, 'exportPDF'])->name('fuel-slips.exportPDF');
     Route::get('fuel-slips/{id}/view-pdf', [FuelSlipController::class, 'viewPDF'])->name('fuel-slips.viewPDF');
