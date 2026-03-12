@@ -113,6 +113,7 @@ Route::middleware(['auth', 'role:boardmember'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('fuel-slips', [FuelSlipController::class, 'index'])->name('fuel-slips.index');
     Route::get('fuel-slips/{id}/pdf', [FuelSlipController::class, 'exportPDF'])->name('fuel-slips.exportPDF');
+    Route::get('fuel-slips/{id}/view-pdf', [FuelSlipController::class, 'viewPDF'])->name('fuel-slips.viewPDF');
 });
 
 // --------------------
@@ -123,6 +124,7 @@ Route::middleware(['auth'])->group(function () {
 Route::middleware(['auth'])->group(function () {
     Route::get('maintenances', [MaintenanceController::class, 'index'])->name('maintenances.index');
     Route::get('maintenances/{id}/pdf', [MaintenanceController::class, 'exportPDF'])->name('maintenances.exportPDF');
+    Route::get('maintenances/{id}/view-pdf', [MaintenanceController::class, 'viewPDF'])->name('maintenances.viewPDF');
 });
 
 Route::middleware(['auth', 'role:admin'])->group(function () {

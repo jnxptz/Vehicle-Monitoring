@@ -69,7 +69,7 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-                <h1>Sangguniang Panlalawigan</h1>
+                <h1>Vehicle Monitoring System</h1>
             </div>
 
             {{-- Hamburger Menu (Mobile/Tablet Only) --}}
@@ -188,7 +188,10 @@
                                                             <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
                                                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                     <strong style="font-size:15px;">{{ $slip->vehicle_name }}</strong>
-                                                                    <a href="{{ route('fuel-slips.exportPDF', $slip->id) }}" style="background:#ff9b00; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
+                                                                    <div style="display:flex; gap:6px;">
+                                                                        <a href="{{ route('fuel-slips.exportPDF', $slip->id) }}" style="background:#ff9b00; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
+                                                                        <a href="javascript:void(0)" onclick="openPDFModal({{ $slip->id }})" style="background:#3b82f6; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">View</a>
+                                                                    </div>
                                                                 </div>
                                                                 <div style="font-size:13px; line-height:1.8;">
                                                                     <div><span style="color:#6b7280;">Plate #:</span> <strong>{{ $slip->plate_number }}</strong></div>
@@ -225,7 +228,7 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-                <h1>Sangguniang Panlalawigan</h1>
+                <h1>Vehicle Monitoring System</h1>
             </div>
 
             {{-- Hamburger Menu (Mobile Only) --}}
@@ -311,7 +314,10 @@
                                         <td style="padding: 14px 16px; color: #64748b; border: none;">{{ $slip->control_number }}</td>
                                         <td style="padding: 14px 16px; color: #64748b; border: none; font-size: 13px;">{{ $slip->date }}</td>
                                         <td style="padding: 14px 16px; border: none;">
-                                            <a href="{{ route('fuel-slips.exportPDF', $slip->id) }}" style="background: #ff9b00; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">PDF</a>
+                                            <div style="display:flex; gap:6px;">
+                                                <a href="{{ route('fuel-slips.exportPDF', $slip->id) }}" style="background: #ff9b00; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">PDF</a>
+                                                <a href="javascript:void(0)" onclick="openPDFModal({{ $slip->id }})" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">View</a>
+                                            </div>
                                         </td>
                                     </tr>
                                 @endforeach
@@ -601,8 +607,97 @@
     </div>
 </div>
 
+<!-- PDF Viewer Modal -->
+<div id="pdfViewerModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); overflow: auto;">
+    <div style="background-color: #fefefe; margin: 1% auto; padding: 0; border: 1px solid #888; border-radius: 8px; width: 95%; max-width: 1000px; height: 95%; max-height: 900px; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #ddd; background: #f8f9fa;">
+            <h2 style="margin: 0; color: #1565c0; font-size: 18px;">Fuel Slip PDF Preview</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a id="pdfDownloadLink" href="#" target="_blank" style="background: #ff9b00; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none;">Download PDF</a>
+                <span onclick="closePDFModal()" style="color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1; background: #f1f3f4; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</span>
+            </div>
+        </div>
+        <div id="pdfContent" style="flex: 1; overflow: auto; background: white;">
+            <div style="padding: 20px; text-align: center; color: #64748b;">
+                Loading PDF preview...
+            </div>
+        </div>
+    </div>
+</div>
+
 <script>
-    window.boardmembersData = @json(isset($boardmembers) ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
+    window.boardmembersData = @json($boardmembers ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
+    
+    function openPDFModal(fuelSlipId) {
+        const modal = document.getElementById('pdfViewerModal');
+        const pdfContent = document.getElementById('pdfContent');
+        const downloadLink = document.getElementById('pdfDownloadLink');
+        
+        // Show loading message
+        pdfContent.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b; font-size: 16px;">Loading PDF preview...</div>';
+        
+        // Set the download link
+        downloadLink.href = "{{ route('fuel-slips.exportPDF', ':id') }}".replace(':id', fuelSlipId);
+        
+        // Fetch the PDF HTML content
+        fetch("{{ route('fuel-slips.viewPDF', ':id') }}".replace(':id', fuelSlipId))
+            .then(response => response.blob())
+            .then(blob => {
+                // Create object URL for the blob
+                const url = URL.createObjectURL(blob);
+                
+                // Create an iframe to display the PDF
+                pdfContent.innerHTML = '<iframe src="' + url + '" style="width: 100%; height: 100%; border: none;"></iframe>';
+                
+                // Clean up the object URL when modal is closed
+                modal.dataset.blobUrl = url;
+            })
+            .catch(error => {
+                console.error('Error loading PDF:', error);
+                pdfContent.innerHTML = '<div style="padding: 40px; text-align: center; color: #dc2626; font-size: 16px;">Error loading PDF preview. Please try downloading the PDF instead.</div>';
+            });
+        
+        // Show the modal
+        modal.style.display = 'block';
+        
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closePDFModal() {
+        const modal = document.getElementById('pdfViewerModal');
+        const pdfContent = document.getElementById('pdfContent');
+        
+        // Clean up blob URL if it exists
+        if (modal.dataset.blobUrl) {
+            URL.revokeObjectURL(modal.dataset.blobUrl);
+            delete modal.dataset.blobUrl;
+        }
+        
+        // Hide the modal
+        modal.style.display = 'none';
+        
+        // Clear the content
+        pdfContent.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">Loading PDF preview...</div>';
+        
+        // Restore body scroll
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('pdfViewerModal');
+        if (event.target === modal) {
+            closePDFModal();
+        }
+    }
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closePDFModal();
+        }
+    });
 </script>
 <script src="{{ asset('js/fuel-slips.js') }}"></script>
 

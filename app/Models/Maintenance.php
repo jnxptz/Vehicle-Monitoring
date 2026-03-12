@@ -18,6 +18,8 @@ class Maintenance extends Model
         'conduct',
         'call_of_no',
         'date',
+        'prepared_by_name',
+        'approved_by_name',
         'photo'
     ];
 

@@ -8,7 +8,7 @@
     <div class="dashboard-header">
         <div class="dashboard-title">
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-            <h1>Sangguniang Panlalawigan</h1>
+            <h1>Vehicle Monitoring System</h1>
         </div>
     </div>
 
@@ -189,9 +189,7 @@
                                                             <span style="font-weight: 500; color: #1e293b;">{{ $user->name }}</span>
                                                             <span style="color: #64748b; margin-left: 8px; font-size: 12px;">{{ $user->email }}</span>
                                                         </div>
-                                                        <div style="background: #f59e0b; color: white; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600;">
-                                                            {{ $user->role }}
-                                                        </div>
+                                                        
                                                     </div>
                                                 @endforeach
                                             </div>

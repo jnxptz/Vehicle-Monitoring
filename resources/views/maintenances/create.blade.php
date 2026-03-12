@@ -7,7 +7,7 @@
     <div class="dashboard-header">
         <div class="dashboard-title">
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-            <h1>Sangguniang Panlalawigan</h1>
+            <h1>Vehicle Monitoring System</h1>
         </div>
     </div>
 
@@ -172,7 +172,7 @@
                             " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
                         </div>
 
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                             <!-- Date -->
                             <div>
                                 <label for="date" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">📅 Date</label>
@@ -186,7 +186,35 @@
                                     transition: all 0.2s ease;
                                 " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
                             </div>
+                            <!-- Prepared By -->
+                            <div>
+                                <label for="prepared_by_name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Prepared By</label>
+                                <input id="prepared_by_name" type="text" name="prepared_by_name" placeholder="" value="{{ old('prepared_by_name') }}" style="
+                                    width: 100%;
+                                    padding: 12px 16px;
+                                    border: 2px solid #e2e8f0;
+                                    border-radius: 8px;
+                                    font-size: 14px;
+                                    background: #ffffff;
+                                    transition: all 0.2s ease;
+                                " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                            </div>
+                            <!-- Approved By -->
+                            <div>
+                                <label for="approved_by_name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Approved By</label>
+                                <input id="approved_by_name" type="text" name="approved_by_name" placeholder="" value="{{ old('approved_by_name') }}" style="
+                                    width: 100%;
+                                    padding: 12px 16px;
+                                    border: 2px solid #e2e8f0;
+                                    border-radius: 8px;
+                                    font-size: 14px;
+                                    background: #ffffff;
+                                    transition: all 0.2s ease;
+                                " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                            </div>
+                        </div>
 
+                        <div style="margin-bottom: 24px;">
                             <!-- Photo Upload -->
                             <div>
                                 <label for="photo" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">📷 Photo (Optional)</label>

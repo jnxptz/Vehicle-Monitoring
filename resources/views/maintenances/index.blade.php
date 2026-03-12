@@ -7,13 +7,45 @@
 @endif
 <link rel="stylesheet" href="{{ asset('css/maintenances-styles.css') }}">
 
+<style>
+    /* Mobile responsive table styles (match fuel slips) */
+    @media (max-width: 768px) {
+        .table-wrapper {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .table-wrapper table {
+            min-width: 600px;
+            font-size: 12px;
+        }
+
+        .table-wrapper th {
+            padding: 8px 4px !important;
+            font-size: 11px !important;
+            white-space: nowrap;
+        }
+
+        .table-wrapper td {
+            padding: 6px 4px !important;
+            font-size: 11px !important;
+            word-wrap: break-word;
+        }
+
+        .details-row div[style*="display:grid"] {
+            grid-template-columns: 1fr !important;
+            gap: 8px !important;
+        }
+    }
+</style>
+
 @if(auth()->user()->role === 'admin')
     <div class="dashboard-page">
         {{-- Header --}}
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-                <h1>Sangguniang Panlalawigan</h1>
+                <h1>Vehicle Monitoring System</h1>
             </div>
 
             {{-- Sidebar 
@@ -88,7 +120,7 @@
         <div class="dashboard-header">
             <div class="dashboard-title">
                 <img src="{{ asset('images/splogoo.png') }}" alt="Logo">
-                <h1>Sangguniang Panlalawigan</h1>
+                <h1>Vehicle Monitoring System</h1>
             </div>
 
             {{-- Sidebar --}}
@@ -169,35 +201,42 @@
                                                 $totalMaint += $v->maintenances ? count($v->maintenances) : 0;
                                             }
                                         @endphp
-                                        <tr class="main-row" onclick="toggleRow('maint-{{ $bm->id }}')" data-loop-even="{{ $loop->even }}">
-                                            <td class="counter-cell">{{ $counter }}</td>
-                                            <td class="boardmember-cell">{{ $bm->name }}</td>
-                                            <td class="maintenance-count-cell">
-                                                <span class="maintenance-count-badge">
+                                        <tr class="main-row" onclick="toggleRow('maint-{{ $bm->id }}')" style="cursor:pointer; background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
+                                            <td style="padding: 16px 20px; font-weight: 500; color: #1e40af; border: none;">{{ $counter }}</td>
+                                            <td style="padding: 16px 20px; font-weight: 500; color: #1e293b; border: none;">{{ $bm->name }}</td>
+                                            <td style="padding: 16px 20px; color: #64748b; border: none;">
+                                                <span style="background: #dbeafe; color: #1d4ed8; padding: 4px 12px; border-radius: 20px; font-size: 13px; font-weight: 500;">
                                                     {{ $totalMaint }} record(s)
                                                 </span>
                                             </td>
                                         </tr>
 
-                                        <tr id="maint-{{ $bm->id }}-details" class="details-row">
-                                            <td colspan="3">
-                                                <div class="maintenance-cards-container">
+                                        <tr id="maint-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
+                                            <td colspan="3" style="padding: 0; border: none;">
+                                                <div class="maintenance-cards-container" style="overflow-x:auto;">
                                                     @if($totalMaint > 0)
-                                                        <div class="maintenance-cards-grid">
+                                                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
                                                             @foreach($bm->vehicles as $vehicle)
                                                                 @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
                                                                     @foreach($vehicle->maintenances as $m)
-                                                                        <div class="maintenance-card">
-                                                                            <div class="maintenance-card-header">
-                                                                                <strong>{{ $vehicle->plate_number }}</strong>
-                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" class="pdf-btn">PDF</a>
+                                                                        <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                                                            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+                                                                                <strong style="font-size:15px;">{{ $vehicle->plate_number }}</strong>
+                                                                                <div style="display:flex; gap:6px;">
+                                                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background:#ff9b00; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">PDF</a>
+                                                                                <a href="javascript:void(0)" onclick="openPDFModal({{ $m->id }})" style="background:#3b82f6; color:white; border:none; padding:4px 10px; border-radius:4px; cursor:pointer; font-size:12px; font-weight:600; text-decoration:none;">View</a>
                                                                             </div>
-                                                                            <div class="maintenance-details">
-                                                                                <div><span class="detail-label">Type:</span> <strong>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</strong></div>
-                                                                                <div><span class="detail-label">KM:</span> {{ $m->maintenance_km ?? '—' }}</div>
-                                                                                <div><span class="detail-label">Operation(s):</span> {{ Str::limit($m->operation, 100, '...') }}</div>
-                                                                                <div><span class="detail-label">Cost:</span> <strong>₱{{ number_format((float) $m->cost, 2) }}</strong></div>
-                                                                                <div><span class="detail-label">Date:</span> {{ $m->date }}</div>
+                                                                            </div>
+                                                                            <div style="font-size:13px; line-height:1.8;">
+                                                                                <div><span style="color:#6b7280;">Type:</span> <strong>{{ ucfirst($m->maintenance_type ?? 'preventive') }}</strong></div>
+                                                                                <div><span style="color:#6b7280;">KM:</span> {{ $m->maintenance_km ?? '—' }}</div>
+                                                                                <div><span style="color:#6b7280;">Operation(s):</span> {{ Str::limit($m->operation, 100, '...') }}</div>
+                                                                                <div><span style="color:#6b7280;">Cost:</span> <strong>₱{{ number_format((float) $m->cost, 2) }}</strong></div>
+                                                                                <div><span style="color:#6b7280;">Date:</span> {{ $m->date }}</div>
+                                                                                @if($m->prepared_by_name || $m->approved_by_name)
+                                                                                <div><span style="color:#6b7280;">Prepared by:</span> {{ $m->prepared_by_name ?? '—' }}</div>
+                                                                                <div><span style="color:#6b7280;">Approved by:</span> {{ $m->approved_by_name ?? '—' }}</div>
+                                                                                @endif
                                                                             </div>
                                                                         </div>
                                                                     @endforeach
@@ -205,7 +244,7 @@
                                                             @endforeach
                                                         </div>
                                                     @else
-                                                        <div class="no-maintenances-message">No maintenances for this boardmember.</div>
+                                                        <div style="padding:12px; color:#6b7280;">No maintenances for this boardmember.</div>
                                                     @endif
                                                 </div>
                                             </td>
@@ -220,32 +259,35 @@
                         <p class="empty-message">No maintenance records found.</p>
                     @endif
                 @else
-                    {{-- Boardmember View: Simple table of their own maintenances --}}
+                    {{-- Boardmember View: Simple table of their own maintenances (same design as fuel slips) --}}
                     @if($maintenances->count() > 0)
-                        <div class="table-wrapper">
-                            <table class="boardmember-maintenances-table">
+                        <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                            <table style="width: 100%; border-collapse: collapse; border: none;">
                                 <thead>
-                                    <tr>
-                                        <th>Vehicle</th>
-                                        <th>Type</th>
-                                        <th>KM</th>
-                                        <th>Operation(s)</th>
-                                        <th>Cost</th>
-                                        <th>Date</th>
-                                        <th>Actions</th>
+                                    <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Vehicle</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Type</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">KM</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Operation(s)</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Cost</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Date</th>
+                                        <th style="padding: 14px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 13px; border: none;">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     @foreach($maintenances as $m)
-                                        <tr class="boardmember-maintenance-row" data-loop-even="{{ $loop->even }}">
-                                            <td class="vehicle-cell">{{ $m->vehicle->plate_number }}</td>
-                                            <td class="type-cell">{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
-                                            <td class="km-cell">{{ $m->maintenance_km ?? '—' }}</td>
-                                            <td class="operation-cell">{{ Str::limit($m->operation, 80, '...') }}</td>
-                                            <td class="cost-cell">₱{{ number_format((float) $m->cost, 2) }}</td>
-                                            <td class="date-cell">{{ $m->date }}</td>
-                                            <td class="actions-cell">
-                                                <a href="{{ route('maintenances.exportPDF', $m->id) }}" class="pdf-btn">PDF</a>
+                                        <tr style="background: {{ $loop->even ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $loop->even ? '#f8fafc' : '#ffffff' }}';">
+                                            <td style="padding: 14px 16px; font-weight: 500; color: #1e293b; border: none;">{{ $m->vehicle->plate_number }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ ucfirst($m->maintenance_type ?? 'preventive') }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ $m->maintenance_km ?? '—' }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none;">{{ Str::limit($m->operation, 80, '...') }}</td>
+                                            <td style="padding: 14px 16px; font-weight: 600; color: #059669; border: none;">₱{{ number_format((float) $m->cost, 2) }}</td>
+                                            <td style="padding: 14px 16px; color: #64748b; border: none; font-size: 13px;">{{ $m->date }}</td>
+                                            <td style="padding: 14px 16px; border: none;">
+                                                <div style="display:flex; gap:6px;">
+                                                    <a href="{{ route('maintenances.exportPDF', $m->id) }}" style="background: #ff9b00; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">PDF</a>
+                                                    <a href="javascript:void(0)" onclick="openPDFModal({{ $m->id }})" style="background: #3b82f6; color: white; border: none; padding: 6px 12px; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 600; text-decoration: none; display: inline-block;">View</a>
+                                                </div>
                                             </td>
                                         </tr>
                                     @endforeach
@@ -414,7 +456,7 @@
                 " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
             </div>
 
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
                 <!-- Date -->
                 <div>
                     <label for="date" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Date</label>
@@ -428,7 +470,35 @@
                         transition: all 0.2s ease;
                     " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
                 </div>
+                <!-- Prepared By -->
+                <div>
+                    <label for="modal_prepared_by_name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Prepared By</label>
+                    <input id="modal_prepared_by_name" type="text" name="prepared_by_name" placeholder="" value="{{ old('prepared_by_name') }}" style="
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        background: #ffffff;
+                        transition: all 0.2s ease;
+                    ">
+                </div>
+                <!-- Approved By -->
+                <div>
+                    <label for="modal_approved_by_name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Approved By</label>
+                    <input id="modal_approved_by_name" type="text" name="approved_by_name" placeholder="" value="{{ old('approved_by_name') }}" style="
+                        width: 100%;
+                        padding: 12px 16px;
+                        border: 2px solid #e2e8f0;
+                        border-radius: 8px;
+                        font-size: 14px;
+                        background: #ffffff;
+                        transition: all 0.2s ease;
+                    ">
+                </div>
+            </div>
 
+            <div style="margin-bottom: 20px;">
                 <!-- Photo Upload -->
                 <div>
                     <label for="photo" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Photo (Optional)</label>
@@ -495,5 +565,96 @@
         </form>
     </div>
 </div>
+
+<!-- PDF Viewer Modal -->
+<div id="pdfViewerModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.8); overflow: auto;">
+    <div style="background-color: #fefefe; margin: 1% auto; padding: 0; border: 1px solid #888; border-radius: 8px; width: 95%; max-width: 1000px; height: 95%; max-height: 900px; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: center; padding: 15px 20px; border-bottom: 1px solid #ddd; background: #f8f9fa;">
+            <h2 style="margin: 0; color: #1565c0; font-size: 18px;">Maintenance PDF Preview</h2>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <a id="pdfDownloadLink" href="#" target="_blank" style="background: #ff9b00; color: white; padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none;">Download PDF</a>
+                <span onclick="closePDFModal()" style="color: #666; font-size: 24px; font-weight: bold; cursor: pointer; line-height: 1; background: #f1f3f4; width: 32px; height: 32px; border-radius: 50%; display: flex; align-items: center; justify-content: center;">&times;</span>
+            </div>
+        </div>
+        <div id="pdfContent" style="flex: 1; overflow: auto; background: white;">
+            <div style="padding: 20px; text-align: center; color: #64748b;">
+                Loading PDF preview...
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    function openPDFModal(maintenanceId) {
+        const modal = document.getElementById('pdfViewerModal');
+        const pdfContent = document.getElementById('pdfContent');
+        const downloadLink = document.getElementById('pdfDownloadLink');
+        
+        // Show loading message
+        pdfContent.innerHTML = '<div style="padding: 40px; text-align: center; color: #64748b; font-size: 16px;">Loading PDF preview...</div>';
+        
+        // Set the download link
+        downloadLink.href = "{{ route('maintenances.exportPDF', ':id') }}".replace(':id', maintenanceId);
+        
+        // Fetch the PDF HTML content
+        fetch("{{ route('maintenances.viewPDF', ':id') }}".replace(':id', maintenanceId))
+            .then(response => response.blob())
+            .then(blob => {
+                // Create object URL for the blob
+                const url = URL.createObjectURL(blob);
+                
+                // Create an iframe to display the PDF
+                pdfContent.innerHTML = '<iframe src="' + url + '" style="width: 100%; height: 100%; border: none;"></iframe>';
+                
+                // Clean up the object URL when modal is closed
+                modal.dataset.blobUrl = url;
+            })
+            .catch(error => {
+                console.error('Error loading PDF:', error);
+                pdfContent.innerHTML = '<div style="padding: 40px; text-align: center; color: #dc2626; font-size: 16px;">Error loading PDF preview. Please try downloading the PDF instead.</div>';
+            });
+        
+        // Show the modal
+        modal.style.display = 'block';
+        
+        // Prevent body scroll when modal is open
+        document.body.style.overflow = 'hidden';
+    }
+    
+    function closePDFModal() {
+        const modal = document.getElementById('pdfViewerModal');
+        const pdfContent = document.getElementById('pdfContent');
+        
+        // Clean up blob URL if it exists
+        if (modal.dataset.blobUrl) {
+            URL.revokeObjectURL(modal.dataset.blobUrl);
+            delete modal.dataset.blobUrl;
+        }
+        
+        // Hide the modal
+        modal.style.display = 'none';
+        
+        // Clear the content
+        pdfContent.innerHTML = '<div style="padding: 20px; text-align: center; color: #64748b;">Loading PDF preview...</div>';
+        
+        // Restore body scroll
+        document.body.style.overflow = 'auto';
+    }
+    
+    // Close modal when clicking outside of it
+    window.onclick = function(event) {
+        const modal = document.getElementById('pdfViewerModal');
+        if (event.target === modal) {
+            closePDFModal();
+        }
+    }
+    
+    // Close modal with Escape key
+    document.addEventListener('keydown', function(event) {
+        if (event.key === 'Escape') {
+            closePDFModal();
+        }
+    });
+</script>
 
 @endsection

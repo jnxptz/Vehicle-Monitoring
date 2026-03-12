@@ -27,7 +27,12 @@
 
         .km-reading { position:fixed; right:32px; bottom:80px; color:#d32f2f; font-weight:700; }
 
-        .footer-bar { position:fixed; left:0; right:0; bottom:0; background:#b71c1c; color:#fff; padding:10px 16px; text-align:center; font-size:11px; }
+        .footer-bar { position:fixed; left:0; right:0; bottom:0; background:#fff; color:#111; padding:10px 20px; text-align:center; }
+        .footer-bar .footer-line-top { border-top:8px solid #b71c1c; margin-bottom:6px; }
+        .footer-bar .footer-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+        .footer-bar .footer-phones { font-size:10px; line-height:1.4; margin-bottom:2px; }
+        .footer-bar .footer-email { font-size:10px; line-height:1.4; }
+        .footer-bar .footer-line-bottom { border-bottom:4px solid #b71c1c; margin-top:6px; }
     </style>
 </head>
 <body>
@@ -138,9 +143,17 @@
         </div>
     </div>
 
-
     <div class="km-reading">KM READING: {{ $fuelSlip->km_reading }}</div>
+<br>
+<br>
+<br>
 
-    <div class="footer-bar">LA UNION: Agkaysa! • (072) 682-2083 • sangguniangpanlalawiganlaunion@gmail.com • www.launion.gov.ph</div>
+    <div class="footer-bar">
+        <div class="footer-line-top"></div>
+        <div class="footer-title">LA UNION: Agkaysa!</div>
+        <div class="footer-phones">(072) 682-2083 : (072) 607-3234</div>
+        <div class="footer-email">sangguniangpanlalawiganlaunion@gmail.com &nbsp;&nbsp; www.launion.gov.ph</div>
+        <div class="footer-line-bottom"></div>
+    </div>
 </body>
 </html>

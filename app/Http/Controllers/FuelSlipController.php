@@ -134,4 +134,17 @@ class FuelSlipController extends Controller
             ->download('fuel-slip-' . $fuelSlip->control_number . '.pdf');
     }
 
+    public function viewPDF($id)
+    {
+        $fuelSlip = FuelSlip::findOrFail($id);
+
+        if (auth()->user()->role === 'boardmember' && $fuelSlip->user_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Generate PDF and return as blob for iframe display
+        return \Barryvdh\DomPDF\Facade\Pdf::loadView('fuel_slips.pdf_template', compact('fuelSlip'))
+            ->stream('fuel-slip-' . $fuelSlip->control_number . '.pdf');
+    }
+
 }

@@ -9,7 +9,7 @@
     <div class="dashboard-header">
         <div class="dashboard-title">
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-            <h1>Sangguniang Panlalawigan</h1>
+            <h1>Vehicle Monitoring System</h1>
         </div>
     </div>
 

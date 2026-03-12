@@ -25,7 +25,14 @@
         .photo .label { margin-bottom:6px; font-weight:700; }
         .photo img { max-width:100%; height:auto; border:1px solid #e0e0e0; border-radius:6px; }
 
-        .footer-bar { position:fixed; left:0; right:0; bottom:0; background:#b71c1c; color:#fff; padding:10px 16px; text-align:center; font-size:11px; }
+        .km-reading { position:fixed; right:32px; bottom:80px; color:#d32f2f; font-weight:700; }
+
+        .footer-bar { position:fixed; left:0; right:0; bottom:0; background:#fff; color:#111; padding:10px 20px; text-align:center; }
+        .footer-bar .footer-line-top { border-top:4px solid #b71c1c; margin-bottom:6px; }
+        .footer-bar .footer-title { font-size:13px; font-weight:700; margin-bottom:4px; }
+        .footer-bar .footer-phones { font-size:10px; line-height:1.4; margin-bottom:2px; }
+        .footer-bar .footer-email { font-size:10px; line-height:1.4; }
+        .footer-bar .footer-line-bottom { border-bottom:2px solid #b71c1c; margin-top:6px; }
     </style>
 </head>
 <body>
@@ -116,32 +123,36 @@
                 </td>
             </tr>
             <tr>
-                <td style="width:50%; padding-right:20px; padding-bottom:6px; text-align:left; border:none; font-size:12px;">
-                    SHERLY P. RABUT
+                <td style="width:50%; padding-right:50px; padding-bottom:6px; text-align:center; border:none; font-size:12px; vertical-align:middle; padding-top:10px;">
+                    <div style="margin-bottom:6px;">{{ $maintenance->prepared_by_name ?? '' }}</div>
+                    <div style="border-top:2px solid #000; width:60%; margin:0 auto;"></div>
+                    <div style="margin-top:6px; font-size:11px;">Laborer I</div>
                 </td>
-                <td style="width:50%; padding-left:20px; padding-bottom:6px; text-align:right; border:none; font-size:12px;">
-                    JANE T. FLORES, Ph.D.
-                </td>
-            </tr>
-            <tr>
-                <td style="width:50%; padding-right:50px; padding-bottom:2px; text-align:center; border:none;">
-                    <div style="border-top:2px solid #000;"></div>
-                </td>
-                <td style="width:50%; padding-left:50px; padding-bottom:2px; text-align:center; border:none;">
-                    <div style="border-top:2px solid #000;"></div>
-                </td>
-            </tr>
-            <tr>
-                <td style="width:50%; padding-right:20px; padding-top:2px; text-align:left; border:none; font-size:11px;">
-                    <small>Laborer I</small>
-                </td>
-                <td style="width:50%; padding-left:20px; padding-top:2px; text-align:right; border:none; font-size:11px;">
-                    <small>Secretary to the Sangguniang</small>
+                <td style="width:50%; padding-left:50px; padding-bottom:6px; text-align:center; border:none; font-size:12px; vertical-align:middle; padding-top:10px;">
+                    <div style="margin-bottom:6px;">{{ $maintenance->approved_by_name ?? '' }}</div>
+                    <div style="border-top:2px solid #000; width:60%; margin:0 auto;"></div>
+                    <div style="margin-top:6px; font-size:11px;">Secretary to the Sangguniang</div>
                 </td>
             </tr>
         </table>
+
+        <br>
+        <br>
+        <br>
     </div>
 
-    <div class="footer-bar">LA UNION: Agkaysa! • (072) 682-2083 • sangguniangpanlalawiganlaunion@gmail.com • www.launion.gov.ph</div>
+    <div style="display:flex; justify-content:space-between; margin-top:18px;">
+        <div><strong>Accept by:</strong> ____________________<br><strong>Invoice No.:</strong> ____________________</div>
+    </div>
+
+    <div class="km-reading">KM READING: {{ $maintenance->maintenance_km ?? '—' }}</div>
+
+    <div class="footer-bar">
+        <div class="footer-line-top"></div>
+        <div class="footer-title">LA UNION: Agkaysa!</div>
+        <div class="footer-phones">(072) 682-2083 : (072) 607-3234</div>
+        <div class="footer-email">sangguniangpanlalawiganlaunion@gmail.com &nbsp;&nbsp; www.launion.gov.ph</div>
+        <div class="footer-line-bottom"></div>
+    </div>
 </body>
 </html>

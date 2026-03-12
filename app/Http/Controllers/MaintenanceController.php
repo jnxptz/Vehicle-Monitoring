@@ -87,6 +87,8 @@ class MaintenanceController extends Controller
             'cost' => 'required|numeric|min:0',
             'conduct' => 'required|string|max:255',
             'date' => 'required|date',
+            'prepared_by_name' => 'nullable|string|max:255',
+            'approved_by_name' => 'nullable|string|max:255',
             'photo' => 'nullable|image|mimes:jpeg,jpg,png,webp,gif|max:5120',
         ]);
 
@@ -122,5 +124,18 @@ class MaintenanceController extends Controller
 
         return Pdf::loadView('maintenances.pdf', compact('maintenance'))
             ->download('maintenance-' . $maintenance->call_of_no . '.pdf');
+    }
+
+    public function viewPDF($id)
+    {
+        $maintenance = Maintenance::with(['vehicle', 'vehicle.bm'])->findOrFail($id);
+
+        if (auth()->user()->role === 'boardmember' && $maintenance->vehicle?->bm_id !== auth()->id()) {
+            abort(403);
+        }
+
+        // Generate PDF and return as blob for iframe display
+        return Pdf::loadView('maintenances.pdf', compact('maintenance'))
+            ->stream('maintenance-' . $maintenance->call_of_no . '.pdf');
     }
 }
