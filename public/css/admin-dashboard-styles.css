@@ -66,12 +66,41 @@
 }
 
 /* KPI Grid styling */
+/* KPI Grid styling */
 .kpi-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    display: flex;
     gap: 16px;
     margin-bottom: 24px;
+    padding-bottom: 6px;
+
+    /* Horizontal scrolling */
+    overflow-x: auto;
+    overflow-y: hidden;
+
+    /* Prevent cards from wrapping */
+    flex-wrap: nowrap;
+
+    /* Smooth scrolling */
+    scroll-behavior: smooth;
+
+    /* Better mobile scrolling */
+    -webkit-overflow-scrolling: touch;
 }
+
+/* Optional: nicer scrollbar */
+.kpi-grid::-webkit-scrollbar {
+    height: 6px;
+}
+
+.kpi-grid::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.kpi-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e1;
+    border-radius: 10px;
+}
+
 
 /* KPI Card styling */
 .kpi-card {
@@ -81,6 +110,11 @@
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     transition: transform 0.2s ease;
+
+    /* Consistent card size */
+    width: 220px;
+    min-width: 220px;
+    flex: 0 0 auto;
 }
 
 .kpi-card:hover {
@@ -101,8 +135,7 @@
     font-size: 24px;
     font-weight: 600;
     color: #1e293b;
-}
-
+}   
 /* Table wrapper styling */
 .table-wrapper {
     background: #ffffff;

@@ -223,13 +223,13 @@
 
                                         <tr id="maint-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
                                             <td colspan="3" style="padding: 0; border: none;">
-                                                <div class="maintenance-cards-container" style="overflow-x:auto;">
+                                                <div class="maintenance-cards-container" style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
                                                     @if($totalMaint > 0)
-                                                        <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
+                                                        <div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:8px;">
                                                             @foreach($bm->vehicles as $vehicle)
                                                                 @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
                                                                     @foreach($vehicle->maintenances as $m)
-                                                                        <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                                                        <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); min-width:300px; flex-shrink:0;">
                                                                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                                 <strong style="font-size:15px;">{{ $vehicle->plate_number }}</strong>
                                                                                 <div style="display:flex; gap:6px;">

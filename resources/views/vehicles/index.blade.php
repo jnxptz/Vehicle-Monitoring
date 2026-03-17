@@ -6,10 +6,10 @@
 <link rel="stylesheet" href="{{ asset('css/vehicles-styles.css') }}">
 
 <div class="dashboard-page">
-    <div class="dashboard-header">
-        <div class="dashboard-title">
-            <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
-            <h1>Vehicle Monitoring System</h1>
+    <div class="dashboard-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; padding: 16px 20px;">
+        <div class="dashboard-title" style="display: flex; align-items: center; gap: 12px; min-width: 0; flex: 1;">
+            <img src="{{ asset('images/SP Seal.png') }}" alt="Logo" style="height: 48px; width: auto; object-fit: contain; flex-shrink: 0;">
+            <h1 style="margin: 0; font-size: 20px; font-weight: 700; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">Vehicle Monitoring System</h1>
         </div>
 
         
@@ -78,7 +78,7 @@
                         @endforeach
                     </select>
 
-                    <button type="button" onclick="openVehicleModal()" class="add-vehicle-btn">+ Register Vehicle</button>
+                    <button type="button" onclick="openVehicleModal()" class="add-vehicle-btn" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important;">+ Register Vehicle</button>
                 </form>
             </div>
 
@@ -193,19 +193,19 @@
 </div>
 
 <!-- Vehicle Modal -->
-<div id="vehicleModal" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4);">
-    <div style="background-color:#fefefe; margin:10% auto; padding:30px; border:1px solid #888; border-radius:8px; width:90%; max-width:500px; max-height:80vh; overflow-y:auto;" onclick="event.stopPropagation();">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h2 style="margin:0;">Register Vehicle</h2>
-            <span onclick="closeVehicleModal()" style="color:#aaa; font-size:28px; font-weight:bold; cursor:pointer;">&times;</span>
+<div id="vehicleModal" style="display:none; position:fixed; z-index:999; left:0; top:0; width:100%; height:100%; background-color:rgba(0,0,0,0.4); backdrop-filter:blur(4px);">
+    <div style="background:linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); margin:5% auto; padding:32px; border:1px solid #e2e8f0; border-radius:12px; width:90%; max-width:520px; max-height:85vh; overflow-y:auto; box-shadow:0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);" onclick="event.stopPropagation();">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; padding-bottom:16px; border-bottom:1px solid #e2e8f0;">
+            <h2 style="margin:0; font-size:20px; font-weight:700; color:#1e293b;">Register Vehicle</h2>
+            <span onclick="closeVehicleModal()" style="color:#64748b; font-size:24px; font-weight:400; cursor:pointer; padding:4px; border-radius:6px; transition:all 0.2s ease;" onmouseover="this.style.background='#f1f5f9'; this.style.color='#475569';" onmouseout="this.style.background='transparent'; this.style.color='#64748b';">&times;</span>
         </div>
 
         <form action="{{ route('vehicles.store') }}" method="POST" onclick="event.stopPropagation();">
             @csrf
 
             @if(isset($allBoardmembers))
-                <label for="boardmember_id" style="display:block; margin-bottom:12px; font-weight:600;">Boardmember:</label>
-                <select id="boardmember_id" name="boardmember_id" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;">
+                <label for="boardmember_id" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Boardmember:</label>
+                <select id="boardmember_id" name="boardmember_id" required style="width:100%; padding:12px 16px; margin-bottom:20px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
                     <option value="">-- Select Boardmember --</option>
                     @foreach($allBoardmembers as $boardmember)
                         <option value="{{ $boardmember->id }}">{{ $boardmember->name }} ({{ $boardmember->office->name ?? 'No Office' }})</option>
@@ -213,16 +213,22 @@
                 </select>
             @endif
 
-            <label for="vehicle_name" style="display:block; margin-bottom:12px; font-weight:600;">Vehicle Name:</label>
-            <input id="vehicle_name" type="text" name="vehicle_name" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g., Toyota Corolla">
+            <label for="vehicle_name" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Vehicle Name:</label>
+            <input id="vehicle_name" type="text" name="vehicle_name" required style="width:100%; padding:12px 16px; margin-bottom:20px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" placeholder="e.g., Toyota Corolla" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
 
-            <label for="plate_number" style="display:block; margin-bottom:12px; font-weight:600;">Plate Number:</label>
-            <input id="plate_number" type="text" name="plate_number" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g., ABC 1234">
+            <label for="plate_number" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Plate Number:</label>
+            <input id="plate_number" type="text" name="plate_number" required style="width:100%; padding:12px 16px; margin-bottom:20px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" placeholder="e.g., ABC 1234" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
 
-            <label for="driver" style="display:block; margin-bottom:12px; font-weight:600;">Driver Name:</label>
-            <input id="driver" type="text" name="driver" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;" placeholder="Enter driver name">
+            <label for="driver" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Driver Name:</label>
+            <input id="driver" type="text" name="driver" required style="width:100%; padding:12px 16px; margin-bottom:20px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" placeholder="Enter driver name" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
 
-            <button type="submit" style="background:#007bff; color:white; padding:10px 20px; border:none; border-radius:4px; cursor:pointer; width:100%; font-weight:600;">Register Vehicle</button>
+            <label for="vehicle_color" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Vehicle Color:</label>
+            <div style="display:flex; gap:12px; margin-bottom:24px;">
+                <input id="vehicle_color" type="text" name="vehicle_color" style="flex:1; padding:12px 16px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" placeholder="e.g., Red, Blue, Black" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
+                <input id="vehicle_color_code" type="color" name="vehicle_color_code" value="#3b82f6" style="width:48px; height:48px; border:1px solid #d1d5db; border-radius:8px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af';" onmouseout="this.style.borderColor='#d1d5db';">
+            </div>
+
+            <button type="submit" style="background:linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color:white; padding:14px 24px; border:none; border-radius:8px; cursor:pointer; width:100%; font-weight:600; font-size:14px; transition:all 0.2s ease; box-shadow:0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2)';">Register Vehicle</button>
         </form>
 
         @if ($errors->any())
@@ -235,7 +241,4 @@
     </div>
 </div>
 
-<footer class="dashboard-footer">
-    &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
-</footer>
 @endsection

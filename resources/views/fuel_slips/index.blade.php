@@ -72,8 +72,7 @@
                 <h1>Vehicle Monitoring System</h1>
             </div>
 
-            @include('partials.user-profile-dropdown')
-
+            
             {{-- Hamburger Menu (Mobile/Tablet Only) --}}
             <div class="hamburger-menu-wrapper">
                 <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">
@@ -189,11 +188,11 @@
 
                                     <tr id="fs-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
                                         <td colspan="3" style="padding: 0; border: none;">
-                                            <div style="overflow-x:auto;">
+                                            <div class="fuel-cards-container" style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
                                                 @if($bm->fuelSlips->count() > 0)
-                                                    <div style="display:grid; grid-template-columns:repeat(auto-fill, minmax(300px, 1fr)); gap:16px;">
+                                                    <div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:8px;">
                                                         @foreach($bm->fuelSlips as $slip)
-                                                            <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
+                                                            <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); min-width:300px; flex-shrink:0;">
                                                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                     <strong style="font-size:15px;">{{ $slip->vehicle_name }}</strong>
                                                                     <div style="display:flex; gap:6px;">
@@ -239,8 +238,7 @@
                 <h1>Vehicle Monitoring System</h1>
             </div>
 
-            @include('partials.user-profile-dropdown')
-
+            
             {{-- Hamburger Menu (Mobile Only) --}}
             <div class="hamburger-menu-wrapper">
                 <input type="checkbox" id="hamburger-toggle" class="hamburger-toggle">

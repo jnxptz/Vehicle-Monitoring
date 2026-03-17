@@ -95,12 +95,12 @@ use Carbon\Carbon;
                         </select>
 
                         
-                        <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="export-btn btn-primary">
+                        <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="export-btn btn-primary" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important; box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2) !important;" onmouseover="this.style.background='linear-gradient(135deg, #d97706 0%, #b45309 100%) !important'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 155, 0, 0.3) !important';" onmouseout="this.style.background='linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 155, 0, 0.2) !important';">
                             Export Monthly PDF
                         </a>
 
                         
-                        <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="export-btn btn-primary yearly">
+                        <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="export-btn btn-primary yearly" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important; box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2) !important;" onmouseover="this.style.background='linear-gradient(135deg, #d97706 0%, #b45309 100%) !important'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 155, 0, 0.3) !important';" onmouseout="this.style.background='linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 155, 0, 0.2) !important';">
                             Export Yearly PDF
                         </a>
                     </form>

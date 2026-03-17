@@ -15,6 +15,8 @@
     <div class="dashboard-body">
         {{-- Sidebar --}}
         <nav class="dashboard-nav">
+            @include('partials.sidebar-profile')
+            
             <a href="{{ route('admin.dashboard') }}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
             
             <a href="{{ route('vehicles.index') }}"><svg viewBox="0 0 24 24"><path d="M5 17h14M5 17a2 2 0 01-2-2V7a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v8a2 2 0 01-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>Vehicles</a>
@@ -24,7 +26,6 @@
             <div class="bottom-section">
                 <a href="{{ route('offices.index') }}" class="active"><svg viewBox="0 0 24 24"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>Offices</a>
                 <a href="{{ route('offices.manage-boardmembers') }}"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Manage Users</a>
-                @include('partials.sidebar-profile')
                 
                 <form action="{{ route('logout') }}" method="POST" class="logout-form">
                     @csrf
@@ -210,41 +211,63 @@
                                     margin-top: 16px;
                                     padding-top: 16px;
                                     border-top: 1px solid #e2e8f0;
+                                    justify-content: center;
                                 ">
                                     <a href="javascript:void(0)" 
                                        onclick="openEditOfficeModal({{ $office->id }}, '{{ $office->name }}')" 
+                                       title="Edit Office"
                                        style="
-                                           flex: 1;
                                            background: #eff6ff;
                                            color: #1d4ed8;
                                            text-decoration: none;
-                                           padding: 10px 16px;
+                                           padding: 8px;
                                            border-radius: 6px;
-                                           font-size: 13px;
+                                           font-size: 14px;
                                            font-weight: 500;
                                            text-align: center;
                                            transition: all 0.2s;
+                                           display: inline-flex;
+                                           align-items: center;
+                                           justify-content: center;
+                                           width: 36px;
+                                           height: 36px;
                                        "
-                                       onmouseover="this.style.background='#dbeafe';"
-                                       onmouseout="this.style.background='#eff6ff';">
-                                        Edit
+                                       onmouseover="this.style.background='#dbeafe'; this.style.transform='translateY(-1px)';"
+                                       onmouseout="this.style.background='#eff6ff'; this.style.transform='translateY(0)';">
+                                        <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;">
+                                            <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                            <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                        </svg>
                                     </a>
-                                    <form action="{{ route('offices.destroy', $office->id) }}" method="POST" style="flex: 1; margin: 0;" onsubmit="return confirm('Are you sure you want to delete this office?');">
+                                    <form action="{{ route('offices.destroy', $office->id) }}" method="POST" style="margin: 0;" onsubmit="return confirm('Are you sure you want to delete this office?');">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" style="
-                                            width: 100%;
-                                            background: #fef2f2;
-                                            color: #dc2626;
-                                            border: none;
-                                            padding: 10px 16px;
-                                            border-radius: 6px;
-                                            font-size: 13px;
-                                            font-weight: 500;
-                                            cursor: pointer;
-                                            transition: all 0.2s;
-                                        " onmouseover="this.style.background='#fee2e2';" onmouseout="this.style.background='#fef2f2';">
-                                            Delete
+                                        <button type="submit" 
+                                                title="Delete Office"
+                                                style="
+                                                    background: #fef2f2;
+                                                    color: #dc2626;
+                                                    border: none;
+                                                    padding: 8px;
+                                                    border-radius: 6px;
+                                                    font-size: 14px;
+                                                    font-weight: 500;
+                                                    cursor: pointer;
+                                                    transition: all 0.2s;
+                                                    display: inline-flex;
+                                                    align-items: center;
+                                                    justify-content: center;
+                                                    width: 36px;
+                                                    height: 36px;
+                                                " 
+                                                onmouseover="this.style.background='#fee2e2'; this.style.transform='translateY(-1px)';" 
+                                                onmouseout="this.style.background='#fef2f2'; this.style.transform='translateY(0)';">
+                                            <svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;">
+                                                <polyline points="3,6 5,6 21,6"/>
+                                                <path d="M19,6v14a2,2,0,0,1-2,2H7a2,2,0,0,1-2-2V6m3,0V4a2,2,0,0,1,2-2h4a2,2,0,0,1,2,2v2"/>
+                                                <line x1="10" y1="11" x2="10" y2="17"/>
+                                                <line x1="14" y1="11" x2="14" y2="17"/>
+                                            </svg>
                                         </button>
                                     </form>
                                 </div>
