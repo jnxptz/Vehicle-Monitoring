@@ -79,7 +79,7 @@ class DashboardController extends Controller
         $offices = Office::orderBy('name')->get();
 
         $query = User::where('role', 'boardmember')
-            ->with(['vehicles', 'office.vehicles']);
+            ->with(['vehicles', 'office.vehicles', 'bm']);
         
         if ($selectedOffice) {
             $query->where('office_id', $selectedOffice);
@@ -103,7 +103,7 @@ class DashboardController extends Controller
             $vehicles = $bm->vehicles()->get();
             
             $fuelCost = (float) ($totalCostByUser[$bm->id] ?? 0);
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            $yearlyBudget = $bm->bm ? $bm->bm->yearly_budget : self::YEARLY_BUDGET_DEFAULT;
             
             // Get fuel slips per vehicle for this user
             $year = now()->year;
@@ -154,12 +154,14 @@ class DashboardController extends Controller
     public function boardmember(Request $request)
     {
         $user = Auth::user();
+        // Load BM relationship to get budget
+        $user->load('bm');
         // fetch all vehicles for this boardmember so the view can list them
         $vehicles = $user->vehicles()->get();
         // prefer user's direct vehicle, otherwise use the first vehicle from their office
         $vehicle = $user->vehicles()->first() ? $user->vehicles()->first() : ($user->office ? $user->office->vehicles()->first() : null);
 
-        $yearlyBudget = 0;
+        $yearlyBudget = $user->bm ? $user->bm->yearly_budget : 0;
         $remainingBudget = 0;
         $budgetUsedPercentage = 0;
         $monthlyLimit = 0;
@@ -173,7 +175,7 @@ class DashboardController extends Controller
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            // Budget already set from BM relationship above
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             // Use latest km for this specific vehicle (not user's across all vehicles)
@@ -274,7 +276,7 @@ class DashboardController extends Controller
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            // Budget already set from BM relationship above
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
@@ -329,7 +331,7 @@ class DashboardController extends Controller
     {
         $user = Auth::user();
         // prefer user's direct vehicle, otherwise use first vehicle from their office
-        $vehicle = $user->vehicle ? $user->vehicle : ($user->office ? $user->office->vehicles()->first() : null);
+        $vehicle = $user->vehicles()->first() ? $user->vehicles()->first() : ($user->office ? $user->office->vehicles()->first() : null);
 
         $yearlyBudget = 0;
         $remainingBudget = 0;
@@ -339,7 +341,7 @@ class DashboardController extends Controller
         $alerts = [];
 
         if ($vehicle) {
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            // Budget already set from BM relationship above
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
@@ -450,7 +452,7 @@ class DashboardController extends Controller
                 $vehicle = $bm->office->vehicles()->first();
             }
             
-            $yearlyBudget = $vehicle ? self::YEARLY_BUDGET_DEFAULT : 0;
+            $yearlyBudget = $bm->bm ? $bm->bm->yearly_budget : ($vehicle ? self::YEARLY_BUDGET_DEFAULT : 0);
 
             $fuelCost = FuelSlip::where('user_id', $bm->id)->whereYear('date', $year)->sum('total_cost');
             $maintenanceCost = $vehicle ? Maintenance::where('vehicle_id', $vehicle->id)->whereYear('date', $year)->sum('cost') : 0;
@@ -508,10 +510,10 @@ class DashboardController extends Controller
         
         $selectedOffice = $request->input('office', null);
         $offices = Office::orderBy('name')->get();
-        $officeName = '';
+        $officeName = $selectedOffice ? '' : 'All Offices';
 
         $query = User::where('role', 'boardmember')
-            ->with(['vehicles', 'office.vehicles']);
+            ->with(['vehicles', 'office.vehicles', 'bm']);
         
         if ($selectedOffice) {
             $query->where('office_id', $selectedOffice);
@@ -536,15 +538,14 @@ class DashboardController extends Controller
             ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
             ->selectRaw('user_id, SUM(total_cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
-        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $monthlyCostByUser, $selectedMonth) {
+        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $monthlyCostByUser, $selectedMonth, $year) {
             // Get all vehicles for this board member
             $vehicles = $bm->vehicles()->get();
             
             $fuelCost = (float) ($totalCostByUser[$bm->id] ?? 0);
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            $yearlyBudget = $bm->bm ? $bm->bm->yearly_budget : self::YEARLY_BUDGET_DEFAULT;
             
             // Get fuel slips per vehicle for this user
-            $year = now()->year;
             $fuelSlipsByVehicle = FuelSlip::where('user_id', $bm->id)
                 ->whereYear('date', $year)
                 ->selectRaw('vehicle_id, SUM(total_cost) as total_cost, SUM(liters) as total_liters')

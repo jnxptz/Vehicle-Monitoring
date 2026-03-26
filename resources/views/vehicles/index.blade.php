@@ -89,7 +89,12 @@
             @endif
 
             @if(isset($boardmembers) && $boardmembers->count() > 0)
-                <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                    <style>
+                        .table-wrapper::-webkit-scrollbar {
+                            display: none;
+                        }
+                    </style>
                     <table style="width: 100%; border-collapse: collapse; border: none;">
                         <thead>
                             <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
@@ -239,6 +244,10 @@
             </div>
         @endif
     </div>
+</div>
+
+<div class="footer">
+    <span>© Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
 </div>
 
 @endsection

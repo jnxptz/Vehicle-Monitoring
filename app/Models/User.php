@@ -44,4 +44,9 @@ class User extends Authenticatable
         // Maintenances through vehicles
         return Maintenance::whereIn('vehicle_id', $this->vehicles()->pluck('id'))->latest();
     }
+
+    public function bm()
+    {
+        return $this->hasOne(BM::class);
+    }
 }

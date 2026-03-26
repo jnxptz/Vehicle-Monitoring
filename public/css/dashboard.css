@@ -388,7 +388,7 @@ body {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid var(--border-primary);
     border-radius: 12px;
-    overflow: hidden;
+    padding: 16px;
     box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     transition: all 0.3s ease;
 }
@@ -423,14 +423,14 @@ body {
 }
 
 .settings-card-body {
-    padding: 20px;
+    padding: 12px;
 }
 
 .profile-info-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 16px 0;
+    padding: 10px 0;
     border-bottom: 1px solid var(--border-primary);
     transition: all 0.2s ease;
 }
@@ -558,7 +558,7 @@ body {
 }
 
 .dashboard-body::before {
-    content: "© {{ date('Y') }} Vehicle Monitoring System | Sangguniang Panlalawigan - Provincial Government of La Union";
+    /* content: "© {{ date('Y') }} Vehicle Monitoring System | Sangguniang Panlalawigan - Provincial Government of La Union"; */
     position: fixed;
     bottom: 20px;
     right: 20px;
@@ -764,6 +764,7 @@ flex-shrink: 0;
     display: flex;
     flex-direction: column;
     gap: 2px;
+    flex-shrink: 0;
 }
 
 .dashboard-nav .logout-form {
@@ -786,7 +787,13 @@ flex-shrink: 0;
     display: flex;
     flex-direction: column;
     height: calc(100vh - 96px);
-    overflow: hidden;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.dashboard-container::-webkit-scrollbar {
+    display: none;
 }
 
 .dashboard-container h2 {
@@ -1070,8 +1077,8 @@ flex-shrink: 0;
     border-radius:10px;
     box-shadow: 0 2px 6px rgba(15,23,42,0.06);
     padding:18px;
-    min-width:300px;
-    flex:1 1 300px;
+    min-width:250px;
+    flex:1 1 250px;
     border:1px solid #e6eef8;
 }
 
@@ -1912,25 +1919,41 @@ flex-shrink: 0;
     padding: 12px 20px;
     text-align: center;
     font-size: 12px;
-    color: var(--text-muted);
+    color: var(--text-secondary);
+    font-weight: 500;
     display: flex;
     justify-content: center;
     align-items: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
-}
-
-.dashboard-footer span {
-    color: var(--text-secondary);
-    font-weight: 500;
 }
 
 .dashboard-footer .footer-divider {
     color: var(--border-secondary);
 }
 
+.footer {
+    background: var(--bg-primary);
+    border-top: 1px solid var(--border-primary);
+    padding: 12px 20px;
+    text-align: center;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    position: relative;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+}
+
 @media (max-width: 768px) {
     .dashboard-footer {
+        padding: 10px 12px;
+        font-size: 11px;
+    }
+    
+    .footer {
         padding: 10px 12px;
         font-size: 11px;
     }

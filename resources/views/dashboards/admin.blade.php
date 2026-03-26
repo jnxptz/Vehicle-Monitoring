@@ -103,7 +103,7 @@
             </div>
 
             <!-- KPI -->
-            <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+            <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 8px; margin-bottom: 24px;">
                 <div class="kpi-card" style="background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%); border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); transition: transform 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)';" onmouseout="this.style.transform='translateY(0)';">
                     <h4 style="margin: 0 0 8px 0; font-size: 13px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</h4>
                     <p style="margin: 0; font-size: 24px; font-weight: 600; color: #1e293b;">₱{{ number_format($rows->sum('yearlyBudget'),2) }}</p>
@@ -126,7 +126,12 @@
             </div>
 
             <!-- TABLE -->
-            <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+            <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                <style>
+                    .table-wrapper::-webkit-scrollbar {
+                        display: none;
+                    }
+                </style>
                 <table class="modern-table" style="width: 100%; border-collapse: collapse; border: none;">
                     <thead>
                         <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
@@ -277,7 +282,7 @@
 </div>
 
 <footer class="dashboard-footer">
-    &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
+    <span>&copy; Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
 </footer>
 
 <script src="{{ asset('js/admin-dashboard.js') }}"></script>

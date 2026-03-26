@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\BM;
+use App\Models\Maintenance;
 use App\Models\Office;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -104,5 +106,81 @@ class OfficeController extends Controller
         $user->update(['office_id' => $request->office_id]);
 
         return redirect()->back()->with('success', "{$user->name} has been assigned to the office successfully.");
+    }
+
+    /**
+     * Show the edit boardmember form
+     */
+    public function editBoardmember(User $user)
+    {
+        $offices = Office::all();
+        $bm = $user->bm;
+        return view('boardmembers.edit', compact('user', 'offices', 'bm'));
+    }
+
+    /**
+     * Update a boardmember
+     */
+    public function updateBoardmember(Request $request, User $user)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255|unique:users,email,' . $user->id,
+            'office_id' => 'nullable|exists:offices,id',
+            'yearly_budget' => 'nullable|numeric|min:0',
+        ]);
+
+        // Update user information
+        $user->update($request->only(['name', 'email', 'office_id']));
+
+        // Update or create BM record with budget
+        if ($request->has('yearly_budget') && $request->yearly_budget !== null) {
+            $bm = $user->bm ?: new BM([
+                'user_id' => $user->id,
+                'name' => $user->name
+            ]);
+            $bm->yearly_budget = $request->yearly_budget;
+            $bm->save();
+        }
+
+        return redirect()->route('offices.manage-boardmembers')->with('success', "{$user->name} has been updated successfully.");
+    }
+
+    /**
+     * Delete a boardmember
+     */
+    public function destroyBoardmember(User $user)
+    {
+        // Get all vehicles before unassigning them
+        $vehicles = $user->vehicles()->get();
+
+        // Delete all fuel slips associated with this boardmember
+        $fuelSlips = $user->fuelSlips()->get();
+        foreach ($fuelSlips as $fuelSlip) {
+            $fuelSlip->delete();
+        }
+
+        // Delete all maintenance records associated with this boardmember's vehicles
+        foreach ($vehicles as $vehicle) {
+            $maintenances = Maintenance::where('vehicle_id', $vehicle->id)->get();
+            foreach ($maintenances as $maintenance) {
+                $maintenance->delete();
+            }
+        }
+
+        // Unassign all vehicles from this boardmember (make them available for others)
+        foreach ($vehicles as $vehicle) {
+            $vehicle->update(['bm_id' => null]);
+        }
+
+        // Delete BM record if it exists
+        if ($user->bm) {
+            $user->bm->delete();
+        }
+
+        $userName = $user->name;
+        $user->delete();
+
+        return redirect()->route('offices.manage-boardmembers')->with('success', "{$userName} has been deleted successfully. All vehicles have been unassigned and are now available for other boardmembers. Fuel slips, maintenance records, and budget data have been removed.");
     }
 }

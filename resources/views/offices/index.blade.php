@@ -4,13 +4,12 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <div class="dashboard-page">
     {{-- Header --}}
-
     <div class="dashboard-header">
         <div class="dashboard-title">
             <img src="{{ asset('images/SP Seal.png') }}" alt="Logo">
             <h1>Vehicle Monitoring System</h1>
         </div>
-            </div>
+    </div>
 
     <div class="dashboard-body">
         {{-- Sidebar --}}
@@ -47,24 +46,13 @@
                 </div>
             @endif
 
-
-
             @if ($errors->any())
-
                 <ul class="error-list">
-
                     @foreach ($errors->all() as $error)
-
                         <li>{{ $error }}</li>
-
                     @endforeach
-
                 </ul>
-
             @endif
-
-
-
             <div class="offices-cards-container" style="
                 background: #ffffff;
                 border-radius: 16px;
@@ -87,7 +75,17 @@
                                 transition: all 0.3s ease;
                                 box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
                                 cursor: pointer;
-                            " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)';" onclick="toggleOfficeDetails({{ $office->id }})">
+                                max-height: 600px;
+                                overflow-y: auto;
+                                scrollbar-width: none;
+                                -ms-overflow-style: none;
+                            " onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 25px rgba(0, 0, 0, 0.1)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0, 0, 0, 0.04)';" onclick="toggleOfficeDetails({{ $office->id }})"
+                            onwheel="event.stopPropagation();">
+                            <style>
+                                .office-card-item::-webkit-scrollbar {
+                                    display: none;
+                                }
+                            </style>
                                 <div style="
                                     background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);
                                     margin: -20px -20px 16px -20px;
@@ -426,8 +424,8 @@
 
 </div>
 
-<footer class="dashboard-footer">
-    &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
-</footer>
+<div class="footer">
+    <span>© Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
+</div>
 
 @endsection

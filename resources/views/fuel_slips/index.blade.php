@@ -110,6 +110,8 @@
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 22V5a2 2 0 012-2h6a2 2 0 012 2v17"/><path d="M13 10h4l2 2v10"/><path d="M7 11v2"/><path d="M17 14v2"/></svg>Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Maintenances</a>
 
+            <div style="flex-grow: 1;"></div>
+
             <div class="bottom-section">
                 <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>Offices</a>
                 <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Manage Users</a>
@@ -164,7 +166,12 @@
 
                 {{-- Fuel Slips Table --}}
                 @if($boardmembers && $boardmembers->count() > 0)
-                    <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                    <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                        <style>
+                            .table-wrapper::-webkit-scrollbar {
+                                display: none;
+                            }
+                        </style>
                         <table style="width: 100%; border-collapse: collapse; border: none;">
                             <thead>
                                 <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
@@ -188,11 +195,10 @@
 
                                     <tr id="fs-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
                                         <td colspan="3" style="padding: 0; border: none;">
-                                            <div class="fuel-cards-container" style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
+                                            <div class="vehicle-cards" onwheel="event.stopPropagation();">
                                                 @if($bm->fuelSlips->count() > 0)
-                                                    <div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:8px;">
-                                                        @foreach($bm->fuelSlips as $slip)
-                                                            <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); min-width:300px; flex-shrink:0;">
+                                                    @foreach($bm->fuelSlips as $slip)
+                                                        <div class="vehicle-card" style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
                                                                 <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                     <strong style="font-size:15px;">{{ $slip->vehicle_name }}</strong>
                                                                     <div style="display:flex; gap:6px;">
@@ -210,7 +216,6 @@
                                                                 </div>
                                                             </div>
                                                         @endforeach
-                                                    </div>
                                                 @else
                                                     <div style="padding:12px; color:#6b7280;">No fuel slips for this boardmember.</div>
                                                 @endif
@@ -269,12 +274,19 @@
                 <a href="{{ route('boardmember.dashboard') }}" class="{{ request()->routeIs('boardmember.dashboard') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Dashboard</a>
                 <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 22V5a2 2 0 012-2h6a2 2 0 012 2v17"/><path d="M13 10h4l2 2v10"/><path d="M7 11v2"/><path d="M17 14v2"/></svg>Fuel Slips</a>
                 <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Maintenances</a>
+                
+                <div style="flex-grow: 1;"></div>
+                
                 <div class="bottom-section">
-                    <form action="{{ route('logout') }}" method="POST" class="logout-form">
-                        @csrf
-                        <button type="submit" class="logout-btn"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle;margin-right:6px;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
-                    </form>
+                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>Offices</a>
                 </div>
+            
+            <div class="logout-form">
+                <form action="{{ route('logout') }}" method="POST" class="logout-form">
+                    @csrf
+                    <button type="submit" class="logout-btn"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;vertical-align:middle;margin-right:6px;"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Logout</button>
+                </form>
+            </div>
             </nav>
 
             <div class="dashboard-container">
@@ -297,7 +309,12 @@
 
                 {{-- Fuel Slips Table (Boardmember View) --}}
                 @if($fuelSlips && $fuelSlips->count() > 0)
-                    <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
+                    <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                        <style>
+                            .table-wrapper::-webkit-scrollbar {
+                                display: none;
+                            }
+                        </style>
                         <table style="width: 100%; border-collapse: collapse; border: none;">
                             <thead>
                                 <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">

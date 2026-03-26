@@ -3,7 +3,9 @@
         <div class="sidebar-avatar">{{ strtoupper(substr(auth()->user()->name, 0, 1)) }}</div>
         <div class="sidebar-user-info">
             <span class="sidebar-user-name">{{ auth()->user()->name }}</span>
-            <span class="sidebar-user-role">{{ auth()->user()->role }}</span>
+            @if(auth()->user()->role === 'admin')
+                <span class="sidebar-user-role">{{ auth()->user()->role }}</span>
+            @endif
         </div>
     </div>
     <div class="sidebar-profile-menu">

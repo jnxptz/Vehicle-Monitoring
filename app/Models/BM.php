@@ -9,6 +9,8 @@ class BM extends Model
 {
     use HasFactory;
 
+    protected $table = 'bms';
+
     protected $fillable = ['user_id', 'name', 'yearly_budget'];
 
     public function user()

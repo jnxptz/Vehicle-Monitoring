@@ -89,6 +89,11 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::get('offices/manage-boardmembers', [OfficeController::class, 'manageBoardmembers'])->name('offices.manage-boardmembers');
     Route::put('offices/assign-boardmember/{user}', [OfficeController::class, 'assignBoardmember'])->name('offices.assign-boardmember');
     
+    // Boardmember management routes
+    Route::get('boardmembers/{user}/edit', [OfficeController::class, 'editBoardmember'])->name('boardmembers.edit');
+    Route::put('boardmembers/{user}', [OfficeController::class, 'updateBoardmember'])->name('boardmembers.update');
+    Route::delete('boardmembers/{user}', [OfficeController::class, 'destroyBoardmember'])->name('boardmembers.destroy');
+    
     // Office resource (CRUD)
     Route::resource('offices', OfficeController::class);
     

@@ -127,9 +127,17 @@
 .vehicle-cards {
     padding: 20px;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 420px));
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 16px;
     justify-content: start;
+    max-height: 600px;
+    overflow-y: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.vehicle-cards::-webkit-scrollbar {
+    display: none;
 }
 
 /* Vehicle header styling */

@@ -62,21 +62,19 @@
                     </div>
                     <div class="settings-card-body">
                         <div class="profile-info-row">
-                            <span class="profile-label">Name</span>
-                            <span class="profile-value">{{ $user->name }}</span>
+                            <span class="profile-label">Name: {{ $user->name }}</span>
                         </div>
                         <div class="profile-info-row">
-                            <span class="profile-label">Email</span>
-                            <span class="profile-value">{{ $user->email }}</span>
+                            <span class="profile-label">Email: {{ $user->email }}</span>
                         </div>
+                        @if(auth()->user()->role === 'admin')
                         <div class="profile-info-row">
-                            <span class="profile-label">Role</span>
-                            <span class="profile-value" style="text-transform:capitalize;">{{ $user->role }}</span>
+                            <span class="profile-label">Role: {{ $user->role }}</span>
                         </div>
+                        @endif
                         @if($user->office)
                         <div class="profile-info-row">
-                            <span class="profile-label">Office</span>
-                            <span class="profile-value">{{ $user->office->name }}</span>
+                            <span class="profile-label">Office: {{ $user->office->name }}</span>
                         </div>
                         @endif
                     </div>

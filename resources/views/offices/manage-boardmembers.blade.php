@@ -66,8 +66,8 @@
                             <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
                                 <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none; width: 35%;">Boardmember Name</th>
                                 <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none; width: 25%;">Current Office</th>
-                                <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none; width: 30%;">Assign Office</th>
                                 <th style="padding: 16px 20px; text-align: center; color: #ffffff; font-weight: 600; font-size: 14px; border: none; width: 10%;">Status</th>
+                                <th style="padding: 16px 20px; text-align: center; color: #ffffff; font-weight: 600; font-size: 14px; border: none; width: 30%;">Actions</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -86,29 +86,36 @@
                                             <span style="color: #94a3b8; font-style: italic; font-size: 13px;">—</span>
                                         @endif
                                     </td>
-                                    <td style="padding: 16px 20px; border: none; border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align: middle;">
-                                        <form action="{{ route('offices.assign-boardmember', $boardmember->id) }}" method="POST" style="display: flex; gap: 8px; align-items: center; flex-wrap: nowrap;">
-                                            @csrf
-                                            @method('PUT')
-                                            <select name="office_id" required style="flex: 1; min-width: 120px; max-width: 180px; padding: 10px 14px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
-                                                <option value="">-- Select Office --</option>
-                                                @foreach($offices as $office)
-                                                    <option value="{{ $office->id }}" {{ $boardmember->office_id === $office->id ? 'selected' : '' }}>
-                                                        {{ $office->name }}
-                                                    </option>
-                                                @endforeach
-                                            </select>
-                                            <button type="submit" style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6 0%, #ff9b00 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 14px; white-space: nowrap; transition: all 0.2s ease; box-shadow: 0 2px 4px rgba(59, 130, 246, 0.2); min-width: 80px;">
-                                                Save
-                                            </button>
-                                        </form>
-                                    </td>
                                     <td style="padding: 16px 20px; border: none; border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align: middle; text-align: center;">
                                         @if($boardmember->office)
                                             <span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #dcfce7; color: #166534; white-space: nowrap;">✓ Assigned</span>
                                         @else
                                             <span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #fee2e2; color: #dc2626; white-space: nowrap;">✗ Pending</span>
                                         @endif
+                                    </td>
+                                    <td style="padding: 16px 20px; border: none; border-bottom: 1px solid #e2e8f0; color: #64748b; vertical-align: middle; text-align: center;">
+                                        <div style="display: flex; gap: 8px; justify-content: center; align-items: center;">
+                                            <button type="button" onclick="openEditModal({{ $boardmember->id }}, '{{ $boardmember->name }}', '{{ $boardmember->email }}', {{ $boardmember->office_id ?? 'null' }}, {{ $boardmember->bm ? $boardmember->bm->yearly_budget : 'null' }})" style="padding: 8px 12px; background: #3b82f6; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.background='#2563eb';" onmouseout="this.style.background='#3b82f6';">
+                                                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                    <path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/>
+                                                    <path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                                </svg>
+                                                Edit
+                                            </button>
+                                            <form action="{{ route('boardmembers.destroy', $boardmember->id) }}" method="POST" style="display: inline;" onsubmit="return confirm('Are you sure you want to delete {{ $boardmember->name }}? This action cannot be undone.');">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" style="padding: 8px 12px; background: #ef4444; color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 4px;" onmouseover="this.style.background='#dc2626';" onmouseout="this.style.background='#ef4444';">
+                                                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                                        <path d="M3 6h18"/>
+                                                        <path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+                                                        <line x1="10" y1="11" x2="10" y2="17"/>
+                                                        <line x1="14" y1="11" x2="14" y2="17"/>
+                                                    </svg>
+                                                    Delete
+                                                </button>
+                                            </form>
+                                        </div>
                                     </td>
                                 </tr>
                             @empty
@@ -123,6 +130,51 @@
                 </div>
             </div>
 
+            <!-- Edit Modal -->
+            <div id="editModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+                <div style="background-color: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">Edit Boardmember</h3>
+                        <button type="button" onclick="closeEditModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+                    </div>
+                    
+                    <form action="/boardmembers/" method="POST" id="editForm">
+                        @csrf
+                        @method('PUT')
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label for="edit_name" style="display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px;">Name</label>
+                            <input type="text" id="edit_name" name="name" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label for="edit_email" style="display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px;">Email</label>
+                            <input type="email" id="edit_email" name="email" required style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                        </div>
+                        
+                        <div style="margin-bottom: 16px;">
+                            <label for="edit_office_id" style="display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px;">Office Assignment</label>
+                            <select id="edit_office_id" name="office_id" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                                <option value="">-- No Office --</option>
+                                @foreach($offices as $office)
+                                    <option value="{{ $office->id }}">{{ $office->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 20px;">
+                            <label for="edit_yearly_budget" style="display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px;">Yearly Budget</label>
+                            <input type="number" id="edit_yearly_budget" name="yearly_budget" step="0.01" min="0" placeholder="Enter yearly budget (optional)" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button type="button" onclick="closeEditModal()" style="padding: 10px 20px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">Cancel</button>
+                            <button type="submit" style="padding: 10px 20px; background: linear-gradient(135deg, #3b82f6 0%, #ff9b00 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500;">Update Boardmember</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
             
         </div>
     </div>
@@ -131,4 +183,32 @@
 <footer class="dashboard-footer">
     &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
 </footer>
+
+<script>
+function openEditModal(userId, name, email, officeId, yearlyBudget) {
+    document.getElementById('edit_name').value = name;
+    document.getElementById('edit_email').value = email;
+    document.getElementById('edit_office_id').value = officeId || '';
+    document.getElementById('edit_yearly_budget').value = yearlyBudget || '';
+    
+    // Update form action with user ID
+    document.getElementById('editForm').action = '/boardmembers/' + userId;
+    
+    // Show modal
+    document.getElementById('editModal').style.display = 'flex';
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').style.display = 'none';
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const modal = document.getElementById('editModal');
+    if (event.target == modal) {
+        closeEditModal();
+    }
+}
+</script>
+
 @endsection
