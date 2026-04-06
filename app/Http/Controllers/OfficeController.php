@@ -134,14 +134,24 @@ class OfficeController extends Controller
         $user->update($request->only(['name', 'email', 'office_id']));
 
         // Update or create BM record with budget
-        if ($request->has('yearly_budget') && $request->yearly_budget !== null) {
-            $bm = $user->bm ?: new BM([
-                'user_id' => $user->id,
-                'name' => $user->name
-            ]);
-            $bm->yearly_budget = $request->yearly_budget;
-            $bm->save();
+        $yearlyBudget = $request->input('yearly_budget');
+        
+        // Always handle budget (including empty/zero values)
+        $bm = $user->bm ?: new BM([
+            'user_id' => $user->id,
+            'name' => $user->name
+        ]);
+        
+        if ($yearlyBudget !== null && $yearlyBudget !== '') {
+            $bm->yearly_budget = $yearlyBudget;
+        } else {
+            $bm->yearly_budget = null;
         }
+        
+        $bm->save();
+        
+        // Debug logging
+        \Log::info('Budget updated for user ' . $user->id . ': ' . $bm->yearly_budget);
 
         return redirect()->route('offices.manage-boardmembers')->with('success', "{$user->name} has been updated successfully.");
     }

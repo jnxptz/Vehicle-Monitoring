@@ -138,7 +138,7 @@
                         <button type="button" onclick="closeEditModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
                     </div>
                     
-                    <form action="/boardmembers/" method="POST" id="editForm">
+                    <form action="#" method="POST" id="editForm">
                         @csrf
                         @method('PUT')
                         
