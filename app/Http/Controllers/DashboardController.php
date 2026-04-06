@@ -88,30 +88,41 @@ class DashboardController extends Controller
         $boardmembers = $query->orderBy('name')->get();
         $ids = $boardmembers->pluck('id');
 
+        // Pre-load all data in efficient queries
         $totalCostByUser = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
             ->selectRaw('user_id, SUM(total_cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
-        $maintenanceByVehicle = Maintenance::whereYear('date', $year)
-            ->selectRaw('vehicle_id, SUM(cost) as total_cost')->groupBy('vehicle_id')->pluck('total_cost', 'vehicle_id');
+        $monthlyCostByUser = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
+            ->selectRaw('user_id, SUM(total_cost) as total_cost')->groupBy('user_id')->pluck('total_cost', 'user_id');
 
         $monthlyLitersByUser = FuelSlip::whereIn('user_id', $ids)
             ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
             ->selectRaw('user_id, SUM(liters) as total_liters')->groupBy('user_id')->pluck('total_liters', 'user_id');
 
-        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser) {
-            // Get all vehicles for this board member
-            $vehicles = $bm->vehicles()->get();
+        // Get all vehicle IDs for boardmembers to limit maintenance queries
+        $allVehicleIds = $boardmembers->pluck('vehicles.*.id')->flatten()->filter()->unique();
+        
+        $maintenanceByVehicle = Maintenance::whereIn('vehicle_id', $allVehicleIds)->whereYear('date', $year)
+            ->selectRaw('vehicle_id, SUM(cost) as total_cost')->groupBy('vehicle_id')->pluck('total_cost', 'vehicle_id');
+
+        $fuelSlipsByVehicleAll = FuelSlip::whereIn('user_id', $ids)->whereYear('date', $year)
+            ->selectRaw('user_id, vehicle_id, SUM(total_cost) as total_cost, SUM(liters) as total_liters')
+            ->groupBy('user_id', 'vehicle_id')
+            ->get()
+            ->groupBy('user_id');
+
+        $rows = $boardmembers->map(function ($bm) use ($totalCostByUser, $maintenanceByVehicle, $monthlyLitersByUser, $monthlyCostByUser, $fuelSlipsByVehicleAll) {
+            // Use already loaded vehicles relationship
+            $vehicles = $bm->vehicles;
             
             $fuelCost = (float) ($totalCostByUser[$bm->id] ?? 0);
+            
+            // Fix: Access budget through bm relationship
             $yearlyBudget = $bm->bm ? $bm->bm->yearly_budget : self::YEARLY_BUDGET_DEFAULT;
             
-            // Get fuel slips per vehicle for this user
-            $year = now()->year;
-            $fuelSlipsByVehicle = FuelSlip::where('user_id', $bm->id)
-                ->whereYear('date', $year)
-                ->selectRaw('vehicle_id, SUM(total_cost) as total_cost, SUM(liters) as total_liters')
-                ->groupBy('vehicle_id')
-                ->pluck('total_cost', 'vehicle_id');
+            // Get fuel slips per vehicle for this user from pre-loaded data
+            $fuelSlipsByVehicle = $fuelSlipsByVehicleAll->get($bm->id, collect())->pluck('total_cost', 'vehicle_id');
             
             // Calculate vehicle details
             $vehiclesDetails = $vehicles->map(function($vehicle) use ($maintenanceByVehicle, $fuelSlipsByVehicle) {
@@ -131,6 +142,7 @@ class DashboardController extends Controller
             $budgetUsedPercentage = $yearlyBudget > 0 ? round(($totalUsed / $yearlyBudget) * 100, 2) : 0;
 
             $monthlyLitersUsed = (float) ($monthlyLitersByUser[$bm->id] ?? 0);
+            $monthlyCostUsed = (float) ($monthlyCostByUser[$bm->id] ?? 0);
 
             return [
                 'user' => $bm,
@@ -140,6 +152,7 @@ class DashboardController extends Controller
                 'remainingBudget' => $remainingBudget,
                 'budgetUsedPercentage' => $budgetUsedPercentage,
                 'monthlyLitersUsed' => $monthlyLitersUsed,
+                'monthlyCostUsed' => $monthlyCostUsed,
                 'fuelCost' => $fuelCost,
                 'maintenanceCostTotal' => $maintenanceCostTotal,
             ];
@@ -232,7 +245,8 @@ class DashboardController extends Controller
 
             $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
             if ($currentKm >= $nextDueKm) {
-                $alerts[] = "Preventive maintenance due: last ({$lastMaintenanceType}) at {$lastMaintenanceKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
+                $vehicleName = $vehicle->vehicle_name ?? $vehicle->make . ' ' . $vehicle->model ?? 'Unknown Vehicle';
+                $alerts[] = "Preventive maintenance due for {$vehicleName}: last ({$lastMaintenanceType}) at {$lastMaintenanceKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
             }
 
             $maintenanceOverview = Maintenance::where('vehicle_id', $vehicle->id)->latest('date')->take(5)->get();

@@ -125,7 +125,8 @@ use Carbon\Carbon;
 
             @php
 
-                $alerts = [];
+                // Preserve alerts from controller, don't overwrite them
+                $alerts = $alerts ?? [];
 
                 
 

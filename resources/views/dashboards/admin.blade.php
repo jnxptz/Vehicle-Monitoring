@@ -275,7 +275,7 @@
 </div>
 
 <footer class="dashboard-footer">
-    <span>&copy; Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
+    <span>&copy; Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union <span class="footer-divider">|</span> Janial Bacani
 </footer>
 
 <script src="{{ asset('js/admin-dashboard.js') }}"></script>
