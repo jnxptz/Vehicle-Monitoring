@@ -78,6 +78,8 @@
                         @endforeach
                     </select>
 
+                    <button type="button" onclick="showAllVehicles()" class="add-vehicle-btn" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%) !important; color: white !important; margin-right: 8px;">📋 Show All Vehicles</button>
+
                     <button type="button" onclick="openVehicleModal()" class="add-vehicle-btn" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important;">+ Register Vehicle</button>
                 </form>
             </div>
@@ -246,8 +248,170 @@
     </div>
 </div>
 
+<!-- Show All Vehicles Modal -->
+<div id="showAllVehiclesModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 800px; max-height: 80vh; box-shadow: 0 10px 25px rgba(0,0,0,0.2); overflow-y: auto;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">📋 All Vehicles</h3>
+            <button type="button" onclick="closeShowAllVehiclesModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+        </div>
+        
+        <div style="overflow-x: auto;">
+            <table style="width: 100%; border-collapse: collapse; border: none;">
+                <thead>
+                    <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
+                        <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Vehicle</th>
+                        <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Boardmember</th>
+                        <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Office</th>
+                        <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Status</th>
+                        <th style="padding: 12px 16px; text-align: center; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="allVehiclesList">
+                    <!-- Vehicles will be loaded here via JavaScript -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Vehicle Assignment Modal -->
+<div id="assignVehicleModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+    <div style="background-color: white; padding: 24px; border-radius: 12px; width: 90%; max-width: 500px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; color: #1e293b; font-size: 18px; font-weight: 600;">🚗 Assign Vehicle</h3>
+            <button type="button" onclick="closeAssignVehicleModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
+        </div>
+        
+        <form id="assignVehicleForm" method="POST" action="">
+            @csrf
+            @method('PUT')
+            
+            <input type="hidden" id="assignVehicleId" name="vehicle_id">
+            
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Vehicle:</label>
+                <div id="assignVehicleInfo" style="padding: 12px; background: #f8fafc; border-radius: 8px; color: #374151;"></div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label for="assignBoardmemberId" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Assign to Boardmember:</label>
+                <select id="assignBoardmemberId" name="boardmember_id" required style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 14px; background: white;">
+                    <option value="">-- Select Boardmember --</option>
+                    @if(isset($allBoardmembers))
+                        @foreach($allBoardmembers as $boardmember)
+                            <option value="{{ $boardmember->id }}">{{ $boardmember->name }} ({{ $boardmember->office->name ?? 'No Office' }})</option>
+                        @endforeach
+                    @endif
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                <button type="button" onclick="closeAssignVehicleModal()" style="padding: 12px 20px; background: #f1f5f9; color: #475569; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Cancel</button>
+                <button type="submit" style="padding: 12px 20px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 500;">Assign Vehicle</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <div class="footer">
     <span>© Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
 </div>
+
+<script>
+function showAllVehicles() {
+    // Show the modal
+    document.getElementById('showAllVehiclesModal').style.display = 'flex';
+    
+    // Load all vehicles via AJAX
+    loadAllVehicles();
+}
+
+function closeShowAllVehiclesModal() {
+    document.getElementById('showAllVehiclesModal').style.display = 'none';
+}
+
+function loadAllVehicles() {
+    fetch('/api/all-vehicles')
+        .then(response => response.json())
+        .then(data => {
+            const tbody = document.getElementById('allVehiclesList');
+            tbody.innerHTML = '';
+            
+            if (data.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="padding: 20px; text-align: center; color: #64748b;">No vehicles found</td></tr>';
+                return;
+            }
+            
+            data.forEach(vehicle => {
+                const row = document.createElement('tr');
+                row.style.cssText = 'background: ' + (data.indexOf(vehicle) % 2 === 0 ? '#f8fafc' : '#ffffff') + '; border-bottom: 1px solid #e2e8f0;';
+                
+                const statusBadge = vehicle.bm_id 
+                    ? '<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #dcfce7; color: #166534;">✓ Assigned</span>'
+                    : '<span style="padding: 3px 8px; border-radius: 12px; font-size: 11px; font-weight: 600; background: #fee2e2; color: #dc2626;">✗ Unassigned</span>';
+                
+                const actionsButton = !vehicle.bm_id 
+                    ? `<button type="button" onclick="openAssignModal(${vehicle.id}, '${vehicle.make} ${vehicle.model}', '${vehicle.plate_number || 'N/A'}')" style="padding: 6px 12px; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; border: none; border-radius: 6px; cursor: pointer; font-size: 12px; font-weight: 500;">Assign</button>`
+                    : '<span style="color: #94a3b8; font-size: 12px;">—</span>';
+                
+                row.innerHTML = `
+                    <td style="padding: 12px 16px; border: none; color: #374151;">
+                        <strong>${vehicle.make} ${vehicle.model}</strong><br>
+                        <small style="color: #64748b;">${vehicle.plate_number || 'N/A'}</small>
+                    </td>
+                    <td style="padding: 12px 16px; border: none; color: #374151;">
+                        ${vehicle.boardmember ? vehicle.boardmember.name : '<span style="color: #94a3b8; font-style: italic;">Unassigned</span>'}
+                    </td>
+                    <td style="padding: 12px 16px; border: none; color: #374151;">
+                        ${vehicle.boardmember && vehicle.boardmember.office ? vehicle.boardmember.office.name : '<span style="color: #94a3b8; font-style: italic;">N/A</span>'}
+                    </td>
+                    <td style="padding: 12px 16px; border: none; text-align: center;">
+                        ${statusBadge}
+                    </td>
+                    <td style="padding: 12px 16px; border: none; text-align: center;">
+                        ${actionsButton}
+                    </td>
+                `;
+                tbody.appendChild(row);
+            });
+        })
+        .catch(error => {
+            console.error('Error loading vehicles:', error);
+            document.getElementById('allVehiclesList').innerHTML = 
+                '<tr><td colspan="5" style="padding: 20px; text-align: center; color: #ef4444;">Error loading vehicles</td></tr>';
+        });
+}
+
+function openAssignModal(vehicleId, vehicleName, plateNumber) {
+    document.getElementById('assignVehicleId').value = vehicleId;
+    document.getElementById('assignVehicleInfo').innerHTML = `<strong>${vehicleName}</strong><br><small style="color: #64748b;">Plate: ${plateNumber}</small>`;
+    
+    // Set the form action dynamically with the vehicle ID
+    const form = document.getElementById('assignVehicleForm');
+    form.action = `/vehicles/${vehicleId}/assign`;
+    
+    document.getElementById('assignVehicleModal').style.display = 'flex';
+}
+
+function closeAssignVehicleModal() {
+    document.getElementById('assignVehicleModal').style.display = 'none';
+    document.getElementById('assignVehicleForm').reset();
+}
+
+// Close modal when clicking outside
+window.onclick = function(event) {
+    const showAllModal = document.getElementById('showAllVehiclesModal');
+    const assignModal = document.getElementById('assignVehicleModal');
+    
+    if (event.target == showAllModal) {
+        closeShowAllVehiclesModal();
+    }
+    
+    if (event.target == assignModal) {
+        closeAssignVehicleModal();
+    }
+}
+</script>
 
 @endsection

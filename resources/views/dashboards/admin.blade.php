@@ -193,20 +193,13 @@
                             @endphp
 
                             <!-- MAIN ROW -->
-                            <tr onclick="toggleRow('{{ $rowId }}')" class="clickable-row" style="background: {{ $index % 2 == 0 ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $index % 2 == 0 ? '#f8fafc' : '#ffffff' }}';">
+                            <tr class="clickable-row" style="background: {{ $index % 2 == 0 ? '#f8fafc' : '#ffffff' }}; border-bottom: 1px solid #e2e8f0; transition: all 0.2s ease; pointer-events: none;" onmouseover="this.style.background='#eff6ff';" onmouseout="this.style.background='{{ $index % 2 == 0 ? '#f8fafc' : '#ffffff' }}';">
                                 <td data-label="#" style="padding: 16px 20px; border: none; font-weight: 500; color: #1e40af;">{{ $index + 1 }}</td>
 
                                 <td data-label="Boardmember" style="padding: 16px 20px; border: none;">
-                                    <div style="display:flex;align-items:center;gap:8px;">
-                                        <button class="expand-btn" onclick="event.stopPropagation(); toggleRow('{{ $rowId }}'); toggleIcon(this);" aria-expanded="false" style="background: none; border: none; cursor: pointer; padding: 4px;">
-                                            <svg class="chev" width="14" height="14" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M6 9l6 6 6-6" stroke="#1e40af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                            </svg>
-                                        </button>
-                                        <div>
-                                            <div class="name" style="font-weight: 500; color: #1e293b;">{{ $row['user']->name }}</div>
-                                            <div class="email" style="font-size: 13px; color: #64748b;">{{ $row['user']->email }}</div>
-                                        </div>
+                                    <div>
+                                        <div class="name" style="font-weight: 500; color: #1e293b;">{{ $row['user']->name }}</div>
+                                        <div class="email" style="font-size: 13px; color: #64748b;">{{ $row['user']->email }}</div>
                                     </div>
                                 </td>
 

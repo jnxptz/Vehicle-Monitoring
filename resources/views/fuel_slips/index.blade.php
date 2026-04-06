@@ -278,7 +278,7 @@
                 <div style="flex-grow: 1;"></div>
                 
                 <div class="bottom-section">
-                    <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>Offices</a>
+                    <!-- Office navigation removed for boardmembers -->
                 </div>
             
             <div class="logout-form">

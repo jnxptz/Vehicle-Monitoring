@@ -142,5 +142,15 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     Route::post('maintenances', [MaintenanceController::class, 'store'])->name('maintenances.store');
 });
 
+// API Routes
+Route::middleware(['auth'])->group(function () {
+    Route::get('/api/all-vehicles', [VehicleController::class, 'getAllVehicles'])->name('api.all-vehicles');
+});
+
+// Vehicle Assignment Route
+Route::middleware(['auth', 'role:admin'])->group(function () {
+    Route::put('/vehicles/{vehicle}/assign', [VehicleController::class, 'assignVehicle'])->name('vehicles.assign');
+});
+
 
 // Note: vehicle creation/management is admin-only via the resource above
