@@ -50,8 +50,9 @@ class MaintenanceController extends Controller
             
             $boardmembers = $query->get();
             $maintenances = Maintenance::with('vehicle')->latest()->get(); // Keep for backward compatibility
+            $maintenanceAlerts = []; // No alerts for admin
         } else {
-            // For boardmember: fetch only their vehicles' maintenances
+            // For boardmember: fetch only their vehicles' maintenances and check maintenance alerts
             $maintenances = Maintenance::with('vehicle')
                 ->whereHas('vehicle', function ($q) use ($user) {
                     $q->where('bm_id', $user->id);
@@ -60,11 +61,45 @@ class MaintenanceController extends Controller
                 ->get();
             $boardmembers = collect(); // Empty collection for boardmember view
             $offices = collect();
+            
+            // Check for maintenance alerts for boardmember's vehicles
+            $maintenanceAlerts = [];
+            $vehicles = $user->vehicles()->get();
+            foreach ($vehicles as $vehicle) {
+                // Get current KM from vehicle or latest fuel slip
+                $currentKm = $vehicle->current_km ?? 0;
+                $latestFuelSlip = \App\Models\FuelSlip::where('vehicle_id', $vehicle->id)
+                    ->orderBy('km_reading', 'desc')
+                    ->first();
+                if ($latestFuelSlip && $latestFuelSlip->km_reading > $currentKm) {
+                    $currentKm = $latestFuelSlip->km_reading;
+                }
+
+                // Get last maintenance
+                $lastMaintenance = Maintenance::where('vehicle_id', $vehicle->id)
+                    ->orderBy('date', 'desc')
+                    ->first();
+                
+                $lastMaintenanceKm = $lastMaintenance ? $lastMaintenance->maintenance_km : 0;
+                if ($lastMaintenanceKm == 0) {
+                    $maxKm = Maintenance::where('vehicle_id', $vehicle->id)
+                        ->whereNotNull('maintenance_km')
+                        ->max('maintenance_km');
+                    $lastMaintenanceKm = $maxKm ? (int) $maxKm : 0;
+                }
+
+                $lastMaintenanceType = $lastMaintenance ? $lastMaintenance->maintenance_type : 'N/A';
+                $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
+                
+                if ($currentKm >= $nextDueKm) {
+                    $maintenanceAlerts[] = "Vehicle {$vehicle->plate_number} ({$vehicle->vehicle_name}) is due for maintenance! Current: {$currentKm} km, Last maintenance ({$lastMaintenanceType}) at {$lastMaintenanceKm} km.";
+                }
+            }
         }
         
         $vehicles = Vehicle::orderBy('plate_number')->get();
         
-        return view('maintenances.index', compact('maintenances', 'vehicles', 'boardmembers', 'offices'));
+        return view('maintenances.index', compact('maintenances', 'vehicles', 'boardmembers', 'offices', 'maintenanceAlerts'));
     }
 
     public function create()

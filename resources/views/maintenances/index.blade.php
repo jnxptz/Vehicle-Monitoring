@@ -177,6 +177,28 @@
                 </div>
 @endif
 
+                {{-- Maintenance Alerts --}}
+                @if(!empty($maintenanceAlerts))
+                    <div class="alerts-box" style="
+                        background: linear-gradient(135deg, #fef3c7 0%, #fef2f2 100%);
+                        border: 2px solid #f59e0b;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin-bottom: 24px;
+                        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+                    ">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 24px; margin-right: 8px;">?</div>
+                            <h4 style="color: #d97706; margin: 0; font-size: 18px; font-weight: 600;">Maintenance Alerts</h4>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; color: #92400e;">
+                            @foreach($maintenanceAlerts as $alert)
+                                <li style="margin-bottom: 8px; font-weight: 500;">{{ $alert }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 {{-- Success/Error Messages --}}
                 @if(session('success'))
                     <div class="success-message">
@@ -192,9 +214,14 @@
 
                 {{-- Admin View: Expandable Boardmembers with Maintenances --}}
                 @if(auth()->user()->role === 'admin')
-                    @if($boardmembers->count() > 0)
-                        <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden;">
-                            <table style="width: 100%; border-collapse: collapse; border: none;">
+                    @if($boardmembers && $boardmembers->count() > 0)
+                    <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                        <style>
+                            .table-wrapper::-webkit-scrollbar {
+                                display: none;
+                            }
+                        </style>
+                        <table style="width: 100%; border-collapse: collapse; border: none;">
                                 <thead>
                                     <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
                                         <th style="padding: 16px 20px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">#</th>
@@ -223,13 +250,12 @@
 
                                         <tr id="maint-{{ $bm->id }}-details" class="details-row" style="display:none; background: #ffffff;">
                                             <td colspan="3" style="padding: 0; border: none;">
-                                                <div class="maintenance-cards-container" style="overflow-x:auto; -webkit-overflow-scrolling: touch;">
-                                                    @if($totalMaint > 0)
-                                                        <div style="display:flex; gap:16px; overflow-x:auto; padding-bottom:8px;">
-                                                            @foreach($bm->vehicles as $vehicle)
-                                                                @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
-                                                                    @foreach($vehicle->maintenances as $m)
-                                                                        <div style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1); min-width:300px; flex-shrink:0;">
+                                                <div class="vehicle-cards" onwheel="event.stopPropagation();">
+                                                @if($totalMaint > 0)
+                                                    @foreach($bm->vehicles as $vehicle)
+                                                        @if($vehicle->maintenances && count($vehicle->maintenances) > 0)
+                                                            @foreach($vehicle->maintenances as $m)
+                                                                <div class="vehicle-card" style="border:1px solid #e6eef8; border-radius:8px; padding:16px; background:#fff; box-shadow:0 1px 3px rgba(0,0,0,0.1);">
                                                                             <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
                                                                                 <strong style="font-size:15px;">{{ $vehicle->plate_number }}</strong>
                                                                                 <div style="display:flex; gap:6px;">

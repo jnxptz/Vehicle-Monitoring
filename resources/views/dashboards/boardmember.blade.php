@@ -4,6 +4,207 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/boardmember-dashboard-styles.css') }}">
 
+<style>
+/* Maintenance Alert Styles for Vehicle Pills */
+.maintenance-alert-orange {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%) !important;
+    border: 2px solid #ea580c !important;
+    color: white !important;
+    position: relative;
+    animation: pulse-orange 2s infinite;
+}
+
+.maintenance-alert-red {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+    border: 2px solid #b91c1c !important;
+    color: white !important;
+    position: relative;
+    animation: pulse-red 1.5s infinite;
+}
+
+.maintenance-alert-icon {
+    position: absolute;
+    top: -8px;
+    right: -8px;
+    background: #dc2626;
+    color: white;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    font-weight: bold;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.maintenance-warning-text {
+    color: #dc2626 !important;
+    font-weight: 600 !important;
+    margin-top: 2px;
+    display: block;
+}
+
+@keyframes pulse-orange {
+    0% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(251, 146, 60, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(251, 146, 60, 0); }
+}
+
+@keyframes pulse-red {
+    0% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+    70% { box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+}
+
+/* Vehicle Card Styles */
+.vehicle-pill-card {
+    background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    border: 2px solid #e2e8f0;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    transition: all 0.3s ease;
+    position: relative;
+}
+
+.vehicle-pill-card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    border-color: #cbd5e1;
+}
+
+.vehicle-card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    padding-bottom: 12px;
+    border-bottom: 2px solid #f1f5f9;
+}
+
+.vehicle-card-header strong {
+    font-size: 18px;
+    font-weight: 700;
+    color: #1e293b;
+}
+
+.vehicle-type {
+    font-size: 13px;
+    color: #64748b;
+    font-weight: 500;
+}
+
+.maintenance-badge {
+    margin-left: auto;
+    padding: 4px 10px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.badge-orange {
+    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%);
+    color: white;
+}
+
+.badge-red {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    color: white;
+}
+
+/* 2-Column Grid Layout */
+.vehicle-card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+}
+
+.grid-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px 14px;
+    background: #f8fafc;
+    border-radius: 10px;
+    border: 1px solid #e2e8f0;
+}
+
+.item-label {
+    font-size: 10px;
+    color: #64748b;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.item-value {
+    font-size: 13px;
+    color: #1e293b;
+    font-weight: 600;
+}
+
+.value-success {
+    color: #059669;
+    font-weight: 700;
+}
+
+.value-danger {
+    color: #dc2626;
+    font-weight: 700;
+}
+
+/* Action Button */
+.card-action {
+    text-align: right;
+    padding-top: 12px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.btn-maintenance {
+    background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
+    color: white;
+    text-decoration: none;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.2);
+}
+
+.btn-maintenance:hover {
+    background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        max-height: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        max-height: 500px;
+        transform: translateY(0);
+    }
+}
+
+.hidden {
+    display: none !important;
+}
+</style>
+
 @php
 use Carbon\Carbon;
 @endphp
@@ -194,21 +395,6 @@ use Carbon\Carbon;
 
             @endif
 
-            {{-- Vehicle list (boardmember may have multiple vehicles) --}}
-
-            @if(isset($vehicles) && $vehicles->count() > 0)
-
-                <div class="vehicle-list">
-                    @foreach($vehicles as $v)
-                        <div class="vehicle-pill">
-                            <strong>{{ $v->plate_number }}</strong>
-                            <small>{{ $v->make ?? '' }} {{ $v->model ?? '' }}</small>
-                        </div>
-                    @endforeach
-                </div>
-
-            @endif
-
             {{-- KPI CARDS --}}
 
             @if(isset($vehicle) && $vehicle)
@@ -270,6 +456,110 @@ use Carbon\Carbon;
                     </div>
                 </div>
 
+                {{-- Vehicle Cards --}}
+
+                @if(isset($vehicles) && $vehicles->count() > 0)
+
+                    <div class="vehicle-list">
+                        @foreach($vehicles as $v)
+                            @php
+                                // Get current KM from vehicle or latest fuel slip
+                                $currentKm = $v->current_km ?? 0;
+                                $latestFuelSlip = \App\Models\FuelSlip::where('vehicle_id', $v->id)
+                                    ->orderBy('km_reading', 'desc')
+                                    ->first();
+                                if ($latestFuelSlip && $latestFuelSlip->km_reading > $currentKm) {
+                                    $currentKm = $latestFuelSlip->km_reading;
+                                }
+
+                                // Get last maintenance
+                                $lastMaintenance = \App\Models\Maintenance::where('vehicle_id', $v->id)
+                                    ->orderBy('date', 'desc')
+                                    ->first();
+                                 
+                                $lastMaintenanceKm = $lastMaintenance ? $lastMaintenance->maintenance_km : 0;
+                                if ($lastMaintenanceKm == 0) {
+                                    $maxKm = \App\Models\Maintenance::where('vehicle_id', $v->id)
+                                        ->whereNotNull('maintenance_km')
+                                        ->max('maintenance_km');
+                                    $lastMaintenanceKm = $maxKm ? (int) $maxKm : 0;
+                                }
+
+                                // Calculate KM since last maintenance
+                                $kmSinceLastMaintenance = $currentKm - $lastMaintenanceKm;
+                                 
+                                // Determine alert level and styling
+                                $alertClass = '';
+                                $alertIcon = '';
+                                if ($kmSinceLastMaintenance >= 8000) {
+                                    $alertClass = 'maintenance-alert-red';
+                                    $alertIcon = '!';
+                                } elseif ($kmSinceLastMaintenance >= 4500) {
+                                    $alertClass = 'maintenance-alert-orange';
+                                    $alertIcon = '!';
+                                } elseif ($kmSinceLastMaintenance >= 5000) {
+                                    $alertClass = 'maintenance-alert-orange';
+                                    $alertIcon = '!';
+                                }
+                            @endphp
+                            <div class="vehicle-pill-card {{ $alertClass }}">
+                                @if($alertIcon)
+                                    <span class="maintenance-alert-icon">{{ $alertIcon }}</span>
+                                @endif
+                                <div class="vehicle-card-header">
+                                    <strong>{{ $v->plate_number }}</strong>
+                                    <span class="vehicle-type">{{ $v->make ?? '' }} {{ $v->model ?? '' }}</span>
+                                    @if($kmSinceLastMaintenance >= 4500)
+                                        <span class="maintenance-badge {{ $kmSinceLastMaintenance >= 8000 ? 'badge-red' : 'badge-orange' }}">
+                                            {{ $kmSinceLastMaintenance >= 8000 ? 'Overdue!' : 'Due Soon' }}
+                                        </span>
+                                    @endif
+                                </div>
+                                 
+                                <div class="vehicle-card-grid">
+                                    <div class="grid-item">
+                                        <span class="item-label">Current KM</span>
+                                        <span class="item-value">{{ number_format($currentKm) }} km</span>
+                                    </div>
+                                    <div class="grid-item">
+                                        <span class="item-label">Last Maintenance</span>
+                                        <span class="item-value">{{ $lastMaintenance ? $lastMaintenance->date : 'N/A' }}</span>
+                                    </div>
+                                    <div class="grid-item">
+                                        <span class="item-label">Last Maint. KM</span>
+                                        <span class="item-value">{{ $lastMaintenanceKm ? number_format($lastMaintenanceKm) . ' km' : 'N/A' }}</span>
+                                    </div>
+                                    <div class="grid-item">
+                                        <span class="item-label">KM Since Last</span>
+                                        <span class="item-value {{ $kmSinceLastMaintenance >= 4500 ? 'value-danger' : 'value-success' }}">
+                                            {{ number_format($kmSinceLastMaintenance) }} km
+                                        </span>
+                                    </div>
+                                    <div class="grid-item">
+                                        <span class="item-label">Driver</span>
+                                        <span class="item-value">{{ auth()->user()->name }}</span>
+                                    </div>
+                                    <div class="grid-item">
+                                        <span class="item-label">Status</span>
+                                        <span class="item-value {{ $kmSinceLastMaintenance >= 4500 ? 'value-danger' : 'value-success' }}">
+                                            {{ $kmSinceLastMaintenance >= 4500 ? 'Needs Service' : 'Good' }}
+                                        </span>
+                                    </div>
+                                </div>
+
+                                @if($kmSinceLastMaintenance >= 4500)
+                                    <div class="card-action">
+                                        <a href="{{ route('maintenances.index') }}" class="btn-maintenance">
+                                            Schedule Maintenance →
+                                        </a>
+                                    </div>
+                                @endif
+                            </div>
+                        @endforeach
+                    </div>
+
+                @endif
+
             @else
 
                 <div class="no-vehicle">
@@ -289,6 +579,10 @@ use Carbon\Carbon;
 <footer class="dashboard-footer">
     &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
 </footer>
+
+<script>
+// No toggle functionality needed - cards display all information directly
+</script>
 
 <script src="{{ asset('js/boardmember-dashboard.js') }}"></script>
 

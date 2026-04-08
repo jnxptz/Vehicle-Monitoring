@@ -127,7 +127,7 @@
                                                     <div class="vehicle-header">
                                                         <strong>{{ $vehicle->vehicle_name ?? $vehicle->plate_number }}</strong>
                                                         <div class="card-actions">
-                                                            <button onclick="openEditModal({{ $vehicle->id }}, '{{ addslashes($vehicle->plate_number) }}', {{ $vehicle->monthly_fuel_limit }}, {{ $vehicle->current_km ?? 0 }})" title="Edit" style="background:#0b77d6; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
+                                                            <button onclick="openEditModal({{ $vehicle->id }}, '{{ addslashes($vehicle->plate_number) }}', {{ $vehicle->monthly_fuel_limit }}, {{ $vehicle->current_km ?? 0 }}, '{{ addslashes($vehicle->driver ?? '') }}')" title="Edit" style="background:#0b77d6; color:white; border:none; padding:6px; border-radius:4px; cursor:pointer; display:inline-flex; align-items:center; justify-content:center;"><svg viewBox="0 0 24 24" style="width:16px;height:16px;stroke:currentColor;fill:none;stroke-width:2;"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg></button>
                                                             <form action="{{ route('vehicles.destroy', $vehicle->id) }}" method="POST" style="display:inline;">
                                                                 @csrf
                                                                 @method('DELETE')
@@ -137,6 +137,7 @@
                                                     </div>
                                                     <div class="vehicle-body">
                                                         <div>Plate: {{ $vehicle->plate_number }}</div>
+                                                        <div>Driver: {{ $vehicle->driver ?? 'Not Assigned' }}</div>
                                                         <div>Monthly Limit: {{ $vehicle->monthly_fuel_limit }} liters</div>
                                                         <div>Current KM: {{ $vehicle->latestFuelSlip?->km_reading ?? $vehicle->current_km ?? 0 }} km</div>
                                                         <div class="kpi-row">
@@ -187,6 +188,9 @@
 
             <label for="edit_plate_number" style="display:block; margin-bottom:12px; font-weight:600;">Plate Number:</label>
             <input id="edit_plate_number" type="text" name="plate_number" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;" placeholder="e.g., ABC 1234">
+
+            <label for="edit_driver" style="display:block; margin-bottom:12px; font-weight:600;">Driver Name:</label>
+            <input id="edit_driver" type="text" name="driver" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;" placeholder="Enter driver name">
 
             <label for="edit_monthly_fuel_limit" style="display:block; margin-bottom:12px; font-weight:600;">Monthly Fuel Limit (liters):</label>
             <input id="edit_monthly_fuel_limit" type="number" name="monthly_fuel_limit" required style="width:100%; padding:8px; margin-bottom:20px; border:1px solid #ddd; border-radius:4px;" min="1" step="0.01">

@@ -68,10 +68,11 @@ function toggleFuelList(vehicleId) {
 }
 
 // Edit modal functions
-function openEditModal(vehicleId, plateNumber, monthlyLimit, currentKm) {
+function openEditModal(vehicleId, plateNumber, monthlyLimit, currentKm, driver) {
     // Set form values
     const editVehicleId = document.getElementById('editVehicleId');
     const editPlateNumber = document.getElementById('edit_plate_number');
+    const editDriver = document.getElementById('edit_driver');
     const editMonthlyLimit = document.getElementById('edit_monthly_fuel_limit');
     const editCurrentKm = document.getElementById('edit_current_km');
     const editForm = document.getElementById('editVehicleForm');
@@ -79,6 +80,7 @@ function openEditModal(vehicleId, plateNumber, monthlyLimit, currentKm) {
     
     if (editVehicleId) editVehicleId.value = vehicleId;
     if (editPlateNumber) editPlateNumber.value = plateNumber;
+    if (editDriver) editDriver.value = driver;
     if (editMonthlyLimit) editMonthlyLimit.value = monthlyLimit;
     if (editCurrentKm) editCurrentKm.value = currentKm;
     

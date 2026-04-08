@@ -56,6 +56,11 @@ Route::get('/admin/dashboard', [DashboardController::class, 'admin'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.dashboard');
 
+// Admin Reports page
+Route::get('/admin/reports', [DashboardController::class, 'reports'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.reports');
+
 // Boardmember dashboard — use DashboardController to calculate remaining budget, monthly usage
 Route::get('/boardmember/dashboard', [DashboardController::class, 'boardmember'])
     ->middleware(['auth', 'role:boardmember'])
@@ -91,6 +96,7 @@ Route::middleware(['auth', 'role:admin'])->group(function () {
     
     // Boardmember management routes
     Route::get('boardmembers/{user}/edit', [OfficeController::class, 'editBoardmember'])->name('boardmembers.edit');
+    Route::post('boardmembers/register', [OfficeController::class, 'registerBoardmember'])->name('boardmembers.register');
     Route::put('boardmembers/{user}', [OfficeController::class, 'updateBoardmember'])->name('boardmembers.update');
     Route::delete('boardmembers/{user}', [OfficeController::class, 'destroyBoardmember'])->name('boardmembers.destroy');
     

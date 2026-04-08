@@ -42,6 +42,18 @@
                 <p class="page-description">Select an office for each boardmember to enable vehicle registration and fuel slip creation.</p>
             </div>
 
+            <div style="margin-bottom: 25px; text-align: right;">
+                <button type="button" onclick="openRegistrationModal()" style="padding: 12px 20px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600; text-decoration: none; transition: all 0.2s ease; display: inline-flex; align-items: center; gap: 8px; box-shadow: 0 4px 6px rgba(30, 64, 175, 0.1);" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(30, 64, 175, 0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(30, 64, 175, 0.1)';">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                        <circle cx="8.5" cy="7" r="4"/>
+                        <line x1="20" y1="8" x2="20" y2="14"/>
+                        <line x1="23" y1="11" x2="17" y2="11"/>
+                    </svg>
+                    Register New Boardmember
+                </button>
+            </div>
+
             @if (session('success'))
                 <div class="success-message">
                     <strong>✓ Success:</strong> {{ session('success') }}
@@ -138,7 +150,7 @@
                         <button type="button" onclick="closeEditModal()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #64748b;">&times;</button>
                     </div>
                     
-                    <form action="#" method="POST" id="editForm">
+                   <form action="#" method="POST" id="editForm">
                         @csrf
                         @method('PUT')
                         
@@ -175,6 +187,55 @@
                 </div>
             </div>
 
+            <!-- Registration Modal -->
+            <div id="registrationModal" style="display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.5); justify-content: center; align-items: center;">
+                <div style="background-color: white; padding: 28px; border-radius: 16px; width: 90%; max-width: 550px; box-shadow: 0 20px 25px rgba(0,0,0,0.15); max-height: 90vh; overflow-y: auto;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+                        <h3 style="margin: 0; color: #1e293b; font-size: 20px; font-weight: 600;">Register New Boardmember</h3>
+                        <button type="button" onclick="closeRegistrationModal()" style="background: none; border: none; font-size: 28px; cursor: pointer; color: #64748b; padding: 0; line-height: 1;">&times;</button>
+                    </div>
+                    
+                    <form action="#" method="POST" id="registrationForm">
+                        @csrf
+                        <div style="margin-bottom: 18px;">
+                            <label for="reg_name" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Full Name</label>
+                            <input type="text" id="reg_name" name="name" required placeholder="Enter boardmember's full name" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+                        </div>
+                        
+                        <div style="margin-bottom: 18px;">
+                            <label for="reg_email" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Email Address</label>
+                            <input type="email" id="reg_email" name="email" required placeholder="Enter email address" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+                        </div>
+                        
+                        <div style="margin-bottom: 18px;">
+                            <label for="reg_password" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Password</label>
+                            <input type="password" id="reg_password" name="password" required placeholder="Enter temporary password" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+                        </div>
+                        
+                        <div style="margin-bottom: 18px;">
+                            <label for="reg_office_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Office Assignment</label>
+                            <select id="reg_office_id" name="office_id" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+                                <option value="">-- Select Office --</option>
+                                @foreach($offices as $office)
+                                    <option value="{{ $office->id }}">{{ $office->name }}</option>
+                                @endforeach
+                            </select>
+                        </div>
+                        
+                        <div style="margin-bottom: 24px;">
+                            <label for="reg_yearly_budget" style="display: block; margin-bottom: 8px; font-weight: 600; color: #374151; font-size: 14px;">Yearly Budget (Optional)</label>
+                            <input type="number" id="reg_yearly_budget" name="yearly_budget" step="0.01" min="0" placeholder="Enter yearly budget (e.g., 50000)" style="width: 100%; padding: 12px 16px; border: 2px solid #e5e7eb; border-radius: 8px; font-size: 14px; transition: border-color 0.2s;">
+                        </div>
+                        
+                        <div style="display: flex; gap: 12px; justify-content: flex-end;">
+                            <button type="button" onclick="closeRegistrationModal()" style="padding: 12px 24px; background: #6b7280; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: background 0.2s;">Cancel</button>
+                            <button type="submit" style="padding: 12px 24px; background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 500; transition: all 0.2s;">Register Boardmember</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            
             
         </div>
     </div>
@@ -202,11 +263,31 @@ function closeEditModal() {
     document.getElementById('editModal').style.display = 'none';
 }
 
+// Registration Modal Functions
+function openRegistrationModal() {
+    // Clear form
+    document.getElementById('registrationForm').reset();
+    
+    // Set form action to registration route
+    document.getElementById('registrationForm').action = '/boardmembers/register';
+    
+    // Show modal
+    document.getElementById('registrationModal').style.display = 'flex';
+}
+
+function closeRegistrationModal() {
+    document.getElementById('registrationModal').style.display = 'none';
+}
+
 // Close modal when clicking outside
 window.onclick = function(event) {
-    const modal = document.getElementById('editModal');
-    if (event.target == modal) {
+    const editModal = document.getElementById('editModal');
+    const regModal = document.getElementById('registrationModal');
+    
+    if (event.target == editModal) {
         closeEditModal();
+    } else if (event.target == regModal) {
+        closeRegistrationModal();
     }
 }
 </script>

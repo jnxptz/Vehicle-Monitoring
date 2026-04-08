@@ -36,10 +36,10 @@
                 <button type="submit">Sign In</button>
             </form>
 
-            <div class="link">
+            <!--<div class="link">
                 Don't have an account?
                 <a href="{{ route('register.form') }}">Register here</a>
-            </div>
+            </div> -->
         </div>
 
         <!-- RIGHT: LOGO -->

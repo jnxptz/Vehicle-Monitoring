@@ -151,6 +151,28 @@
                 @endif
             </div>
 
+                {{-- Maintenance Alerts --}}
+                @if(!empty($maintenanceAlerts))
+                    <div class="alerts-box" style="
+                        background: linear-gradient(135deg, #fef3c7 0%, #fef2f2 100%);
+                        border: 2px solid #f59e0b;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin-bottom: 24px;
+                        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+                    ">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 24px; margin-right: 8px;">?</div>
+                            <h4 style="color: #d97706; margin: 0; font-size: 18px; font-weight: 600;">Maintenance Alerts</h4>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; color: #92400e;">
+                            @foreach($maintenanceAlerts as $alert)
+                                <li style="margin-bottom: 8px; font-weight: 500;">{{ $alert }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 {{-- Success/Error Messages --}}
                 @if(session('success'))
                     <div class="success-message">
@@ -454,23 +476,23 @@
                 <div>
                     <label for="vehicle_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">Select Vehicle</label>
                     <div style="position: relative;">
-                        <select id="vehicle_id" name="vehicle_id" style="
+                        <select id="vehicle_id" name="vehicle_id" disabled style="
                             width: 100%;
                             padding: 12px 16px;
                             border: 2px solid #e2e8f0;
                             border-radius: 8px;
-                            background: #ffffff;
+                            background: #f1f5f9;
                             font-size: 14px;
-                            color: #1e293b;
+                            color: #64748b;
                             appearance: none;
                             background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205%205z%22%20fill%3D%22%236b7280%22/%3E%3C/svg%3E');
                             background-repeat: no-repeat;
                             background-position: right 12px center;
                             background-size: 20px;
-                            cursor: pointer;
+                            cursor: not-allowed;
                             transition: all 0.2s ease;
-                        " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
-                            <option value="">Choose a vehicle...</option>
+                        " onmouseover="if(!this.disabled) { this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)'; }" onmouseout="if(!this.disabled) { this.style.borderColor='#e2e8f0'; this.style.boxShadow='none'; }">
+                            <option value="">Select boardmember first...</option>
                         </select>
                     </div>
                 </div>
@@ -652,9 +674,105 @@
     </div>
 </div>
 
+@php
+    $boardmembersData = [];
+    if ($boardmembers) {
+        foreach ($boardmembers as $bm) {
+            $vehicles = [];
+            foreach ($bm->vehicles as $vehicle) {
+                $vehicles[] = [
+                    'id' => $vehicle->id,
+                    'plate_number' => $vehicle->plate_number,
+                    'vehicle_name' => $vehicle->vehicle_name,
+                    'driver' => $vehicle->driver,
+                    'current_km' => $vehicle->getLatestKm(),
+                    'monthly_fuel_limit' => $vehicle->monthly_fuel_limit
+                ];
+            }
+            $boardmembersData[$bm->id] = $vehicles;
+        }
+    }
+@endphp
+
 <script>
-    window.boardmembersData = @json($boardmembers ? $boardmembers->mapWithKeys(function($bm) { return [$bm->id => $bm->vehicles ?? []]; }) : []);
-    
+    window.boardmembersData = @json($boardmembersData);
+
+    // Auto-fill functionality for Fuel Slip Modal
+    (function() {
+        const boardmemberSelect = document.getElementById('boardmember_id');
+        const vehicleSelect = document.getElementById('vehicle_id');
+        const kmInput = document.getElementById('km_reading');
+        const driverInput = document.getElementById('driver');
+
+        if (!boardmemberSelect || !vehicleSelect) return;
+
+        // Boardmember change - load their vehicles
+        boardmemberSelect.addEventListener('change', function() {
+            const boardmemberId = this.value;
+
+            // Clear vehicle dropdown
+            vehicleSelect.innerHTML = '<option value="">Choose a vehicle...</option>';
+
+            // Clear auto-filled fields
+            if (kmInput) kmInput.value = '';
+            if (driverInput) driverInput.value = '';
+
+            if (!boardmemberId) {
+                vehicleSelect.disabled = true;
+                vehicleSelect.style.background = '#f1f5f9';
+                vehicleSelect.style.color = '#64748b';
+                vehicleSelect.style.cursor = 'not-allowed';
+                return;
+            }
+
+            // Enable vehicle dropdown
+            vehicleSelect.disabled = false;
+            vehicleSelect.style.background = '#ffffff';
+            vehicleSelect.style.color = '#1e293b';
+            vehicleSelect.style.cursor = 'pointer';
+
+            // Get vehicles for selected boardmember
+            const vehicles = window.boardmembersData[boardmemberId] || [];
+
+            // Populate vehicle dropdown
+            vehicles.forEach(function(vehicle) {
+                const option = document.createElement('option');
+                option.value = vehicle.id;
+                option.text = vehicle.plate_number + ' — ' + (vehicle.vehicle_name || 'Unknown Vehicle');
+                // Store vehicle data for auto-fill
+                option.setAttribute('data-driver', vehicle.driver || '');
+                option.setAttribute('data-km', vehicle.current_km || 0);
+                vehicleSelect.add(option);
+            });
+
+            // Auto-select if only one vehicle
+            if (vehicles.length === 1) {
+                vehicleSelect.selectedIndex = 1;
+                autoFillVehicleData(vehicleSelect.options[1]);
+            }
+        });
+
+        // Vehicle change - auto-fill KM and Driver
+        vehicleSelect.addEventListener('change', function() {
+            const selectedOption = this.options[this.selectedIndex];
+            if (selectedOption && selectedOption.value) {
+                autoFillVehicleData(selectedOption);
+            } else {
+                // Clear fields if no vehicle selected
+                if (kmInput) kmInput.value = '';
+                if (driverInput) driverInput.value = '';
+            }
+        });
+
+        function autoFillVehicleData(option) {
+            const driver = option.getAttribute('data-driver') || '';
+            const km = option.getAttribute('data-km') || '';
+
+            if (driverInput) driverInput.value = driver;
+            if (kmInput) kmInput.value = km;
+        }
+    })();
+
     function openPDFModal(fuelSlipId) {
         const modal = document.getElementById('pdfViewerModal');
         const pdfContent = document.getElementById('pdfContent');

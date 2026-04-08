@@ -193,4 +193,57 @@ class OfficeController extends Controller
 
         return redirect()->route('offices.manage-boardmembers')->with('success', "{$userName} has been deleted successfully. All vehicles have been unassigned and are now available for other boardmembers. Fuel slips, maintenance records, and budget data have been removed.");
     }
+
+    /**
+     * Register a new boardmember
+     */
+    public function registerBoardmember(Request $request)
+    {
+        // Validate the request
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|string|email|max:255|unique:users',
+            'password' => 'required|string|min:8',
+            'office_id' => 'nullable|exists:offices,id',
+            'yearly_budget' => 'nullable|numeric|min:0',
+        ]);
+
+        try {
+            // Create the new user
+            $user = User::create([
+                'name' => $request->name,
+                'email' => $request->email,
+                'password' => bcrypt($request->password),
+                'role' => 'boardmember',
+                'office_id' => $request->office_id,
+                'email_verified_at' => now(), // Auto-verify email for admin-created accounts
+            ]);
+
+            // Create BM record with budget if provided
+            if ($request->filled('yearly_budget')) {
+                BM::create([
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'yearly_budget' => $request->yearly_budget,
+                ]);
+            } else {
+                // Create BM record with default budget
+                BM::create([
+                    'user_id' => $user->id,
+                    'name' => $user->name,
+                    'yearly_budget' => 100000, // Default budget
+                ]);
+            }
+
+            return redirect()->route('offices.manage-boardmembers')->with('success', "Boardmember '{$user->name}' has been registered successfully! They can now log in with their credentials.");
+
+        } catch (\Exception $e) {
+            // Log the error for debugging
+            \Log::error('Boardmember registration failed: ' . $e->getMessage());
+            
+            return redirect()->route('offices.manage-boardmembers')
+                ->with('error', 'Registration failed: ' . $e->getMessage())
+                ->withInput();
+        }
+    }
 }

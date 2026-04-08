@@ -64,6 +64,27 @@
                     </div>
                 @endif
 
+                @if(!empty($maintenanceAlerts))
+                    <div class="alerts-box" style="
+                        background: linear-gradient(135deg, #fef3c7 0%, #fef2f2 100%);
+                        border: 2px solid #f59e0b;
+                        border-radius: 12px;
+                        padding: 20px;
+                        margin-bottom: 24px;
+                        box-shadow: 0 4px 12px rgba(245, 158, 11, 0.1);
+                    ">
+                        <div style="display: flex; align-items: center; margin-bottom: 12px;">
+                            <div style="font-size: 24px; margin-right: 8px;"></div>
+                            <h4 style="color: #d97706; margin: 0; font-size: 18px; font-weight: 600;">Maintenance Alerts</h4>
+                        </div>
+                        <ul style="margin: 0; padding-left: 20px; color: #92400e;">
+                            @foreach($maintenanceAlerts as $alert)
+                                <li style="margin-bottom: 8px; font-weight: 500;">{{ $alert }}</li>
+                            @endforeach
+                        </ul>
+                    </div>
+                @endif
+
                 <div class="form-block" style="
                     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
                     border-radius: 16px;
@@ -300,10 +321,10 @@
                             <div style="color: #64748b; font-size: 14px;">
                                 <div style="display: flex; align-items: center; margin-bottom: 4px;">
                                     <span style="color: #059669; margin-right: 4px;">💡</span>
-                                    Select a boardmember first to filter their vehicles, then choose a registered vehicle to auto-fill details.
+                                    <strong>Auto-fill enabled:</strong> Select a boardmember to see their vehicles, then choose a vehicle to auto-fill all details.
                                 </div>
                                 <div style="font-size: 12px;">
-                                    Vehicle name, plate number, driver, and KM reading will be auto-filled.
+                                    Vehicle name, plate number, driver, and KM reading will be automatically populated.
                                 </div>
                             </div>
                             <button type="submit" class="btn-primary" style="
@@ -322,30 +343,95 @@
                             </button>
                         </div>
                     </form>
-                                vehicleSelect.disabled = !boardmemberId;
+
+                    <script>
+                        (function() {
+                            const boardmemberSelect = document.getElementById('boardmember_id');
+                            const vehicleSelect = document.getElementById('vehicle_id');
+                            const nameInput = document.getElementById('vehicle_name');
+                            const plateInput = document.getElementById('plate_number');
+                            const driverInput = document.getElementById('driver');
+                            const kmInput = document.getElementById('km_reading');
+
+                            // Store all vehicle options for filtering
+                            const allVehicleOptions = Array.from(vehicleSelect.options).slice(1); // Skip "Choose a vehicle..."
+
+                            function filterVehiclesByBoardmember(boardmemberId) {
+                                // Clear current options except the first one
+                                while (vehicleSelect.options.length > 1) {
+                                    vehicleSelect.remove(1);
+                                }
+
+                                if (!boardmemberId) {
+                                    vehicleSelect.disabled = true;
+                                    vehicleSelect.value = '';
+                                    clearFields();
+                                    return;
+                                }
+
+                                // Filter vehicles for selected boardmember
+                                const filteredVehicles = allVehicleOptions.filter(opt => {
+                                    return opt.getAttribute('data-boardmember') === boardmemberId;
+                                });
+
+                                // Add filtered vehicles back
+                                filteredVehicles.forEach(opt => {
+                                    vehicleSelect.add(opt.cloneNode(true));
+                                });
+
+                                vehicleSelect.disabled = false;
                                 vehicleSelect.value = '';
+                                clearFields();
+
+                                // Auto-select if only one vehicle
+                                if (filteredVehicles.length === 1) {
+                                    vehicleSelect.selectedIndex = 1;
+                                    autoFillVehicleData(filteredVehicles[0]);
+                                }
+                            }
+
+                            function clearFields() {
                                 nameInput.value = '';
                                 plateInput.value = '';
                                 driverInput.value = '';
                                 kmInput.value = '';
                             }
 
-                            boardmemberSelect && boardmemberSelect.addEventListener('change', function(){
-                                filterVehiclesByBoardmember(this.value);
-                            });
+                            function autoFillVehicleData(option) {
+                                const name = option.getAttribute('data-name') || '';
+                                const plate = option.getAttribute('data-plate') || '';
+                                const driver = option.getAttribute('data-driver') || '';
+                                const km = option.getAttribute('data-km') || '';
 
-                            vehicleSelect && vehicleSelect.addEventListener('change', function(){
-                                const opt = this.options[this.selectedIndex];
-                                const name = opt.getAttribute('data-name') || '';
-                                const plate = opt.getAttribute('data-plate') || '';
-                                const driver = opt.getAttribute('data-driver') || '';
-                                const km = opt.getAttribute('data-km') || '';
+                                if (name) nameInput.value = name;
+                                if (plate) plateInput.value = plate;
+                                if (driver) driverInput.value = driver;
+                                if (km) kmInput.value = km;
+                            }
 
-                                if(name) nameInput.value = name;
-                                if(plate) plateInput.value = plate;
-                                if(driver) driverInput.value = driver;
-                                if(km) kmInput.value = km;
-                            });
+                            // Boardmember change event
+                            if (boardmemberSelect) {
+                                boardmemberSelect.addEventListener('change', function() {
+                                    filterVehiclesByBoardmember(this.value);
+                                });
+                            }
+
+                            // Vehicle change event
+                            if (vehicleSelect) {
+                                vehicleSelect.addEventListener('change', function() {
+                                    const opt = this.options[this.selectedIndex];
+                                    if (opt && opt.value) {
+                                        autoFillVehicleData(opt);
+                                    } else {
+                                        clearFields();
+                                    }
+                                });
+                            }
+
+                            // Initialize on page load
+                            if (boardmemberSelect && boardmemberSelect.value) {
+                                filterVehiclesByBoardmember(boardmemberSelect.value);
+                            }
                         })();
                     </script>
                 </div>

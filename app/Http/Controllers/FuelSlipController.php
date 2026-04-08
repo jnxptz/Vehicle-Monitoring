@@ -50,14 +50,49 @@ class FuelSlipController extends Controller
             
             $boardmembers = $query->get();
             $fuelSlips = FuelSlip::latest()->get(); // Keep for backward compatibility
+            $maintenanceAlerts = []; // No alerts for admin
         } else {
-            // For boardmember: fetch only their fuel slips
+            // For boardmember: fetch only their fuel slips and check maintenance alerts
             $fuelSlips = FuelSlip::where('user_id', $user->id)->latest()->get();
             $boardmembers = collect(); // Empty collection for boardmember view
             $offices = collect();
+            
+            // Check for maintenance alerts for boardmember's vehicles
+            $maintenanceAlerts = [];
+            $vehicles = $user->vehicles()->get();
+            foreach ($vehicles as $vehicle) {
+                // Get current KM from vehicle or latest fuel slip
+                $currentKm = $vehicle->current_km ?? 0;
+                $latestFuelSlip = FuelSlip::where('vehicle_id', $vehicle->id)
+                    ->orderBy('km_reading', 'desc')
+                    ->first();
+                if ($latestFuelSlip && $latestFuelSlip->km_reading > $currentKm) {
+                    $currentKm = $latestFuelSlip->km_reading;
+                }
+
+                // Get last maintenance
+                $lastMaintenance = \App\Models\Maintenance::where('vehicle_id', $vehicle->id)
+                    ->orderBy('date', 'desc')
+                    ->first();
+                
+                $lastMaintenanceKm = $lastMaintenance ? $lastMaintenance->maintenance_km : 0;
+                if ($lastMaintenanceKm == 0) {
+                    $maxKm = \App\Models\Maintenance::where('vehicle_id', $vehicle->id)
+                        ->whereNotNull('maintenance_km')
+                        ->max('maintenance_km');
+                    $lastMaintenanceKm = $maxKm ? (int) $maxKm : 0;
+                }
+
+                $lastMaintenanceType = $lastMaintenance ? $lastMaintenance->maintenance_type : 'N/A';
+                $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
+                
+                if ($currentKm >= $nextDueKm) {
+                    $maintenanceAlerts[] = "Vehicle {$vehicle->plate_number} ({$vehicle->vehicle_name}) is due for maintenance! Current: {$currentKm} km, Last maintenance ({$lastMaintenanceType}) at {$lastMaintenanceKm} km.";
+                }
+            }
         }
 
-        return view('fuel_slips.index', compact('fuelSlips', 'boardmembers', 'offices'));
+        return view('fuel_slips.index', compact('fuelSlips', 'boardmembers', 'offices', 'maintenanceAlerts'));
     }
 
     public function create()
@@ -69,11 +104,46 @@ class FuelSlipController extends Controller
         // Provide boardmembers with offices so admin can pick a boardmember then a vehicle
         $boardmembers = \App\Models\User::where('role', 'boardmember')
             ->whereNotNull('office_id')
-            ->with(['office.vehicles' => function($q){ $q->orderBy('plate_number'); }])
+            ->with(['office', 'vehicles' => function($q){ $q->orderBy('plate_number'); }])
             ->orderBy('name')
             ->get();
 
-        return view('fuel_slips.create', compact('boardmembers'));
+        // Check for maintenance alerts for all vehicles
+        $maintenanceAlerts = [];
+        foreach ($boardmembers as $bm) {
+            foreach ($bm->office->vehicles ?? [] as $vehicle) {
+                // Get current KM from vehicle or latest fuel slip
+                $currentKm = $vehicle->current_km ?? 0;
+                $latestFuelSlip = \App\Models\FuelSlip::where('vehicle_id', $vehicle->id)
+                    ->orderBy('km_reading', 'desc')
+                    ->first();
+                if ($latestFuelSlip && $latestFuelSlip->km_reading > $currentKm) {
+                    $currentKm = $latestFuelSlip->km_reading;
+                }
+
+                // Get last maintenance
+                $lastMaintenance = \App\Models\Maintenance::where('vehicle_id', $vehicle->id)
+                    ->orderBy('date', 'desc')
+                    ->first();
+                
+                $lastMaintenanceKm = $lastMaintenance ? $lastMaintenance->maintenance_km : 0;
+                if ($lastMaintenanceKm == 0) {
+                    $maxKm = \App\Models\Maintenance::where('vehicle_id', $vehicle->id)
+                        ->whereNotNull('maintenance_km')
+                        ->max('maintenance_km');
+                    $lastMaintenanceKm = $maxKm ? (int) $maxKm : 0;
+                }
+
+                $lastMaintenanceType = $lastMaintenance ? $lastMaintenance->maintenance_type : 'N/A';
+                $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
+                
+                if ($currentKm >= $nextDueKm) {
+                    $maintenanceAlerts[] = "Vehicle {$vehicle->plate_number} ({$vehicle->vehicle_name}) is due for maintenance! Current: {$currentKm} km, Last maintenance ({$lastMaintenanceType}) at {$lastMaintenanceKm} km.";
+                }
+            }
+        }
+
+        return view('fuel_slips.create', compact('boardmembers', 'maintenanceAlerts'));
     }
 
     public function store(Request $request)
@@ -116,6 +186,11 @@ class FuelSlipController extends Controller
             'prepared_by_name' => $request->prepared_by_name,
             'approved_by_name' => $request->approved_by_name,
         ]);
+
+        // Update vehicle's current_km if vehicle exists
+        if ($selectedVehicle) {
+            $selectedVehicle->update(['current_km' => $request->km_reading]);
+        }
 
         $redirectRoute = auth()->user()->role === 'admin' ? 'admin.dashboard' : 'boardmember.dashboard';
 

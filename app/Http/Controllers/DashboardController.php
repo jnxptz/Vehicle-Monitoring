@@ -154,11 +154,131 @@ class DashboardController extends Controller
     }
 
     /**
+     * Admin reports page for boardmember comparison and analytics
+     */
+    public function reports(Request $request)
+    {
+        $year = $request->input('year', now()->year);
+        $reportType = $request->input('report_type', 'current-month');
+        $monthRange = $request->input('month_range', null);
+
+        // Get all boardmembers
+        $boardmembers = User::where('role', 'boardmember')
+            ->with(['office', 'vehicles'])
+            ->orderBy('name')
+            ->get();
+
+        $ids = $boardmembers->pluck('id');
+
+        // Calculate date range based on report type
+        $startMonth = 1;
+        $endMonth = 12;
+
+        switch ($reportType) {
+            case 'current-month':
+                $startMonth = now()->month;
+                $endMonth = now()->month;
+                break;
+            case 'quarterly':
+                $currentQuarter = ceil(now()->month / 3);
+                $startMonth = ($currentQuarter - 1) * 3 + 1;
+                $endMonth = $currentQuarter * 3;
+                break;
+            case 'semester':
+                $startMonth = now()->month <= 6 ? 1 : 7;
+                $endMonth = now()->month <= 6 ? 6 : 12;
+                break;
+            case 'custom-range':
+                if ($monthRange) {
+                    list($startMonth, $endMonth) = explode('-', $monthRange);
+                }
+                break;
+        }
+
+        // Get fuel slips data for the period
+        $fuelQuery = FuelSlip::whereIn('user_id', $ids)
+            ->whereYear('date', $year);
+
+        if ($startMonth == $endMonth) {
+            $fuelQuery->whereMonth('date', $startMonth);
+        } else {
+            $fuelQuery->whereBetween('date', [
+                Carbon::createFromDate($year, $startMonth, 1)->startOfMonth(),
+                Carbon::createFromDate($year, $endMonth, 1)->endOfMonth()
+            ]);
+        }
+
+        $fuelCostByUser = $fuelQuery
+            ->selectRaw('user_id, SUM(total_cost) as total_cost')
+            ->groupBy('user_id')
+            ->pluck('total_cost', 'user_id');
+
+        // Get all vehicle IDs for these boardmembers
+        $vehicleIds = Vehicle::whereIn('bm_id', $ids)->pluck('id');
+
+        // Get maintenance data for the period
+        $maintenanceQuery = Maintenance::whereIn('vehicle_id', $vehicleIds)
+            ->whereYear('date', $year);
+
+        if ($startMonth == $endMonth) {
+            $maintenanceQuery->whereMonth('date', $startMonth);
+        } else {
+            $maintenanceQuery->whereBetween('date', [
+                Carbon::createFromDate($year, $startMonth, 1)->startOfMonth(),
+                Carbon::createFromDate($year, $endMonth, 1)->endOfMonth()
+            ]);
+        }
+
+        $maintenanceCostByVehicle = $maintenanceQuery
+            ->selectRaw('vehicle_id, SUM(cost) as total_cost')
+            ->groupBy('vehicle_id')
+            ->pluck('total_cost', 'vehicle_id');
+
+        // Build boardmember stats
+        $boardmemberStats = [];
+        foreach ($boardmembers as $bm) {
+            $vehicles = $bm->vehicles;
+            $maintenanceCost = 0;
+
+            foreach ($vehicles as $vehicle) {
+                $maintenanceCost += (float) ($maintenanceCostByVehicle[$vehicle->id] ?? 0);
+            }
+
+            $boardmemberStats[$bm->id] = [
+                'name' => $bm->name,
+                'office' => $bm->office?->name,
+                'fuelSlipCost' => (float) ($fuelCostByUser[$bm->id] ?? 0),
+                'maintenanceCost' => $maintenanceCost,
+            ];
+        }
+
+        $periodLabel = match($reportType) {
+            'current-month' => Carbon::createFromDate(null, $startMonth, 1)->format('F Y'),
+            'quarterly' => "Q" . ceil($startMonth/3) . " $year",
+            'semester' => ($startMonth == 1 ? 'First' : 'Second') . " Semester $year",
+            'custom-range' => Carbon::createFromDate(null, $startMonth, 1)->format('F') . ' - ' . Carbon::createFromDate(null, $endMonth, 1)->format('F Y'),
+            default => "$year"
+        };
+
+        return view('dashboards.reports', compact(
+            'boardmemberStats',
+            'year',
+            'reportType',
+            'monthRange',
+            'periodLabel',
+            'startMonth',
+            'endMonth'
+        ));
+    }
+
+    /**
      * Boardmember dashboard showing their vehicle and budget
      */
     public function boardmember(Request $request)
     {
         $user = Auth::user();
+        // Load bm relationship to get budget data
+        $user->load('bm');
         // fetch all vehicles for this boardmember so the view can list them
         $vehicles = $user->vehicles()->get();
         // prefer user's direct vehicle, otherwise use the first vehicle from their office
@@ -178,7 +298,8 @@ class DashboardController extends Controller
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            // Fix: Access budget through bm relationship like in admin method
+            $yearlyBudget = $user->bm ? $user->bm->yearly_budget : self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             // Use latest km for this specific vehicle (not user's across all vehicles)
@@ -234,8 +355,12 @@ class DashboardController extends Controller
             $lastMaintenanceType = $lastMaintenance ? $lastMaintenance->maintenance_type : 'N/A';
 
             $nextDueKm = ($lastMaintenanceKm > 0) ? ($lastMaintenanceKm + 5000) : 5000;
+            
+            // Debug: Log maintenance calculation
+            \Log::info("Maintenance Alert Debug - Vehicle: {$vehicle->id}, Current KM: {$currentKm}, Last Maintenance KM: {$lastMaintenanceKm}, Next Due KM: {$nextDueKm}, Last Maintenance Type: {$lastMaintenanceType}");
+            
             if ($currentKm >= $nextDueKm) {
-                $alerts[] = "Preventive maintenance due: last ({$lastMaintenanceType}) at {$lastMaintenanceKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
+                $alerts[] = "⚠️ Preventive maintenance due: last ({$lastMaintenanceType}) at {$lastMaintenanceKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
             }
 
             $maintenanceOverview = Maintenance::where('vehicle_id', $vehicle->id)->latest('date')->take(5)->get();
@@ -264,6 +389,8 @@ class DashboardController extends Controller
     public function exportPdf(Request $request)
     {
         $user = Auth::user();
+        // Load bm relationship to get budget data
+        $user->load('bm');
         // prefer user's direct vehicle, otherwise use first vehicle from their office
         $vehicle = $user->vehicles()->first() ? $user->vehicles()->first() : ($user->office ? $user->office->vehicles()->first() : null);
 
@@ -279,7 +406,8 @@ class DashboardController extends Controller
         $selectedMonthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
 
         if ($vehicle) {
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            // Fix: Access budget through bm relationship like in admin method
+            $yearlyBudget = $user->bm ? $user->bm->yearly_budget : self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
@@ -333,6 +461,8 @@ class DashboardController extends Controller
     public function exportYearlyPdf()
     {
         $user = Auth::user();
+        // Load bm relationship to get budget data
+        $user->load('bm');
         // prefer user's direct vehicle, otherwise use first vehicle from their office
         $vehicle = $user->vehicle ? $user->vehicle : ($user->office ? $user->office->vehicles()->first() : null);
 
@@ -344,7 +474,8 @@ class DashboardController extends Controller
         $alerts = [];
 
         if ($vehicle) {
-            $yearlyBudget = self::YEARLY_BUDGET_DEFAULT;
+            // Fix: Access budget through bm relationship like in admin method
+            $yearlyBudget = $user->bm ? $user->bm->yearly_budget : self::YEARLY_BUDGET_DEFAULT;
             $monthlyLimit = $vehicle->monthly_fuel_limit ?? 100;
 
             $fuelCost = FuelSlip::where('user_id', $user->id)->whereYear('date', now()->year)->sum('total_cost');
