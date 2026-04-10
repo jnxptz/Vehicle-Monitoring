@@ -4,11 +4,13 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use App\Models\Vehicle;
 use App\Models\FuelSlip;
 use App\Models\Maintenance;
 use App\Models\User;
 use App\Models\Office;
+use App\Mail\MaintenanceDueMail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Carbon\Carbon;
 
@@ -361,6 +363,18 @@ class DashboardController extends Controller
             
             if ($currentKm >= $nextDueKm) {
                 $alerts[] = "⚠️ Preventive maintenance due: last ({$lastMaintenanceType}) at {$lastMaintenanceKm} km, next at {$nextDueKm} km, current: {$currentKm} km.";
+                
+                // Send email notification for maintenance due
+                $emailKey = 'maintenance_due_email_sent_' . $vehicle->id . '_' . date('Y-m-d');
+                if (!session()->has($emailKey) && $user->email) {
+                    try {
+                        Mail::to($user->email)->send(new MaintenanceDueMail($vehicle, $currentKm, $lastMaintenanceKm, $nextDueKm, $lastMaintenanceType));
+                        \Log::info('Maintenance due email sent to: ' . $user->email . ' for vehicle: ' . $vehicle->plate_number);
+                        session()->put($emailKey, true);
+                    } catch (\Exception $e) {
+                        \Log::error('Failed to send maintenance due email: ' . $e->getMessage());
+                    }
+                }
             }
 
             $maintenanceOverview = Maintenance::where('vehicle_id', $vehicle->id)->latest('date')->take(5)->get();

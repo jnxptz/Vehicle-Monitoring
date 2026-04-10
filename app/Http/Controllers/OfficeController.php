@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\BM;
-use App\Models\Maintenance;
+use App\Models\FuelSlip;
+use App\Models\Vehicle;
 use App\Models\Office;
 use App\Models\User;
+use App\Models\BM;
+use App\Mail\BudgetAdjustmentMail;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Mail;
 
 class OfficeController extends Controller
 {
@@ -127,31 +130,67 @@ class OfficeController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|max:255|unique:users,email,' . $user->id,
             'office_id' => 'nullable|exists:offices,id',
-            'yearly_budget' => 'nullable|numeric|min:0',
+            'yearly_budget' => 'nullable|numeric',
         ]);
 
         // Update user information
         $user->update($request->only(['name', 'email', 'office_id']));
 
         // Update or create BM record with budget
-        $yearlyBudget = $request->input('yearly_budget');
+        $topUpAmount = $request->input('yearly_budget');
         
         // Always handle budget (including empty/zero values)
         $bm = $user->bm ?: new BM([
             'user_id' => $user->id,
-            'name' => $user->name
+            'name' => $user->name,
         ]);
         
-        if ($yearlyBudget !== null && $yearlyBudget !== '') {
-            $bm->yearly_budget = $yearlyBudget;
-        } else {
-            $bm->yearly_budget = null;
+        $oldBudget = $bm->yearly_budget ?? 0;
+        $adjustmentAmount = $request->input('yearly_budget');
+        
+        if ($adjustmentAmount !== null && $adjustmentAmount !== '') {
+            $adjustmentAmount = floatval($adjustmentAmount);
+            
+            if ($adjustmentAmount != 0) {
+                // Calculate new budget
+                $newBudget = $oldBudget + $adjustmentAmount;
+                
+                // Prevent negative budget
+                if ($newBudget < 0) {
+                    return redirect()->back()
+                        ->withInput()
+                        ->with('error', "Cannot decrease budget by ₱" . number_format(abs($adjustmentAmount), 2) . ". Current budget is only ₱" . number_format($oldBudget, 2));
+                }
+                
+                $bm->yearly_budget = $newBudget;
+                $bm->save();
+                
+                $type = $adjustmentAmount > 0 ? 'increase' : 'decrease';
+                
+                \Log::info('Budget adjusted for user ' . $user->id . ': ' . ($adjustmentAmount > 0 ? 'Added' : 'Subtracted') . ' ₱' . abs($adjustmentAmount) . ', New total: ₱' . $newBudget);
+                
+                // Send email notification to the user
+                try {
+                    \Mail::to($user->email)->send(new \App\Mail\BudgetAdjustmentMail(
+                        $user,
+                        $adjustmentAmount,
+                        $oldBudget,
+                        $newBudget,
+                        $type
+                    ));
+                    \Log::info('Budget adjustment email sent to: ' . $user->email);
+                    $emailStatus = 'Email notification sent.';
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send budget adjustment email: ' . $e->getMessage());
+                    $emailStatus = 'Email notification failed.';
+                }
+                
+                return redirect()->route('offices.manage-boardmembers')
+                    ->with('success', "{$user->name} has been updated successfully. Budget " . ($adjustmentAmount > 0 ? "increased" : "decreased") . " by ₱" . number_format(abs($adjustmentAmount), 2) . ". " . $emailStatus);
+            }
         }
         
         $bm->save();
-        
-        // Debug logging
-        \Log::info('Budget updated for user ' . $user->id . ': ' . $bm->yearly_budget);
 
         return redirect()->route('offices.manage-boardmembers')->with('success', "{$user->name} has been updated successfully.");
     }

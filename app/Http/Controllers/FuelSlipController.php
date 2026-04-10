@@ -8,7 +8,9 @@ use App\Models\Vehicle;
 use App\Models\Office;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\MaintenanceDueMail;
 
 class FuelSlipController extends Controller
 {
@@ -88,6 +90,18 @@ class FuelSlipController extends Controller
                 
                 if ($currentKm >= $nextDueKm) {
                     $maintenanceAlerts[] = "Vehicle {$vehicle->plate_number} ({$vehicle->vehicle_name}) is due for maintenance! Current: {$currentKm} km, Last maintenance ({$lastMaintenanceType}) at {$lastMaintenanceKm} km.";
+                    
+                    // Send email notification for maintenance due
+                    $emailKey = 'maintenance_due_email_sent_' . $vehicle->id . '_' . date('Y-m-d');
+                    if (!session()->has($emailKey) && $user->email) {
+                        try {
+                            Mail::to($user->email)->send(new MaintenanceDueMail($vehicle, $currentKm, $lastMaintenanceKm, $nextDueKm, $lastMaintenanceType));
+                            \Log::info('Maintenance due email sent to: ' . $user->email . ' for vehicle: ' . $vehicle->plate_number);
+                            session()->put($emailKey, true);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to send maintenance due email: ' . $e->getMessage());
+                        }
+                    }
                 }
             }
         }
@@ -164,11 +178,40 @@ class FuelSlipController extends Controller
             'date' => 'required|date',
             'prepared_by_name' => 'nullable|string|max:255',
             'approved_by_name' => 'nullable|string|max:255',
+            'is_official_business' => 'nullable|boolean',
         ]);
 
         $selectedVehicle = null;
         if ($request->filled('vehicle_id')) {
             $selectedVehicle = Vehicle::find($request->vehicle_id);
+        }
+
+        // Check if official business - if true, skip fuel limit check
+        $isOfficialBusiness = $request->boolean('is_official_business', false);
+        
+        // Debug: Log the checkbox value
+        \Log::info('is_official_business raw: ' . $request->input('is_official_business'));
+        \Log::info('is_official_business boolean: ' . ($isOfficialBusiness ? 'true' : 'false'));
+        \Log::info('All request data: ' . json_encode($request->all()));
+        
+        // If not official business, check fuel limit
+        if (!$isOfficialBusiness && $selectedVehicle && $selectedVehicle->monthly_fuel_limit > 0) {
+            // Calculate current monthly usage for this vehicle and user
+            $currentMonth = date('m');
+            $currentYear = date('Y');
+            
+            $monthlyLitersUsed = FuelSlip::where('user_id', $request->boardmember_id)
+                ->where('vehicle_id', $selectedVehicle->id)
+                ->whereMonth('date', $currentMonth)
+                ->whereYear('date', $currentYear)
+                ->sum('liters');
+            
+            // Check if adding this would exceed the limit
+            if (($monthlyLitersUsed + $request->liters) > $selectedVehicle->monthly_fuel_limit) {
+                return redirect()->back()
+                    ->withInput()
+                    ->with('error', 'Cannot add fuel slip: Monthly fuel limit (' . $selectedVehicle->monthly_fuel_limit . 'L) would be exceeded. Check "Official Business" to bypass fuel limit (will still deduct from budget).');
+            }
         }
 
         FuelSlip::create([
@@ -185,6 +228,7 @@ class FuelSlipController extends Controller
             'date' => $request->date,
             'prepared_by_name' => $request->prepared_by_name,
             'approved_by_name' => $request->approved_by_name,
+            'is_official_business' => $isOfficialBusiness,
         ]);
 
         // Update vehicle's current_km if vehicle exists

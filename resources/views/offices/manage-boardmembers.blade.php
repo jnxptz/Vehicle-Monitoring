@@ -23,7 +23,8 @@
             <a href="{{ route('vehicles.index') }}"><svg viewBox="0 0 24 24"><path d="M5 17h14M5 17a2 2 0 01-2-2V7a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v8a2 2 0 01-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}"><svg viewBox="0 0 24 24"><path d="M3 22V5a2 2 0 012-2h6a2 2 0 012 2v17"/><path d="M13 10h4l2 2v10"/><path d="M7 11v2"/><path d="M17 14v2"/></svg>Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Maintenances</a>
-            
+            <a href="{{ route('admin.reports') }}"><svg viewBox="0 0 24 24"><path d="M9 17v-2H4.5A2.5 2.5 0 012 12.5v-9A2.5 2.5 0 014.5 1h9A2.5 2.5 0 0116 3.5V9h-2V3.5a.5.5 0 00-.5-.5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5H9z"/><path d="M19 23h-9a2.5 2.5 0 01-2.5-2.5v-9a2.5 2.5 0 012.5-2.5h9a2.5 2.5 0 012.5 2.5v9a2.5 2.5 0 01-2.5 2.5zM10 11a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h9a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5h-9z"/><circle cx="14.5" cy="17.5" r="1.5"/></svg>Reports</a>
+
             <div class="bottom-section">
                 <a href="{{ route('offices.index') }}"><svg viewBox="0 0 24 24"><path d="M3 21h18M9 8h1M9 12h1M9 16h1M14 8h1M14 12h1M14 16h1"/><path d="M5 21V5a2 2 0 012-2h10a2 2 0 012 2v16"/></svg>Offices</a>
                 <a href="{{ route('offices.manage-boardmembers') }}" class="active"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>Manage Users</a>
@@ -175,8 +176,15 @@
                         </div>
                         
                         <div style="margin-bottom: 20px;">
-                            <label for="edit_yearly_budget" style="display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px;">Yearly Budget</label>
-                            <input type="number" id="edit_yearly_budget" name="yearly_budget" step="0.01" min="0" placeholder="Enter yearly budget (optional)" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
+                            <label for="edit_yearly_budget" style="display: block; margin-bottom: 6px; font-weight: 600; color: #374151; font-size: 14px;">
+                                Adjust Budget
+                                <span style="font-weight: 400; color: #6b7280; font-size: 12px;">(+ to increase, - to decrease)</span>
+                            </label>
+                            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 6px;">
+                                <span style="font-size: 13px; color: #6b7280;">Current:</span>
+                                <span id="current_budget_display" style="font-size: 13px; font-weight: 600; color: #1e40af;">₱0.00</span>
+                            </div>
+                            <input type="number" id="edit_yearly_budget" name="yearly_budget" step="0.01" placeholder="Enter amount (e.g., 50000 or -20000)" style="width: 100%; padding: 10px 14px; border: 1px solid #d1d5db; border-radius: 8px; font-size: 14px;">
                         </div>
                         
                         <div style="display: flex; gap: 12px; justify-content: flex-end;">
@@ -250,7 +258,11 @@ function openEditModal(userId, name, email, officeId, yearlyBudget) {
     document.getElementById('edit_name').value = name;
     document.getElementById('edit_email').value = email;
     document.getElementById('edit_office_id').value = officeId || '';
-    document.getElementById('edit_yearly_budget').value = yearlyBudget || '';
+    document.getElementById('edit_yearly_budget').value = ''; // Clear top-up field
+    
+    // Display current budget
+    const currentBudget = yearlyBudget || 0;
+    document.getElementById('current_budget_display').textContent = '₱' + parseFloat(currentBudget).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
     
     // Update form action with user ID
     document.getElementById('editForm').action = '/boardmembers/' + userId;

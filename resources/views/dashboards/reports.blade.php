@@ -68,25 +68,25 @@
             </div>
         </nav>
 
-        <div class="dashboard-container" style="overflow-y: auto; max-height: calc(100vh - 80px);">
+        <div class="dashboard-container">
 
             <!-- PAGE HEADER -->
-            <div class="page-header">
+            <div class="page-header" style="margin-bottom: 20px;">
                 <div>
                     <h2>Reports & Analytics</h2>
                     <p class="sub-text">Boardmember Comparison & Monthly Analysis - {{ $periodLabel }}</p>
                 </div>
-                <a href="{{ route('admin.dashboard') }}" class="btn-primary btn-sm">← Back to Dashboard</a>
+                
             </div>
 
             <!-- Report Controls -->
-            <div class="report-controls" style="background: #f8fafc; border-radius: 12px; padding: 20px; margin-bottom: 24px; border: 1px solid #e2e8f0;">
+            <div class="report-controls" style="background: #f8fafc; border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
                 <form method="GET" action="{{ route('admin.reports') }}">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px;">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                         <!-- Report Type -->
                         <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px;">Report Type</label>
-                            <select name="report_type" id="report-type" onchange="toggleMonthRange()" style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 14px; cursor: pointer;">
+                            
+                            <select name="report_type" id="report-type" onchange="toggleMonthRange(); this.form.submit();" style="width: 100%; padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 12px; cursor: pointer;">
                                 <option value="current-month" {{ $reportType == 'current-month' ? 'selected' : '' }}>Current Month</option>
                                 <option value="quarterly" {{ $reportType == 'quarterly' ? 'selected' : '' }}>Quarterly (3 Months)</option>
                                 <option value="semester" {{ $reportType == 'semester' ? 'selected' : '' }}>Semester (6 Months)</option>
@@ -96,8 +96,8 @@
 
                         <!-- Year Selection -->
                         <div>
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px;">Year</label>
-                            <select name="year" style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 14px; cursor: pointer;">
+                            
+                            <select name="year" onchange="this.form.submit()" style="width: 100%; padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 12px; cursor: pointer;">
                                 @for($y = now()->year; $y >= now()->year - 2; $y--)
                                     <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
                                 @endfor
@@ -106,8 +106,8 @@
 
                         <!-- Month Range (for custom range) -->
                         <div id="month-range-container" style="{{ $reportType == 'custom-range' ? '' : 'display: none;' }}">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b; font-size: 14px;">Month Range</label>
-                            <select name="month_range" style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 14px; cursor: pointer;">
+                            
+                            <select name="month_range" onchange="this.form.submit()" style="width: 100%; padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 12px; cursor: pointer;">
                                 @foreach([
                                     '1-2' => 'January - February',
                                     '2-3' => 'February - March',
@@ -127,62 +127,47 @@
                         </div>
                     </div>
 
-                    <div style="display: flex; justify-content: space-between; align-items: center;">
-                        <button type="submit" class="btn-primary" style="padding: 10px 24px; font-size: 14px; font-weight: 600;">
-                            Generate Report
-                        </button>
-                    </div>
+                    
                 </form>
 
                 <!-- Summary Stats -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #e2e8f0;">
-                    <div style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color: white; padding: 16px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Total Boardmembers</div>
-                        <div style="font-size: 24px; font-weight: 700;">{{ count($boardmemberStats) }}</div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #3b82f6;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Boardmembers</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1e293b;">{{ count($boardmemberStats) }}</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%); color: white; padding: 16px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Total Fuel Cost</div>
-                        <div style="font-size: 24px; font-weight: 700;">₱{{ number_format(collect($boardmemberStats)->sum('fuelSlipCost'), 0) }}</div>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #f59e0b;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Fuel Cost</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #dc2626;">₱{{ number_format(collect($boardmemberStats)->sum('fuelSlipCost'), 0) }}</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #10b981 0%, #059669 100%); color: white; padding: 16px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Total Maintenance</div>
-                        <div style="font-size: 24px; font-weight: 700;">₱{{ number_format(collect($boardmemberStats)->sum('maintenanceCost'), 0) }}</div>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #10b981;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Maintenance</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #059669;">₱{{ number_format(collect($boardmemberStats)->sum('maintenanceCost'), 0) }}</p>
                     </div>
-                    <div style="background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%); color: white; padding: 16px; border-radius: 10px; text-align: center;">
-                        <div style="font-size: 12px; opacity: 0.9; margin-bottom: 4px;">Grand Total</div>
-                        <div style="font-size: 24px; font-weight: 700;">₱{{ number_format(collect($boardmemberStats)->sum('fuelSlipCost') + collect($boardmemberStats)->sum('maintenanceCost'), 0) }}</div>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #8b5cf6;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Grand Total</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1d4ed8;">₱{{ number_format(collect($boardmemberStats)->sum('fuelSlipCost') + collect($boardmemberStats)->sum('maintenanceCost'), 0) }}</p>
                     </div>
                 </div>
             </div>
 
             <!-- Comparison Table -->
-            <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); overflow: hidden; max-height: 500px; overflow-y: auto;">
+            <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 600px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; margin: 0 !important; flex: 1;">
                 <style>
                     .table-wrapper::-webkit-scrollbar {
-                        width: 8px;
-                    }
-                    .table-wrapper::-webkit-scrollbar-track {
-                        background: #f1f5f9;
-                        border-radius: 4px;
-                    }
-                    .table-wrapper::-webkit-scrollbar-thumb {
-                        background: #cbd5e1;
-                        border-radius: 4px;
-                    }
-                    .table-wrapper::-webkit-scrollbar-thumb:hover {
-                        background: #94a3b8;
+                        display: none;
                     }
                 </style>
-                <table style="width: 100%; border-collapse: collapse;">
+                <table class="modern-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>
-                        <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%); color: white;">
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 13px;">Rank</th>
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 13px;">Boardmember</th>
-                            <th style="padding: 14px 16px; text-align: left; font-weight: 600; font-size: 13px;">Office</th>
-                            <th style="padding: 14px 16px; text-align: right; font-weight: 600; font-size: 13px;">Fuel Cost</th>
-                            <th style="padding: 14px 16px; text-align: right; font-weight: 600; font-size: 13px;">Maintenance</th>
-                            <th style="padding: 14px 16px; text-align: right; font-weight: 600; font-size: 13px;">Total</th>
-                            <th style="padding: 14px 16px; text-align: center; font-weight: 600; font-size: 13px;">% of Total</th>
+                        <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
+                            <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Rank</th>
+                            <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Boardmember</th>
+                            <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Office</th>
+                            <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Fuel Cost</th>
+                            <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Maintenance</th>
+                            <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Total</th>
+                            <th style="padding: 16px 20px; text-align: center; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">% of Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -198,23 +183,30 @@
                                 $total = ($stats['fuelSlipCost'] ?? 0) + ($stats['maintenanceCost'] ?? 0);
                                 $percentage = $grandTotal > 0 ? ($total / $grandTotal) * 100 : 0;
                             @endphp
-                            <tr style="border-bottom: 1px solid #e2e8f0;">
-                                <td style="padding: 12px 16px; font-weight: 700; color: #1e40af;">#{{ $rank++ }}</td>
-                                <td style="padding: 12px 16px; font-weight: 600; color: #1e293b;">{{ $stats['name'] }}</td>
-                                <td style="padding: 12px 16px; color: #64748b; font-size: 13px;">{{ $stats['office'] ?? 'N/A' }}</td>
-                                <td style="padding: 12px 16px; text-align: right; font-weight: 600; color: #d97706;">₱{{ number_format($stats['fuelSlipCost'] ?? 0, 2) }}</td>
-                                <td style="padding: 12px 16px; text-align: right; font-weight: 600; color: #059669;">₱{{ number_format($stats['maintenanceCost'] ?? 0, 2) }}</td>
-                                <td style="padding: 12px 16px; text-align: right; font-weight: 700; color: #1e293b;">₱{{ number_format($total, 2) }}</td>
-                                <td style="padding: 12px 16px; text-align: center;">
-                                    <div style="background: #e0e7ff; border-radius: 20px; padding: 4px 12px; font-size: 12px; font-weight: 600; color: #4338ca;">
+                            <tr style="border-bottom: 1px solid #f1f5f9; transition: all 0.15s ease;">
+                                <td style="padding: 14px 20px; font-weight: 700; color: #1e40af; font-size: 14px; border: none;">#{{ $rank++ }}</td>
+                                <td style="padding: 14px 20px; font-weight: 600; color: #1e293b; font-size: 14px; border: none;">{{ $stats['name'] }}</td>
+                                <td style="padding: 14px 20px; color: #64748b; font-size: 13px; border: none;">{{ $stats['office'] ?? 'N/A' }}</td>
+                                <td style="padding: 14px 20px; text-align: right; font-weight: 600; color: #d97706; font-size: 14px; border: none;">₱{{ number_format($stats['fuelSlipCost'] ?? 0, 2) }}</td>
+                                <td style="padding: 14px 20px; text-align: right; font-weight: 600; color: #059669; font-size: 14px; border: none;">₱{{ number_format($stats['maintenanceCost'] ?? 0, 2) }}</td>
+                                <td style="padding: 14px 20px; text-align: right; font-weight: 700; color: #1e293b; font-size: 14px; border: none;">₱{{ number_format($total, 2) }}</td>
+                                <td style="padding: 14px 20px; text-align: center; border: none;">
+                                    <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-radius: 12px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: #4f46e5; display: inline-block; box-shadow: 0 1px 2px rgba(79, 70, 229, 0.1);">
                                         {{ number_format($percentage, 1) }}%
                                     </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" style="padding: 24px; text-align: center; color: #64748b;">
-                                    No data available for the selected period.
+                                <td colspan="7" style="padding: 48px 24px; text-align: center; color: #94a3b8; border: none;">
+                                    <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
+                                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #cbd5e1;">
+                                            <path d="M9 17v-2H4.5A2.5 2.5 0 012 12.5v-9A2.5 2.5 0 014.5 1h9A2.5 2.5 0 0116 3.5V9h-2V3.5a.5.5 0 00-.5-.5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5H9z"/>
+                                            <path d="M19 23h-9a2.5 2.5 0 01-2.5-2.5v-9a2.5 2.5 0 012.5-2.5h9a2.5 2.5 0 012.5 2.5v9a2.5 2.5 0 01-2.5 2.5z"/>
+                                        </svg>
+                                        <span style="font-size: 14px; font-weight: 500;">No data available for the selected period</span>
+                                        <span style="font-size: 12px; color: #cbd5e1;">Try adjusting your filters to see results</span>
+                                    </div>
                                 </td>
                             </tr>
                         @endforelse

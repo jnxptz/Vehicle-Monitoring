@@ -87,6 +87,7 @@
                     <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}">Vehicles</a>
                     <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}">Fuel Slips</a>
                     <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}">Maintenances</a>
+                    <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}">Reports</a>
                     <a href="{{ route('offices.index') }}" class="{{ request()->routeIs('offices.*') ? 'active' : '' }}">Offices</a>
                     <a href="{{ route('offices.manage-boardmembers') }}" class="{{ request()->routeIs('offices.manage-boardmembers') ? 'active' : '' }}">Manage Users</a>
                     <div class="logout-form">
@@ -109,6 +110,7 @@
             <a href="{{ route('vehicles.index') }}" class="{{ request()->routeIs('vehicles.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M5 17h14M5 17a2 2 0 01-2-2V7a2 2 0 012-2h2.5l1.5-2h6l1.5 2H19a2 2 0 012 2v8a2 2 0 01-2 2M5 17v2m14-2v2"/><circle cx="7.5" cy="17" r="1.5"/><circle cx="16.5" cy="17" r="1.5"/></svg>Vehicles</a>
             <a href="{{ route('fuel-slips.index') }}" class="{{ request()->routeIs('fuel-slips.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M3 22V5a2 2 0 012-2h6a2 2 0 012 2v17"/><path d="M13 10h4l2 2v10"/><path d="M7 11v2"/><path d="M17 14v2"/></svg>Fuel Slips</a>
             <a href="{{ route('maintenances.index') }}" class="{{ request()->routeIs('maintenances.*') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M14.7 6.3a1 1 0 000 1.4l1.6 1.6a1 1 0 001.4 0l3.77-3.77a6 6 0 01-7.94 7.94l-6.91 6.91a2.12 2.12 0 01-3-3l6.91-6.91a6 6 0 017.94-7.94l-3.76 3.76z"/></svg>Maintenances</a>
+            <a href="{{ route('admin.reports') }}" class="{{ request()->routeIs('admin.reports') ? 'active' : '' }}"><svg viewBox="0 0 24 24"><path d="M9 17v-2H4.5A2.5 2.5 0 012 12.5v-9A2.5 2.5 0 014.5 1h9A2.5 2.5 0 0116 3.5V9h-2V3.5a.5.5 0 00-.5-.5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5H9z"/><path d="M19 23h-9a2.5 2.5 0 01-2.5-2.5v-9a2.5 2.5 0 012.5-2.5h9a2.5 2.5 0 012.5 2.5v9a2.5 2.5 0 01-2.5 2.5zM10 11a.5.5 0 00-.5.5v9a.5.5 0 00.5.5h9a.5.5 0 00.5-.5v-9a.5.5 0 00-.5-.5h-9z"/><circle cx="14.5" cy="17.5" r="1.5"/></svg>Reports</a>
 
             <div style="flex-grow: 1;"></div>
 
@@ -621,20 +623,43 @@
             </div>
 
             <!-- Submit Button -->
-            <div style="display: flex; align-items: center; justify-content: center;">
-                <div style="color: #64748b; font-size: 14px;">
-                    <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                        
-                    </div>
-                    
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 16px;">
+                <!-- Official Business Checkbox -->
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <input type="checkbox" id="is_official_business_modal" name="is_official_business" value="1" style="
+                        width: 18px;
+                        height: 18px;
+                        cursor: pointer;
+                        accent-color: #3b82f6;
+                    " onchange="
+                        const label = document.getElementById('official-business-label-modal');
+                        if (this.checked) {
+                            label.style.color = '#1e40af';
+                            label.style.fontWeight = '600';
+                        } else {
+                            label.style.color = '#64748b';
+                            label.style.fontWeight = '500';
+                        }
+                    ">
+                    <label for="is_official_business_modal" id="official-business-label-modal" style="
+                        font-size: 13px;
+                        color: #64748b;
+                        font-weight: 500;
+                        cursor: pointer;
+                        user-select: none;
+                    ">
+                        Official Business
+                        <span style="display: block; font-size: 10px; color: #94a3b8; font-weight: 400;">(Deduct from budget only)</span>
+                    </label>
                 </div>
+
                 <button type="submit" class="btn-primary" style="
-                    padding: 6px 17px;
-                    font-size: 16px;
+                    padding: 10px 24px;
+                    font-size: 15px;
                     font-weight: 600;
                     background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
                     border: none;
-                    border-radius: 23px;
+                    border-radius: 8px;
                     cursor: pointer;
                     transition: all 0.2s ease;
                     box-shadow: 0 4px 12px rgba(59, 130, 246, 0.2);

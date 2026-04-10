@@ -327,6 +327,36 @@
                                     Vehicle name, plate number, driver, and KM reading will be automatically populated.
                                 </div>
                             </div>
+
+                            <!-- Official Business Checkbox -->
+                            <div style="display: flex; align-items: center; gap: 8px; margin-right: 24px;">
+                                <input type="checkbox" id="is_official_business" name="is_official_business" value="1" style="
+                                    width: 18px;
+                                    height: 18px;
+                                    cursor: pointer;
+                                    accent-color: #3b82f6;
+                                " onchange="
+                                    const label = document.getElementById('official-business-label');
+                                    if (this.checked) {
+                                        label.style.color = '#1e40af';
+                                        label.style.fontWeight = '600';
+                                    } else {
+                                        label.style.color = '#64748b';
+                                        label.style.fontWeight = '500';
+                                    }
+                                ">
+                                <label for="is_official_business" id="official-business-label" style="
+                                    font-size: 14px;
+                                    color: #64748b;
+                                    font-weight: 500;
+                                    cursor: pointer;
+                                    user-select: none;
+                                ">
+                                    Official Business
+                                    <span style="display: block; font-size: 11px; color: #94a3b8; font-weight: 400;">(Deduct from budget only, not fuel limit)</span>
+                                </label>
+                            </div>
+
                             <button type="submit" class="btn-primary" style="
                                 padding: 14px 32px;
                                 font-size: 16px;

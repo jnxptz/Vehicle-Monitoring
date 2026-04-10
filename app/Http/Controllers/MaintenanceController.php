@@ -7,7 +7,10 @@ use App\Models\Vehicle;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Mail\MaintenanceNotificationMail;
+use App\Mail\MaintenanceDueMail;
 
 class MaintenanceController extends Controller
 {
@@ -93,6 +96,18 @@ class MaintenanceController extends Controller
                 
                 if ($currentKm >= $nextDueKm) {
                     $maintenanceAlerts[] = "Vehicle {$vehicle->plate_number} ({$vehicle->vehicle_name}) is due for maintenance! Current: {$currentKm} km, Last maintenance ({$lastMaintenanceType}) at {$lastMaintenanceKm} km.";
+                    
+                    // Send email notification for maintenance due
+                    $emailKey = 'maintenance_due_email_sent_' . $vehicle->id . '_' . date('Y-m-d');
+                    if (!session()->has($emailKey) && $user->email) {
+                        try {
+                            Mail::to($user->email)->send(new MaintenanceDueMail($vehicle, $currentKm, $lastMaintenanceKm, $nextDueKm, $lastMaintenanceType));
+                            \Log::info('Maintenance due email sent to: ' . $user->email . ' for vehicle: ' . $vehicle->plate_number);
+                            session()->put($emailKey, true);
+                        } catch (\Exception $e) {
+                            \Log::error('Failed to send maintenance due email: ' . $e->getMessage());
+                        }
+                    }
                 }
             }
         }
@@ -137,7 +152,22 @@ class MaintenanceController extends Controller
         }
 
         try {
-            Maintenance::create($data);
+            $maintenance = Maintenance::create($data);
+            $maintenance->load('vehicle.bm');
+            
+            // Send email notification to the boardmember
+            if ($maintenance->vehicle?->bm?->email) {
+                try {
+                    Mail::to($maintenance->vehicle->bm->email)->send(new MaintenanceNotificationMail($maintenance));
+                    \Log::info('Maintenance notification email sent to: ' . $maintenance->vehicle->bm->email);
+                    $emailStatus = 'Email notification sent.';
+                } catch (\Exception $e) {
+                    \Log::error('Failed to send maintenance notification email: ' . $e->getMessage());
+                    $emailStatus = 'Email notification failed.';
+                }
+            } else {
+                $emailStatus = 'No email notification (boardmember has no email).';
+            }
         } catch (\Throwable $e) {
             report($e);
             return redirect()->back()
@@ -145,7 +175,7 @@ class MaintenanceController extends Controller
                 ->with('error', 'Could not save maintenance. Please try again.');
         }
 
-        return redirect()->route('maintenances.index')->with('success', 'Maintenance recorded.');
+        return redirect()->route('maintenances.index')->with('success', 'Maintenance recorded. ' . ($emailStatus ?? ''));
     }
 
     public function exportPDF($id)

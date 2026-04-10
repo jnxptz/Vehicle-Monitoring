@@ -22,7 +22,8 @@ class FuelSlip extends Model
         'control_number',
         'date',
         'prepared_by_name',
-        'approved_by_name'
+        'approved_by_name',
+        'is_official_business'
     ];
 
     /**
@@ -33,6 +34,7 @@ class FuelSlip extends Model
         'unit_cost' => 'decimal:2',
         'total_cost' => 'decimal:2',
         'liters' => 'decimal:2',
+        'is_official_business' => 'boolean',
     ];
 
     public function vehicle()
