@@ -210,7 +210,9 @@
 
             <!-- KPI -->
 
-            <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px;">
+            <div class="report-controls" style="background: #f8fafc; border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+
+                <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0; justify-content: center;">
 
                 <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #3b82f6;">
 
@@ -251,6 +253,8 @@
                 </div>
 
             </div>
+
+        </div>
 
 
 

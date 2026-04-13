@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <title>Admin Monthly Dashboard PDF</title>
+    <title>Reports PDF</title>
     <style>
         @page {
             size: A4;
@@ -107,33 +107,65 @@
         }
         
         .summary-cards {
-            display: flex;
-            gap: 15px;
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
             margin-bottom: 20px;
-            justify-content: flex-start;
         }
-        
+
         .summary-card {
-            flex: 0 0 auto;
-            width: 180px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-radius: 6px;
+            background: #ffffff;
             border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             text-align: center;
         }
-        
-        .card-label {
-            font-size: 11px;
-            color: #64748b;
-            margin-bottom: 4px;
-            font-weight: 500;
+
+        .summary-card:nth-child(1) {
+            border-top: 4px solid #3b82f6;
         }
-        
+
+        .summary-card:nth-child(2) {
+            border-top: 4px solid #f59e0b;
+        }
+
+        .summary-card:nth-child(3) {
+            border-top: 4px solid #10b981;
+        }
+
+        .summary-card:nth-child(4) {
+            border-top: 4px solid #8b5cf6;
+        }
+
+        .card-label {
+            font-size: 12px;
+            color: #64748b;
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
         .card-value {
-            font-size: 18px;
+            font-size: 28px;
             font-weight: 700;
-            color: #1e40af;
+        }
+
+        .summary-card:nth-child(1) .card-value {
+            color: #1e293b;
+        }
+
+        .summary-card:nth-child(2) .card-value {
+            color: #dc2626;
+        }
+
+        .summary-card:nth-child(3) .card-value {
+            color: #059669;
+        }
+
+        .summary-card:nth-child(4) .card-value {
+            color: #1d4ed8;
         }
         
         .data-table {
@@ -192,21 +224,6 @@
             text-align: center;
         }
         
-        .vehicle-section {
-            margin-bottom: 25px;
-        }
-        
-        .vehicle-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 10px;
-            padding: 8px;
-            background: #f1f5f9;
-            border-radius: 4px;
-            border-left: 3px solid #1e40af;
-        }
-        
         .footer {
             margin-top: 40px;
             padding-top: 20px;
@@ -216,24 +233,19 @@
             color: #64748b;
         }
         
-        .status-high {
-            color: #dc2626;
-            font-weight: 600;
-        }
-        
-        .status-medium {
-            color: #f59e0b;
-            font-weight: 600;
-        }
-        
-        .status-low {
-            color: #059669;
-            font-weight: 600;
-        }
-        
         .currency {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             font-weight: 600;
+        }
+        
+        .percentage-badge {
+            background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%);
+            border-radius: 12px;
+            padding: 4px 10px;
+            font-size: 11px;
+            font-weight: 700;
+            color: #4f46e5;
+            display: inline-block;
         }
         
         @media print {
@@ -263,7 +275,7 @@
         <div class="title-section">
             <div class="gov-title">Province of La Union</div>
             <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
-            <div class="doc-title">Board Member Monthly Report</div>
+            <div class="doc-title">Boardmember Comparison Report</div>
         </div>
     </div>
     
@@ -274,108 +286,62 @@
         </div>
         <div class="meta-item">
             <span class="meta-label">Period:</span>
-            <span class="meta-value">{{ $selectedMonthName }} {{ $year }}</span>
-        </div>
-        @if($officeName)
-            <div class="meta-item">
-                <span class="meta-label">Office:</span>
-                <span class="meta-value">{{ $officeName }}</span>
-            </div>
-        @endif
-    </div>
-
-    <div class="section-title">Monthly Overview</div>
-    <div class="summary-cards">
-        <div class="summary-card">
-            <div class="card-label">Total Liters Used</div>
-            <div class="card-value">{{ number_format($totalMonthlyLiters, 2) }} L</div>
-        </div>
-        <div class="summary-card">
-            <div class="card-label">Total Cost</div>
-            <div class="card-value currency">₱{{ number_format($totalMonthlyCost, 2) }}</div>
+            <span class="meta-value">{{ $periodLabel }}</span>
         </div>
     </div>
 
-    <div class="section-title">Boardmember Performance ({{ $selectedMonthName }} {{ $year }})</div>
+    
+
+    <div class="section-title">Boardmember Comparison ({{ $periodLabel }})</div>
     <table class="data-table">
         <thead>
             <tr>
-                <th class="text-center">#</th>
+                <th class="text-center">Rank</th>
                 <th>Boardmember</th>
-                <th class="text-right">Monthly Liters</th>
-                <th class="text-right">Monthly Cost</th>
-                <th class="text-right">Yearly Budget</th>
-                <th class="text-right">Yearly Used</th>
-                <th class="text-right">Yearly Remaining</th>
-                <th class="text-right">Usage %</th>
+                <th>Office</th>
+                <th class="text-right">Fuel Cost</th>
+                <th class="text-right">Maintenance</th>
+                <th class="text-right">Total</th>
+                <th class="text-center">% of Total</th>
             </tr>
         </thead>
         <tbody>
-            @forelse($rows as $row)
+            @php
+                $sortedStats = collect($boardmemberStats)->sortByDesc(function($item) {
+                    return ($item['fuelSlipCost'] ?? 0) + ($item['maintenanceCost'] ?? 0);
+                });
+                $grandTotal = $sortedStats->sum('fuelSlipCost') + $sortedStats->sum('maintenanceCost');
+                $rank = 1;
+            @endphp
+            @forelse($sortedStats as $id => $stats)
+                @php
+                    $total = ($stats['fuelSlipCost'] ?? 0) + ($stats['maintenanceCost'] ?? 0);
+                    $percentage = $grandTotal > 0 ? ($total / $grandTotal) * 100 : 0;
+                @endphp
                 <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
-                    <td>{{ $row['user']->name }}</td>
-                    <td class="text-right">{{ number_format($row['monthlyLitersUsed'], 2) }}</td>
-                    <td class="text-right currency">₱{{ number_format($row['monthlyCostUsed'], 2) }}</td>
-                    <td class="text-right currency">₱{{ number_format($row['yearlyBudget'], 2) }}</td>
-                    <td class="text-right currency">₱{{ number_format($row['totalUsed'], 2) }}</td>
-                    <td class="text-right currency {{ $row['remainingBudget'] < 0 ? 'status-high' : ($row['budgetUsedPercentage'] >= 80 ? 'status-medium' : 'status-low') }}">
-                        ₱{{ number_format($row['remainingBudget'], 2) }}
-                    </td>
-                    <td class="text-right">
-                        <span class="{{ $row['budgetUsedPercentage'] >= 90 ? 'status-high' : ($row['budgetUsedPercentage'] >= 80 ? 'status-medium' : 'status-low') }}">
-                            {{ $row['budgetUsedPercentage'] }}%
-                        </span>
+                    <td class="text-center">#{{ $rank++ }}</td>
+                    <td>{{ $stats['name'] }}</td>
+                    <td>{{ $stats['office'] ?? 'N/A' }}</td>
+                    <td class="text-right currency">₱{{ number_format($stats['fuelSlipCost'] ?? 0, 2) }}</td>
+                    <td class="text-right currency">₱{{ number_format($stats['maintenanceCost'] ?? 0, 2) }}</td>
+                    <td class="text-right currency"><strong>₱{{ number_format($total, 2) }}</strong></td>
+                    <td class="text-center">
+                        <span class="percentage-badge">{{ number_format($percentage, 1) }}%</span>
                     </td>
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center" style="padding:20px; font-style: italic; color: #64748b;">
-                        No boardmembers found for the selected filters.
+                    <td colspan="7" class="text-center" style="padding:20px; font-style: italic; color: #64748b;">
+                        No data available for the selected period
                     </td>
                 </tr>
             @endforelse
         </tbody>
     </table>
 
-    @if($rows->count() > 0)
-        <div class="section-title">Vehicle Breakdown</div>
-        @foreach($rows as $row)
-            @if(count($row['vehicles']) > 0)
-                <div class="vehicle-section">
-                    <div class="vehicle-title">{{ $row['user']->name }} - Vehicle Details</div>
-                    <table class="data-table" style="font-size: 10px;">
-                        <thead>
-                            <tr>
-                                <th>Vehicle Name</th>
-                                <th class="text-right">Plate Number</th>
-                                <th class="text-right">Fuel Cost</th>
-                                <th class="text-right">Maintenance Cost</th>
-                                <th class="text-right">Total Cost</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($row['vehicles'] as $vehicle)
-                                <tr>
-                                    <td>{{ $vehicle['vehicle']->vehicle_name }}</td>
-                                    <td class="text-right">{{ $vehicle['vehicle']->plate_number }}</td>
-                                    <td class="text-right currency">₱{{ number_format($vehicle['fuelSlipCost'], 2) }}</td>
-                                    <td class="text-right currency">₱{{ number_format($vehicle['maintenanceCost'], 2) }}</td>
-                                    <td class="text-right currency">
-                                        <strong>₱{{ number_format($vehicle['fuelSlipCost'] + $vehicle['maintenanceCost'], 2) }}</strong>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
-            @endif
-        @endforeach
-    @endif
-
     <div class="footer">
         <div><strong>BM Vehicle Monitoring System</strong></div>
-        <div>Monthly Fleet Report - Generated on {{ now()->format('F d, Y') }} at {{ now()->format('h:i A') }}</div>
+        <div>Boardmember Comparison Report - Generated on {{ now()->format('F d, Y') }} at {{ now()->format('h:i A') }}</div>
         <div style="margin-top: 5px; font-size: 9px; color: #94a3b8;">
             Province of La Union • Office of the Sangguniang Panlalawigan
         </div>

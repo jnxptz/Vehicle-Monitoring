@@ -125,10 +125,15 @@
                                 @endforeach
                             </select>
                         </div>
+                        
                     </div>
-
+                       
                     
                 </form>
+ <a href="{{ route('admin.reports.pdf', ['year' => $year, 'report_type' => $reportType, 'month_range' => $monthRange]) }}" class="export-btn btn-primary" style="padding: 1px 8px;">
+                    Export PDF
+                </a>
+                
 
                 <!-- Summary Stats -->
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">

@@ -61,6 +61,11 @@ Route::get('/admin/reports', [DashboardController::class, 'reports'])
     ->middleware(['auth', 'role:admin'])
     ->name('admin.reports');
 
+// Admin Reports PDF export
+Route::get('/admin/reports/pdf', [DashboardController::class, 'exportReportsPdf'])
+    ->middleware(['auth', 'role:admin'])
+    ->name('admin.reports.pdf');
+
 // Boardmember dashboard — use DashboardController to calculate remaining budget, monthly usage
 Route::get('/boardmember/dashboard', [DashboardController::class, 'boardmember'])
     ->middleware(['auth', 'role:boardmember'])

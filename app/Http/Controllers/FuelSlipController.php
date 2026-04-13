@@ -196,16 +196,17 @@ class FuelSlipController extends Controller
         
         // If not official business, check fuel limit
         if (!$isOfficialBusiness && $selectedVehicle && $selectedVehicle->monthly_fuel_limit > 0) {
-            // Calculate current monthly usage for this vehicle and user
-            $currentMonth = date('m');
-            $currentYear = date('Y');
-            
+            // Calculate current monthly usage for this vehicle and user based on the fuel slip date
+            $fuelSlipDate = \Carbon\Carbon::parse($request->date);
+            $currentMonth = $fuelSlipDate->month;
+            $currentYear = $fuelSlipDate->year;
+
             $monthlyLitersUsed = FuelSlip::where('user_id', $request->boardmember_id)
                 ->where('vehicle_id', $selectedVehicle->id)
                 ->whereMonth('date', $currentMonth)
                 ->whereYear('date', $currentYear)
                 ->sum('liters');
-            
+
             // Check if adding this would exceed the limit
             if (($monthlyLitersUsed + $request->liters) > $selectedVehicle->monthly_fuel_limit) {
                 return redirect()->back()
