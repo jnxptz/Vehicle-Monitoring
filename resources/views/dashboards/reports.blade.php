@@ -74,66 +74,68 @@
             <div class="page-header" style="margin-bottom: 20px;">
                 <div>
                     <h2>Reports & Analytics</h2>
-                    <p class="sub-text">Boardmember Comparison & Monthly Analysis - {{ $periodLabel }}</p>
+                    
                 </div>
                 
             </div>
 
             <!-- Report Controls -->
             <div class="report-controls" style="background: #f8fafc; border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-                <form method="GET" action="{{ route('admin.reports') }}">
-                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 12px;">
-                        <!-- Report Type -->
-                        <div>
-                            
-                            <select name="report_type" id="report-type" onchange="toggleMonthRange(); this.form.submit();" style="width: 100%; padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 12px; cursor: pointer;">
-                                <option value="current-month" {{ $reportType == 'current-month' ? 'selected' : '' }}>Current Month</option>
-                                <option value="quarterly" {{ $reportType == 'quarterly' ? 'selected' : '' }}>Quarterly (3 Months)</option>
-                                <option value="semester" {{ $reportType == 'semester' ? 'selected' : '' }}>Semester (6 Months)</option>
-                                <option value="custom-range" {{ $reportType == 'custom-range' ? 'selected' : '' }}>Custom Range</option>
-                            </select>
-                        </div>
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px;">
+                    <form method="GET" action="{{ route('admin.reports') }}" style="flex-grow: 1;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <!-- Report Type -->
+                            <div style="flex: 1; min-width: 160px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Report Period</label>
+                                <select name="report_type" id="report-type" onchange="toggleMonthRange(); this.form.submit();" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    <option value="current-month" {{ $reportType == 'current-month' ? 'selected' : '' }}>Current Month</option>
+                                    <option value="quarterly" {{ $reportType == 'quarterly' ? 'selected' : '' }}>Quarterly (3 Months)</option>
+                                    <option value="semester" {{ $reportType == 'semester' ? 'selected' : '' }}>Semester (6 Months)</option>
+                                    <option value="custom-range" {{ $reportType == 'custom-range' ? 'selected' : '' }}>Custom Range</option>
+                                </select>
+                            </div>
 
-                        <!-- Year Selection -->
-                        <div>
-                            
-                            <select name="year" onchange="this.form.submit()" style="width: 100%; padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 12px; cursor: pointer;">
-                                @for($y = now()->year; $y >= now()->year - 2; $y--)
-                                    <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                @endfor
-                            </select>
-                        </div>
+                            <!-- Year Selection -->
+                            <div style="flex: 1; min-width: 120px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Year</label>
+                                <select name="year" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    @for($y = now()->year; $y >= now()->year - 2; $y--)
+                                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
 
-                        <!-- Month Range (for custom range) -->
-                        <div id="month-range-container" style="{{ $reportType == 'custom-range' ? '' : 'display: none;' }}">
-                            
-                            <select name="month_range" onchange="this.form.submit()" style="width: 100%; padding: 6px 10px; border: 2px solid #e2e8f0; border-radius: 8px; background: #ffffff; font-size: 12px; cursor: pointer;">
-                                @foreach([
-                                    '1-2' => 'January - February',
-                                    '2-3' => 'February - March',
-                                    '3-4' => 'March - April',
-                                    '4-5' => 'April - May',
-                                    '5-6' => 'May - June',
-                                    '6-7' => 'June - July',
-                                    '7-8' => 'July - August',
-                                    '8-9' => 'August - September',
-                                    '9-10' => 'September - October',
-                                    '10-11' => 'October - November',
-                                    '11-12' => 'November - December',
-                                ] as $value => $label)
-                                    <option value="{{ $value }}" {{ $monthRange == $value ? 'selected' : '' }}>{{ $label }}</option>
-                                @endforeach
-                            </select>
+                            <!-- Month Range (for custom range) -->
+                            <div id="month-range-container" style="flex: 1; min-width: 160px; {{ $reportType == 'custom-range' ? '' : 'display: none;' }}">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Custom Range</label>
+                                <select name="month_range" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    @foreach([
+                                        '1-2' => 'January - February',
+                                        '2-3' => 'February - March',
+                                        '3-4' => 'March - April',
+                                        '4-5' => 'April - May',
+                                        '5-6' => 'May - June',
+                                        '6-7' => 'June - July',
+                                        '7-8' => 'July - August',
+                                        '8-9' => 'August - September',
+                                        '9-10' => 'September - October',
+                                        '10-11' => 'October - November',
+                                        '11-12' => 'November - December',
+                                    ] as $value => $label)
+                                        <option value="{{ $value }}" {{ $monthRange == $value ? 'selected' : '' }}>{{ $label }}</option>
+                                    @endforeach
+                                </select>
+                            </div>
                         </div>
-                        
+                    </form>
+
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{{ route('admin.reports.pdf', ['year' => $year, 'report_type' => $reportType, 'month_range' => $monthRange]) }}" class="export-btn btn-primary" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #2563eb; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(37,99,235,0.2); text-decoration: none;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Export PDF
+                        </a>
                     </div>
-                       
-                    
-                </form>
- <a href="{{ route('admin.reports.pdf', ['year' => $year, 'report_type' => $reportType, 'month_range' => $monthRange]) }}" class="export-btn btn-primary" style="padding: 1px 8px;">
-                    Export PDF
-                </a>
-                
+                </div>
 
                 <!-- Summary Stats -->
                 <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
@@ -172,7 +174,6 @@
                             <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Fuel Cost</th>
                             <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Maintenance</th>
                             <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Total</th>
-                            <th style="padding: 16px 20px; text-align: center; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">% of Total</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -195,15 +196,10 @@
                                 <td style="padding: 14px 20px; text-align: right; font-weight: 600; color: #d97706; font-size: 14px; border: none;">₱{{ number_format($stats['fuelSlipCost'] ?? 0, 2) }}</td>
                                 <td style="padding: 14px 20px; text-align: right; font-weight: 600; color: #059669; font-size: 14px; border: none;">₱{{ number_format($stats['maintenanceCost'] ?? 0, 2) }}</td>
                                 <td style="padding: 14px 20px; text-align: right; font-weight: 700; color: #1e293b; font-size: 14px; border: none;">₱{{ number_format($total, 2) }}</td>
-                                <td style="padding: 14px 20px; text-align: center; border: none;">
-                                    <div style="background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); border-radius: 12px; padding: 6px 14px; font-size: 12px; font-weight: 700; color: #4f46e5; display: inline-block; box-shadow: 0 1px 2px rgba(79, 70, 229, 0.1);">
-                                        {{ number_format($percentage, 1) }}%
-                                    </div>
-                                </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="7" style="padding: 48px 24px; text-align: center; color: #94a3b8; border: none;">
+                                <td colspan="6" style="padding: 48px 24px; text-align: center; color: #94a3b8; border: none;">
                                     <div style="display: flex; flex-direction: column; align-items: center; gap: 12px;">
                                         <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" style="color: #cbd5e1;">
                                             <path d="M9 17v-2H4.5A2.5 2.5 0 012 12.5v-9A2.5 2.5 0 014.5 1h9A2.5 2.5 0 0116 3.5V9h-2V3.5a.5.5 0 00-.5-.5h-9a.5.5 0 00-.5.5v9a.5.5 0 00.5.5H9z"/>

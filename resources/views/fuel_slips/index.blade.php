@@ -424,12 +424,7 @@
         }
     }
 
-    window.onclick = function(event) {
-        const modal = document.getElementById('fuelSlipModal');
-        if (event.target === modal) {
-            closeFuelSlipModal();
-        }
-    }
+
 </script>
 
 <!-- Fuel Slip Modal -->

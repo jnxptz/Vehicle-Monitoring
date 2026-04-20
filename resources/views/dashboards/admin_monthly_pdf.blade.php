@@ -2,327 +2,193 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     <title>Admin Monthly Dashboard PDF</title>
+    <link rel="stylesheet" href="{{ public_path('css/boardmember_pdf.css') }}">
     <style>
-        @page {
-            size: A4;
-            margin: 15mm;
-        }
-        
-        * {
-            box-sizing: border-box;
-        }
-        
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-size: 12px;
-            line-height: 1.4;
+            font-family: 'DejaVu Sans', Arial, sans-serif;
+            font-size: 11px;
             color: #333;
-            margin: 0;
-            padding: 0;
+            padding: 24px 32px;
             background: #fff;
         }
-        
-        .header {
-            position: relative;
-            padding-top: 6px;
-            margin-bottom: 6px;
-        }
-        
-        .logo-left {
-            position: absolute;
-            left: 120px;
-            top: 0;
-        }
-        
-        .logo-right {
-            position: absolute;
-            right: 120px;
-            top: 0;
-        }
-        
-        .logo-left img, .logo-right img {
-            width: 48px;
-            height: auto;
-        }
-        
-        .title-section {
-            text-align: center;
-            max-width: 720px;
-            margin: 0 auto;
-        }
-        
-        .gov-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 4px;
-        }
-        
-        .sub-title {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 8px;
-        }
-        
-        .doc-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1e40af;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-        
-        .meta-section {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 25px;
-            padding: 12px;
-            background: #f8fafc;
-            border-radius: 6px;
-            border-left: 4px solid #1e40af;
-        }
-        
-        .meta-item {
-            font-size: 11px;
-        }
-        
-        .meta-label {
-            font-weight: 600;
-            color: #64748b;
-        }
-        
-        .meta-value {
-            color: #1e293b;
-        }
-        
-        .section-title {
-            font-size: 16px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid #e2e8f0;
-        }
-        
-        .summary-cards {
-            display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            justify-content: flex-start;
-        }
-        
-        .summary-card {
-            flex: 0 0 auto;
-            width: 180px;
-            padding: 12px 16px;
-            background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
-            border-radius: 6px;
-            border: 1px solid #e2e8f0;
-            text-align: center;
-        }
-        
-        .card-label {
-            font-size: 11px;
-            color: #64748b;
-            margin-bottom: 4px;
-            font-weight: 500;
-        }
-        
-        .card-value {
-            font-size: 18px;
-            font-weight: 700;
-            color: #1e40af;
-        }
-        
-        .data-table {
+
+        /* ── HEADER ── */
+        .header-table {
             width: 100%;
             border-collapse: collapse;
-            margin-bottom: 20px;
-            font-size: 10px;
-            border: 1px solid #e2e8f0;
+            margin-bottom: 14px;
+            border-bottom: 2px solid #1976d2;
         }
-        
-        .data-table th {
-            background: #f8fafc;
-            color: #374151;
-            padding: 8px 12px;
-            text-align: left;
-            font-weight: 600;
-            border-bottom: 2px solid #e2e8f0;
-            border-right: 1px solid #e2e8f0;
-            font-size: 9px;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .header-table td { vertical-align: middle; padding-bottom: 10px; }
+        .header-logo { width: 36px; text-align: center; padding: 0 4px; }
+        .header-logo img { width: 44px; height: auto; }
+        .header-center { text-align: center; padding: 0 6px; }
+        .gov-title { font-size: 14px; font-weight: 700; color: #111; letter-spacing: 0.5px; }
+        .sub-title  { font-size: 10.5px; color: #555; margin-top: 2px; }
+        .doc-title  { font-size: 13px; font-weight: 600; color: #222; margin-top: 4px; }
+
+        /* ── META ── */
+        .meta-table {
+            width: 100%; border-collapse: collapse; margin-bottom: 16px;
+            background: #f0f4fb; border-radius: 4px;
         }
-        
-        .data-table th:last-child {
-            border-right: none;
+        .meta-table td { padding: 7px 12px; font-size: 10.5px; color: #444; }
+        .label { font-weight: 600; color: #1976d2; }
+
+        /* ── SECTION TITLES ── */
+        h2 {
+            font-size: 11.5px; font-weight: 700; color: #1976d2;
+            margin: 16px 0 8px; padding-bottom: 4px;
+            border-bottom: 1px solid #d0d9e8;
+            text-transform: uppercase; letter-spacing: 0.4px;
         }
-        
-        .data-table td {
-            padding: 8px 12px;
-            border-bottom: 1px solid #f1f5f9;
-            border-right: 1px solid #f1f5f9;
+        h3 { font-size: 11px; font-weight: 600; color: #444; margin: 12px 0 6px; }
+
+        /* ── SUMMARY CARDS (2 side by side) ── */
+        .cards-table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 8px;
+            margin-bottom: 10px;
+        }
+        .card {
+            width: 50%;
+            background: #f7f9fd;
+            border: 1px solid #d0d9e8;
+            border-radius: 5px;
+            padding: 10px 14px;
+            text-align: center;
             vertical-align: middle;
         }
-        
-        .data-table td:last-child {
-            border-right: none;
+        .card-label {
+            font-size: 10px; font-weight: 600;
+            color: #1976d2; text-transform: uppercase; letter-spacing: 0.3px;
         }
-        
-        .data-table tbody tr:last-child td {
-            border-bottom: none;
+        .card-value { font-size: 16px; font-weight: 700; color: #222; margin-top: 4px; }
+        .card-sub   { font-size: 9.5px; color: #888; margin-top: 2px; }
+
+        /* ── DATA TABLES ── */
+        .data-table { width: 100%; border-collapse: collapse; margin-top: 6px; font-size: 10.5px; }
+        .data-table th {
+            background: #1976d2; color: #fff;
+            padding: 7px 10px; text-align: left;
+            font-weight: 600; font-size: 10px; letter-spacing: 0.3px;
         }
-        
-        .data-table tbody tr:nth-child(even) {
-            background: #fafbfc;
+        .data-table th.tr, .data-table td.tr { text-align: right; }
+        .data-table th.tc, .data-table td.tc { text-align: center; }
+        .data-table td { padding: 6px 10px; border-bottom: 1px solid #e8edf4; color: #333; }
+        .data-table tbody tr:nth-child(even) { background: #f7f9fd; }
+        .data-table tfoot td {
+            background: #e8f0fb; font-weight: 700;
+            padding: 7px 10px; border-top: 2px solid #c0cfe8;
         }
-        
-        .data-table tbody tr:hover {
-            background: #f8fafc;
-        }
-        
-        .text-right {
-            text-align: right;
-        }
-        
-        .text-center {
-            text-align: center;
-        }
-        
-        .vehicle-section {
-            margin-bottom: 25px;
-        }
-        
+
+        /* ── VEHICLE SECTION ── */
         .vehicle-title {
-            font-size: 14px;
-            font-weight: 600;
-            color: #1e293b;
-            margin-bottom: 10px;
-            padding: 8px;
-            background: #f1f5f9;
-            border-radius: 4px;
-            border-left: 3px solid #1e40af;
+            font-size: 11px; font-weight: 600; color: #1e293b;
+            margin: 12px 0 6px; padding: 7px 10px;
+            background: #f0f4fb; border-radius: 4px;
+            border-left: 3px solid #1976d2;
         }
-        
+
+        /* ── STATUS COLORS ── */
+        .status-high   { color: #dc2626; font-weight: 600; }
+        .status-medium { color: #f59e0b; font-weight: 600; }
+        .status-low    { color: #059669; font-weight: 600; }
+
+        /* ── HIGHLIGHT ── */
+        .highlight-box {
+            background: #f0f4fb; border-left: 3px solid #1976d2;
+            border-radius: 3px; padding: 8px 12px;
+            margin-top: 6px; font-size: 10.5px;
+        }
+
+        /* ── FOOTER ── */
         .footer {
-            margin-top: 40px;
-            padding-top: 20px;
-            border-top: 1px solid #e2e8f0;
-            text-align: center;
-            font-size: 10px;
-            color: #64748b;
-        }
-        
-        .status-high {
-            color: #dc2626;
-            font-weight: 600;
-        }
-        
-        .status-medium {
-            color: #f59e0b;
-            font-weight: 600;
-        }
-        
-        .status-low {
-            color: #059669;
-            font-weight: 600;
-        }
-        
-        .currency {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            font-weight: 600;
-        }
-        
-        @media print {
-            body {
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-            
-            .data-table {
-                page-break-inside: avoid;
-            }
-            
-            .summary-cards {
-                page-break-inside: avoid;
-            }
+            margin-top: 28px; padding-top: 12px;
+            border-top: 1px solid #e0e0e0;
+            text-align: center; font-size: 9.5px; color: #999; line-height: 1.6;
         }
     </style>
 </head>
 <body>
-    <div class="header">
-        <div class="logo-left">
-            <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="left-logo" style="width:48px; height:auto;">
-        </div>
-        <div class="logo-right">
-            <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="right-logo" style="width:48px; height:auto;">
-        </div>
-        <div class="title-section">
-            <div class="gov-title">Province of La Union</div>
-            <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
-            <div class="doc-title">Board Member Monthly Report</div>
-        </div>
-    </div>
-    
-    <div class="meta-section">
-        <div class="meta-item">
-            <span class="meta-label">Generated:</span>
-            <span class="meta-value">{{ now()->format('F d, Y h:i A') }}</span>
-        </div>
-        <div class="meta-item">
-            <span class="meta-label">Period:</span>
-            <span class="meta-value">{{ $selectedMonthName }} {{ $year }}</span>
-        </div>
-        @if($officeName)
-            <div class="meta-item">
-                <span class="meta-label">Office:</span>
-                <span class="meta-value">{{ $officeName }}</span>
-            </div>
-        @endif
-    </div>
 
-    <div class="section-title">Monthly Overview</div>
-    <div class="summary-cards">
-        <div class="summary-card">
-            <div class="card-label">Total Liters Used</div>
-            <div class="card-value">{{ number_format($totalMonthlyLiters, 2) }} L</div>
-        </div>
-        <div class="summary-card">
-            <div class="card-label">Total Cost</div>
-            <div class="card-value currency">₱{{ number_format($totalMonthlyCost, 2) }}</div>
-        </div>
-    </div>
+    {{-- ── HEADER ── --}}
+    <table class="header-table">
+        <tr>
+            <td class="header-logo">
+                <img src="{{ public_path('images/PGLU_logo.jpg') }}" alt="PGLU Logo">
+            </td>
+            <td class="header-center">
+                <div class="gov-title">Province of La Union</div>
+                <div class="sub-title">Office of the Sangguniang Panlalawigan</div>
+                <div class="doc-title">Board Member Monthly Report</div>
+            </td>
+            <td class="header-logo">
+                <img src="{{ public_path('images/Bagong-Pilipinas.png') }}" alt="Bagong Pilipinas">
+            </td>
+        </tr>
+    </table>
 
-    <div class="section-title">Boardmember Performance ({{ $selectedMonthName }} {{ $year }})</div>
+    {{-- ── META ── --}}
+    <table class="meta-table">
+        <tr>
+            <td><span class="label">Generated:</span> {{ now()->format('F d, Y h:i A') }}</td>
+            <td><span class="label">Period:</span> {{ $selectedMonthName }} {{ $year }}</td>
+            @if($officeName)
+                <td><span class="label">Office:</span> {{ $officeName }}</td>
+            @endif
+        </tr>
+    </table>
+
+    {{-- ── SUMMARY CARDS ── --}}
+    <h2>Monthly Overview ({{ $selectedMonthName }} {{ $year }})</h2>
+    <table class="cards-table">
+        <tr>
+            <td class="card">
+                <div class="card-label">Total Liters Used</div>
+                <div class="card-value">{{ number_format($totalMonthlyLiters, 2) }} L</div>
+                <div class="card-sub">{{ $selectedMonthName }} {{ $year }}</div>
+            </td>
+            <td class="card">
+                <div class="card-label">Total Cost</div>
+                <div class="card-value">&#8369;{{ number_format($totalMonthlyCost, 2) }}</div>
+                <div class="card-sub">{{ $selectedMonthName }} {{ $year }}</div>
+            </td>
+        </tr>
+    </table>
+
+    {{-- ── BOARDMEMBER PERFORMANCE ── --}}
+    <h2>Boardmember Performance ({{ $selectedMonthName }} {{ $year }})</h2>
     <table class="data-table">
         <thead>
             <tr>
-                <th class="text-center">#</th>
+                <th class="tc" style="width:28px;">#</th>
                 <th>Boardmember</th>
-                <th class="text-right">Monthly Liters</th>
-                <th class="text-right">Monthly Cost</th>
-                <th class="text-right">Yearly Budget</th>
-                <th class="text-right">Yearly Used</th>
-                <th class="text-right">Yearly Remaining</th>
-                <th class="text-right">Usage %</th>
+                <th class="tr">Monthly Liters</th>
+                <th class="tr">Monthly Cost</th>
+                <th class="tr">Yearly Budget</th>
+                <th class="tr">Yearly Used</th>
+                <th class="tr">Remaining</th>
+                <th class="tr">Usage %</th>
             </tr>
         </thead>
         <tbody>
             @forelse($rows as $row)
                 <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>
+                    <td class="tc">{{ $loop->iteration }}</td>
                     <td>{{ $row['user']->name }}</td>
-                    <td class="text-right">{{ number_format($row['monthlyLitersUsed'], 2) }}</td>
-                    <td class="text-right currency">₱{{ number_format($row['monthlyCostUsed'], 2) }}</td>
-                    <td class="text-right currency">₱{{ number_format($row['yearlyBudget'], 2) }}</td>
-                    <td class="text-right currency">₱{{ number_format($row['totalUsed'], 2) }}</td>
-                    <td class="text-right currency {{ $row['remainingBudget'] < 0 ? 'status-high' : ($row['budgetUsedPercentage'] >= 80 ? 'status-medium' : 'status-low') }}">
-                        ₱{{ number_format($row['remainingBudget'], 2) }}
+                    <td class="tr">{{ number_format($row['monthlyLitersUsed'], 2) }}</td>
+                    <td class="tr">&#8369;{{ number_format($row['monthlyCostUsed'], 2) }}</td>
+                    <td class="tr">&#8369;{{ number_format($row['yearlyBudget'], 2) }}</td>
+                    <td class="tr">&#8369;{{ number_format($row['totalUsed'], 2) }}</td>
+                    <td class="tr {{ $row['remainingBudget'] < 0 ? 'status-high' : ($row['budgetUsedPercentage'] >= 80 ? 'status-medium' : 'status-low') }}">
+                        &#8369;{{ number_format($row['remainingBudget'], 2) }}
                     </td>
-                    <td class="text-right">
+                    <td class="tr">
                         <span class="{{ $row['budgetUsedPercentage'] >= 90 ? 'status-high' : ($row['budgetUsedPercentage'] >= 80 ? 'status-medium' : 'status-low') }}">
                             {{ $row['budgetUsedPercentage'] }}%
                         </span>
@@ -330,7 +196,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="8" class="text-center" style="padding:20px; font-style: italic; color: #64748b;">
+                    <td colspan="8" class="tc" style="padding:16px; font-style:italic; color:#999;">
                         No boardmembers found for the selected filters.
                     </td>
                 </tr>
@@ -338,47 +204,43 @@
         </tbody>
     </table>
 
+    {{-- ── VEHICLE BREAKDOWN ── --}}
     @if($rows->count() > 0)
-        <div class="section-title">Vehicle Breakdown</div>
+        <h2>Vehicle Breakdown</h2>
         @foreach($rows as $row)
             @if(count($row['vehicles']) > 0)
-                <div class="vehicle-section">
-                    <div class="vehicle-title">{{ $row['user']->name }} - Vehicle Details</div>
-                    <table class="data-table" style="font-size: 10px;">
-                        <thead>
+                <div class="vehicle-title">{{ $row['user']->name }} &mdash; Vehicle Details</div>
+                <table class="data-table" style="margin-bottom:10px;">
+                    <thead>
+                        <tr>
+                            <th>Vehicle Name</th>
+                            <th class="tr">Plate Number</th>
+                            <th class="tr">Fuel Cost</th>
+                            <th class="tr">Maintenance Cost</th>
+                            <th class="tr">Total Cost</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($row['vehicles'] as $vehicle)
                             <tr>
-                                <th>Vehicle Name</th>
-                                <th class="text-right">Plate Number</th>
-                                <th class="text-right">Fuel Cost</th>
-                                <th class="text-right">Maintenance Cost</th>
-                                <th class="text-right">Total Cost</th>
+                                <td>{{ $vehicle['vehicle']->vehicle_name }}</td>
+                                <td class="tr">{{ $vehicle['vehicle']->plate_number }}</td>
+                                <td class="tr">&#8369;{{ number_format($vehicle['fuelSlipCost'], 2) }}</td>
+                                <td class="tr">&#8369;{{ number_format($vehicle['maintenanceCost'], 2) }}</td>
+                                <td class="tr"><strong>&#8369;{{ number_format($vehicle['fuelSlipCost'] + $vehicle['maintenanceCost'], 2) }}</strong></td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @foreach($row['vehicles'] as $vehicle)
-                                <tr>
-                                    <td>{{ $vehicle['vehicle']->vehicle_name }}</td>
-                                    <td class="text-right">{{ $vehicle['vehicle']->plate_number }}</td>
-                                    <td class="text-right currency">₱{{ number_format($vehicle['fuelSlipCost'], 2) }}</td>
-                                    <td class="text-right currency">₱{{ number_format($vehicle['maintenanceCost'], 2) }}</td>
-                                    <td class="text-right currency">
-                                        <strong>₱{{ number_format($vehicle['fuelSlipCost'] + $vehicle['maintenanceCost'], 2) }}</strong>
-                                    </td>
-                                </tr>
-                            @endforeach
-                        </tbody>
-                    </table>
-                </div>
+                        @endforeach
+                    </tbody>
+                </table>
             @endif
         @endforeach
     @endif
 
+    {{-- ── FOOTER ── --}}
     <div class="footer">
-        <div><strong>BM Vehicle Monitoring System</strong></div>
-        <div>Monthly Fleet Report - Generated on {{ now()->format('F d, Y') }} at {{ now()->format('h:i A') }}</div>
-        <div style="margin-top: 5px; font-size: 9px; color: #94a3b8;">
-            Province of La Union • Office of the Sangguniang Panlalawigan
-        </div>
+        <p>This is a monthly report generated from the BM Vehicle Monitoring System.</p>
+        <p>Report generated on {{ now()->format('F d, Y') }} at {{ now()->format('h:i A') }}</p>
     </div>
+
 </body>
 </html>

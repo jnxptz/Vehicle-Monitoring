@@ -73,7 +73,12 @@
             @endif
 
             <div class="table-container">
-                <div class="table-wrapper">
+                <div class="table-wrapper" style="max-height: 500px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none;">
+                    <style>
+                        .table-wrapper::-webkit-scrollbar {
+                            display: none;
+                        }
+                    </style>
                     <table style="width: 100%; border-collapse: collapse; font-size: 15px; border: none; table-layout: fixed;">
                         <thead>
                             <tr style="background: linear-gradient(135deg, #1e40af 0%, #ff9b00 100%);">
