@@ -5,6 +5,46 @@
 <link rel="stylesheet" href="{{ asset('css/boardmember-dashboard-styles.css') }}">
 
 <style>
+/* Fixed Header and Sidebar Layout */
+.dashboard-header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1100 !important;
+}
+
+.dashboard-page {
+    padding-top: 70px;
+}
+
+/* Fixed Dashboard Nav */
+.dashboard-nav {
+    position: fixed !important;
+    top: 70px;
+    left: 0;
+    width: 240px;
+    height: calc(100vh - 70px) !important;
+    overflow-y: auto;
+}
+
+.dashboard-container {
+    margin-left: 240px;
+    overflow-y: auto;
+    height: calc(100vh - 70px);
+}
+
+/* Mobile overrides */
+@media (max-width: 768px) {
+    .dashboard-nav {
+        display: none !important;
+    }
+    .dashboard-container {
+        margin-left: 0 !important;
+        padding: 16px !important;
+    }
+}
+
 /* Maintenance Alert Styles for Vehicle Pills */
 .maintenance-alert-orange {
     background: linear-gradient(135deg, #fb923c 0%, #f97316 100%) !important;
@@ -261,31 +301,18 @@ use Carbon\Carbon;
         </nav>
 
         <div class="dashboard-container">
-
             {{-- PAGE HEADER --}}
-
             <div class="page-header">
-
                 <div>
-
+                    <h2>Welcome, {{ auth()->user()->name }}</h2>
                     <p class="sub-text">
-
                         @if(isset($vehicles) && $vehicles->count() > 0)
-
-                           
-
                         @else
-
                             No vehicle assigned
-
                         @endif
-
                     </p>
-
                 </div>
-
                 @if($vehicle)
-
                     <form method="GET" action="{{ route('boardmember.dashboard') }}" class="filter-bar">
                         <select name="month" onchange="this.form.submit()">
                             @foreach(range(1, 12) as $month)
@@ -294,93 +321,54 @@ use Carbon\Carbon;
                                 </option>
                             @endforeach
                         </select>
-
-                        
                         <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="export-btn btn-primary" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important; box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2) !important;" onmouseover="this.style.background='linear-gradient(135deg, #d97706 0%, #b45309 100%) !important'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 155, 0, 0.3) !important';" onmouseout="this.style.background='linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 155, 0, 0.2) !important';">
                             Export Monthly PDF
                         </a>
-
-                        
                         <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="export-btn btn-primary yearly" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important; box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2) !important;" onmouseover="this.style.background='linear-gradient(135deg, #d97706 0%, #b45309 100%) !important'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 155, 0, 0.3) !important';" onmouseout="this.style.background='linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 155, 0, 0.2) !important';">
                             Export Yearly PDF
                         </a>
                     </form>
-
                 @endif
-
             </div>
 
             {{-- Ensure a selected vehicle when multiple exist --}}
 
             @php
-
                 if ((!isset($vehicle) || !$vehicle) && isset($vehicles) && $vehicles->count() > 0) {
-
                     $vehicle = $vehicles->first();
-
                 }
-
             @endphp
 
             {{-- Alerts (if any) --}}
 
             @php
-
                 // Preserve alerts from controller, don't overwrite them
                 $alerts = $alerts ?? [];
-
-                
-
                 // Check for fuel limit exceeded
-
                 if(isset($vehicle) && $vehicle) {
-
                     // Use selected month from filter instead of current month
-
                     $selectedMonth = (int) request()->input('month', now()->month);
-
                     $selectedMonth = ($selectedMonth >= 1 && $selectedMonth <= 12) ? $selectedMonth : now()->month;
-
                     $year = now()->year;
-
                     
-
                     // Get fuel slips for selected month
 
                     $monthlyFuelSlips = \App\Models\FuelSlip::where('user_id', Auth::id())
-
                         ->where('vehicle_id', $vehicle->id)
-
                         ->whereMonth('date', $selectedMonth)
-
                         ->whereYear('date', $year)
-
                         ->get();
-
-                    
-
                     $totalLitersUsed = $monthlyFuelSlips->sum('liters');
 
-                    
-
                     // Check if exceeded monthly fuel limit
-
                     if($totalLitersUsed > $vehicle->monthly_fuel_limit) {
-
                         $monthName = Carbon::createFromDate(null, $selectedMonth, 1)->format('F');
-
                         $alerts[] = "You have exceeded your monthly fuel limit of {$vehicle->monthly_fuel_limit} liters in {$monthName}! Current usage: {$totalLitersUsed} liters.";
-
                     }
-
                 }
-
             @endphp
 
-            
-
             @if(!empty($alerts))
-
                 <div class="alerts-box">
                     <div>
                         <div>⚠️</div>
@@ -392,34 +380,28 @@ use Carbon\Carbon;
                         @endforeach
                     </ul>
                 </div>
-
             @endif
 
             {{-- KPI CARDS --}}
 
             @if(isset($vehicle) && $vehicle)
-
                 <div class="kpi-grid">
                     <div class="kpi-card kpi-card-style">
                         <h4>Yearly Budget</h4>
                         <p>₱{{ number_format($yearlyBudget, 2) }}</p>
                     </div>
-
                     <div class="kpi-card">
                         <h4>Budget Used</h4>
                         <p>₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</p>
                     </div>
-
                     <div class="kpi-card">
                         <h4>Remaining Budget</h4>
                         <p>₱{{ number_format($remainingBudget, 2) }}</p>
                     </div>
-
                     <div class="kpi-card">
                         <h4>Fuel Used ({{ $selectedMonthName ?? \Carbon\Carbon::now()->format('F') }})</h4>
                         <p>{{ $monthlyLitersUsed }} L</p>
                     </div>
-
                 </div>
 
                 {{-- OVERVIEW CARDS --}}
@@ -459,7 +441,6 @@ use Carbon\Carbon;
                 {{-- Vehicle Cards --}}
 
                 @if(isset($vehicles) && $vehicles->count() > 0)
-
                     <div class="vehicle-list">
                         @foreach($vehicles as $v)
                             @php
@@ -557,9 +538,7 @@ use Carbon\Carbon;
                             </div>
                         @endforeach
                     </div>
-
                 @endif
-
             @else
 
                 <div class="no-vehicle">
@@ -567,23 +546,14 @@ use Carbon\Carbon;
                     <h4>No vehicle assigned</h4>
                     <p>Please contact your administrator to assign a vehicle to your account.</p>
                 </div>
-
             @endif
-
         </div> 
-
     </div> 
-
 </div>
-
-<footer class="dashboard-footer">
-    &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
-</footer>
 
 <script>
 // No toggle functionality needed - cards display all information directly
 </script>
 
 <script src="{{ asset('js/boardmember-dashboard.js') }}"></script>
-
 @endsection

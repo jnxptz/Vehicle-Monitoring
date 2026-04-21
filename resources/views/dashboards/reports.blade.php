@@ -250,7 +250,7 @@
                 <table class="modern-table" style="width: 100%; border-collapse: separate; border-spacing: 0;">
                     <thead>
                         <tr style="background: linear-gradient(135deg, #1e40af 0%, #3b82f6 100%);">
-                            <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Rank</th>
+                            <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">#</th>
                             <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Boardmember</th>
                             <th style="padding: 16px 20px; text-align: left; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Office</th>
                             <th style="padding: 16px 20px; text-align: right; font-weight: 700; font-size: 12px; text-transform: uppercase; letter-spacing: 0.5px; color: #ffffff; border: none;">Fuel Cost</th>

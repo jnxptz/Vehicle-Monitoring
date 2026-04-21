@@ -98,7 +98,7 @@
     <table class="data-table">
         <thead>
             <tr>
-                <th class="tc" style="width:40px;">Rank</th>
+                <th class="tc" style="width:40px;">#</th>
                 <th>Boardmember</th>
                 <th>Office</th>
                 <th class="tr">Fuel Cost</th>

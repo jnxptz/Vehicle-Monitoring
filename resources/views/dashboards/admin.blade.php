@@ -1,5 +1,6 @@
 @extends('layouts.app')
 @section('content')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard-styles.css') }}">
@@ -135,93 +136,88 @@
         </nav>
         <div class="dashboard-container">
             <!-- PAGE HEADER -->
-            <div class="page-header" style="margin-bottom: 5px;">
+            <div class="page-header">
                 <div>
-                    <h2>Boardmembers Overview</h2>
-                
+                    <h2>Welcome, {{ auth()->user()->name }}</h2>
+                    <p class="sub-text">Boardmembers Overview</p>
                 </div>
-            </div>
-
-            <!-- Report Controls -->
-            <div class="report-controls" style="background: #f8fafc; border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px;">
-                    <form method="GET" action="{{ route('admin.dashboard') }}" style="flex-grow: 1;">
-                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
-                            <!-- Office Selection -->
-                            <div style="flex: 1; min-width: 200px;">
-                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Office / Department</label>
-                                <select name="office" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
-                                    <option value="">All Offices</option>
-                                    @foreach($offices as $office)
-                                        <option value="{{ $office->id }}" {{ $selectedOffice == $office->id ? 'selected' : '' }}>
-                                            {{ $office->name }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Month Selection -->
-                            <div style="flex: 1; min-width: 140px;">
-                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Month</label>
-                                <select name="month" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
-                                    @foreach(range(1,12) as $m)
-                                        <option value="{{ $m }}" {{ $m == $selectedMonth ? 'selected' : '' }}>
-                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
-                                        </option>
-                                    @endforeach
-                                </select>
-                            </div>
-
-                            <!-- Year Selection -->
-                            <div style="flex: 1; min-width: 100px;">
-                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Year</label>
-                                <select name="year" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
-                                    @for($y = now()->year; $y >= now()->year - 2; $y--)
-                                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
-                                    @endfor
-                                </select>
-                            </div>
+                <form method="GET" action="{{ route('admin.dashboard') }}" class="filter-bar">
+                    <div style="display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-end;">
+                        <!-- Office Selection -->
+                        <div>
+                            <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Office</label>
+                            <select name="office" onchange="this.form.submit()" style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer;">
+                                <option value="">All Offices</option>
+                                @foreach($offices as $office)
+                                    <option value="{{ $office->id }}" {{ $selectedOffice == $office->id ? 'selected' : '' }}>
+                                        {{ $office->name }}
+                                    </option>
+                                @endforeach
+                            </select>
                         </div>
-                    </form>
 
-                    <div style="display: flex; gap: 8px;">
-                        <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #2563eb; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(37,99,235,0.2); text-decoration: none;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            Monthly (PDF)
-                        </a>
-                        <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #10b981; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(16,185,129,0.2); text-decoration: none;" onmouseover="this.style.background='#059669';" onmouseout="this.style.background='#10b981';">
-                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            Yearly (PDF)
-                        </a>
+                        <!-- Month Selection -->
+                        <div>
+                            <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Month</label>
+                            <select name="month" onchange="this.form.submit()" style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer;">
+                                @foreach(range(1,12) as $m)
+                                    <option value="{{ $m }}" {{ $m == $selectedMonth ? 'selected' : '' }}>
+                                        {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
+
+                        <!-- Year Selection -->
+                        <div>
+                            <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Year</label>
+                            <select name="year" onchange="this.form.submit()" style="padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer;">
+                                @for($y = now()->year; $y >= now()->year - 2; $y--)
+                                    <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                @endfor
+                            </select>
+                        </div>
+
+                        <!-- PDF Buttons -->
+                        <div style="display: flex; gap: 8px; align-items: flex-end;">
+                            <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #2563eb; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(37,99,235,0.2); text-decoration: none;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Monthly (PDF)
+                            </a>
+                            <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #10b981; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(16,185,129,0.2); text-decoration: none;" onmouseover="this.style.background='#059669';" onmouseout="this.style.background='#10b981';">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                                Yearly (PDF)
+                            </a>
+                        </div>
                     </div>
-                </div>
+                </form>
 
                 <!-- KPI Cards -->
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #3b82f6;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</h4>
-                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1e293b;">₱{{ number_format($rows->sum('yearlyBudget'), 0) }}</p>
-                    </div>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; width: 100%;">
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #3b82f6;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</h4>
+                    <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1e293b;">₱{{ number_format($rows->sum('yearlyBudget'), 0) }}</p>
+                </div>
 
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #f59e0b;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Used</h4>
-                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #dc2626;">₱{{ number_format($rows->sum('totalUsed'), 0) }}</p>
-                    </div>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #f59e0b;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Used</h4>
+                    <p style="margin: 0; font-size: 28px; font-weight: 700; color: #dc2626;">₱{{ number_format($rows->sum('totalUsed'), 0) }}</p>
+                </div>
 
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #10b981;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Remaining Budget</h4>
-                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #059669;">₱{{ number_format($rows->sum('remainingBudget'), 0) }}</p>
-                    </div>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #10b981;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Remaining Budget</h4>
+                    <p style="margin: 0; font-size: 28px; font-weight: 700; color: #059669;">₱{{ number_format($rows->sum('remainingBudget'), 0) }}</p>
+                </div>
 
-                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #8b5cf6;">
-                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">{{ $selectedMonthName }} Liters</h4>
-                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1d4ed8;">{{ number_format($rows->sum('monthlyLitersUsed'), 0) }} L</p>
-                    </div>
+                <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #8b5cf6;">
+                    <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">{{ $selectedMonthName }} Liters</h4>
+                    <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1d4ed8;">{{ number_format($rows->sum('monthlyLitersUsed'), 0) }} L</p>
+                </div>
                 </div>
             </div>
 
             <!-- TABLE -->
-            <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: hidden; max-height: 600px; overflow-y: auto; scrollbar-width: none; -ms-overflow-style: none; margin: 0 !important; flex: 1;">
+            <div class="table-wrapper" style="background: #ffffff; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); overflow: visible; margin-bottom: 16px;">
                 <style>
                     .table-wrapper::-webkit-scrollbar {
                         display: none;
@@ -350,7 +346,187 @@
                 </table>
             </div>
 
-            
+            <!-- Line Chart -->
+            <div style="background: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-top: 16px; width: 100%;">
+                <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1e293b;">Daily Expenses ({{ $selectedMonthName }} {{ $year }})</h4>
+                <div style="height: 300px;">
+                    <canvas id="fuelSlipTrendChart"></canvas>
+                </div>
+            </div>
+
+            <script>
+                @php
+                    // Get daily data for the selected month
+                    $dailyFuelSlipCounts = [];
+                    $dailyFuelCosts = [];
+                    $dailyMaintenanceCosts = [];
+                    $daysInMonth = \Carbon\Carbon::create($year, $selectedMonth)->daysInMonth;
+                    
+                    for($day = 1; $day <= $daysInMonth; $day++) {
+                        $date = \Carbon\Carbon::create($year, $selectedMonth, $day)->format('Y-m-d');
+                        
+                        // Fuel slip count
+                        $count = \App\Models\FuelSlip::whereMonth('date', $selectedMonth)
+                            ->whereYear('date', $year)
+                            ->whereDay('date', $day)
+                            ->when($selectedOffice, function($query) use ($selectedOffice) {
+                                return $query->whereHas('user', function($q) use ($selectedOffice) {
+                                    $q->where('office_id', $selectedOffice);
+                                });
+                            })
+                            ->count();
+                        $dailyFuelSlipCounts[] = $count;
+                        
+                        // Fuel costs
+                        $fuelCost = \App\Models\FuelSlip::whereMonth('date', $selectedMonth)
+                            ->whereYear('date', $year)
+                            ->whereDay('date', $day)
+                            ->when($selectedOffice, function($query) use ($selectedOffice) {
+                                return $query->whereHas('user', function($q) use ($selectedOffice) {
+                                    $q->where('office_id', $selectedOffice);
+                                });
+                            })
+                            ->sum('total_cost') ?? 0;
+                        $dailyFuelCosts[] = $fuelCost;
+                        
+                        // Maintenance costs
+                        $maintenanceCost = \App\Models\Maintenance::whereMonth('date', $selectedMonth)
+                            ->whereYear('date', $year)
+                            ->whereDay('date', $day)
+                            ->when($selectedOffice, function($query) use ($selectedOffice) {
+                                return $query->whereHas('vehicle', function($q) use ($selectedOffice) {
+                                    $q->where('office_id', $selectedOffice);
+                                });
+                            })
+                            ->sum('cost') ?? 0;
+                        $dailyMaintenanceCosts[] = $maintenanceCost;
+                    }
+                    
+                    $dayLabels = [];
+                    for($day = 1; $day <= $daysInMonth; $day++) {
+                        $dayLabels[] = $day;
+                    }
+                @endphp
+
+                const dayLabels = @json($dayLabels);
+                const dailyFuelSlipCounts = @json($dailyFuelSlipCounts);
+                const dailyFuelCosts = @json($dailyFuelCosts);
+                const dailyMaintenanceCosts = @json($dailyMaintenanceCosts);
+
+                const ctx = document.getElementById('fuelSlipTrendChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: dayLabels,
+                        datasets: [
+                            {
+                                label: 'Fuel Costs',
+                                data: dailyFuelCosts,
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#f59e0b',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                yAxisID: 'y'
+                            },
+                            {
+                                label: 'Maintenance Costs',
+                                data: dailyMaintenanceCosts,
+                                borderColor: '#10b981',
+                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointRadius: 3,
+                                pointBackgroundColor: '#10b981',
+                                pointBorderColor: '#ffffff',
+                                pointBorderWidth: 2,
+                                yAxisID: 'y'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: 'top',
+                                labels: {
+                                    usePointStyle: true,
+                                    padding: 20,
+                                    font: {
+                                        size: 12,
+                                        weight: 600
+                                    }
+                                }
+                            },
+                            tooltip: {
+                                backgroundColor: 'rgba(30, 64, 175, 0.9)',
+                                padding: 10,
+                                cornerRadius: 6,
+                                callbacks: {
+                                    title: function(context) {
+                                        return 'Day ' + context[0].label;
+                                    },
+                                    label: function(context) {
+                                        return context.dataset.label + ': ₱' + context.parsed.y.toLocaleString();
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: {
+                                        size: 11
+                                    },
+                                    callback: function(value) {
+                                        return '₱' + value.toLocaleString();
+                                    }
+                                },
+                                grid: {
+                                    display: true,
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Amount (₱)',
+                                    font: {
+                                        size: 11,
+                                        weight: 600
+                                    }
+                                }
+                            },
+                            x: {
+                                ticks: {
+                                    font: {
+                                        size: 10
+                                    },
+                                    maxRotation: 45,
+                                    minRotation: 45
+                                },
+                                grid: {
+                                    display: false
+                                },
+                                title: {
+                                    display: true,
+                                    text: 'Day of Month',
+                                    font: {
+                                        size: 11,
+                                        weight: 600
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            </script>
 
         </div>
     </div>
