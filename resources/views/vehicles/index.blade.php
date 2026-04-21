@@ -4,6 +4,69 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin.css') }}">
 <link rel="stylesheet" href="{{ asset('css/vehicles-styles.css') }}">
+<style>
+    /* Fixed Header and Sidebar Layout */
+    .dashboard-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1100 !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        height: 70px;
+        padding: 10px 20px !important;
+    }
+
+    .dashboard-body {
+        margin-top: 70px; /* Offset for fixed header */
+        display: flex;
+        height: calc(100vh - 70px);
+        overflow: hidden;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    .dashboard-nav {
+        position: fixed !important;
+        top: 70px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 70px) !important;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border-right: 1px solid #e2e8f0;
+        flex: none !important;
+    }
+
+    .dashboard-container {
+        margin-left: 240px; /* Offset for fixed sidebar */
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1;
+        overflow-y: auto !important;
+        height: calc(100vh - 70px);
+        padding: 24px !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        scrollbar-width: thin;
+    }
+
+    /* Mobile overrides */
+    @media (max-width: 768px) {
+        .dashboard-nav {
+            display: none !important;
+        }
+        .dashboard-container {
+            margin-left: 0 !important;
+            padding: 16px !important;
+        }
+    }
+</style>
 
 <div class="dashboard-page">
     <div class="dashboard-header" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: nowrap; padding: 16px 20px;">
@@ -235,11 +298,6 @@
             <label for="driver" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Driver Name:</label>
             <input id="driver" type="text" name="driver" required style="width:100%; padding:12px 16px; margin-bottom:20px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" placeholder="Enter driver name" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
 
-            <label for="vehicle_color" style="display:block; margin-bottom:8px; font-weight:600; color:#374151; font-size:14px;">Vehicle Color:</label>
-            <div style="display:flex; gap:12px; margin-bottom:24px;">
-                <input id="vehicle_color" type="text" name="vehicle_color" style="flex:1; padding:12px 16px; border:1px solid #d1d5db; border-radius:8px; background:#ffffff; color:#374151; font-size:14px; transition:all 0.2s ease; box-shadow:0 1px 2px 0 rgba(0, 0, 0, 0.05);" placeholder="e.g., Red, Blue, Black" onmouseover="this.style.borderColor='#9ca3af'; this.style.boxShadow='0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)';" onmouseout="this.style.borderColor='#d1d5db'; this.style.boxShadow='0 1px 2px 0 rgba(0, 0, 0, 0.05)';">
-                <input id="vehicle_color_code" type="color" name="vehicle_color_code" value="#3b82f6" style="width:48px; height:48px; border:1px solid #d1d5db; border-radius:8px; cursor:pointer; transition:all 0.2s ease;" onmouseover="this.style.borderColor='#9ca3af';" onmouseout="this.style.borderColor='#d1d5db';">
-            </div>
 
             <button type="submit" style="background:linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); color:white; padding:14px 24px; border:none; border-radius:8px; cursor:pointer; width:100%; font-weight:600; font-size:14px; transition:all 0.2s ease; box-shadow:0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2);" onmouseover="this.style.background='linear-gradient(135deg, #2563eb 0%, #1e40af 100%)'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 10px 15px -3px rgba(59, 130, 246, 0.4), 0 4px 6px -2px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.background='linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%)'; this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px -1px rgba(59, 130, 246, 0.3), 0 2px 4px -1px rgba(59, 130, 246, 0.2)';">Register Vehicle</button>
         </form>
@@ -269,8 +327,7 @@
                         <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Vehicle</th>
                         <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Boardmember</th>
                         <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Office</th>
-                        <th style="padding: 12px 16px; text-align: left; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Status</th>
-                        <th style="padding: 12px 16px; text-align: center; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Actions</th>
+                        <th style="padding: 12px 16px; text-align: center; color: #ffffff; font-weight: 600; font-size: 14px; border: none;">Status</th>
                     </tr>
                 </thead>
                 <tbody id="allVehiclesList">
@@ -320,9 +377,6 @@
     </div>
 </div>
 
-<div class="footer">
-    <span>© Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
-</div>
 
 <script>
 function showAllVehicles() {
@@ -374,9 +428,6 @@ function loadAllVehicles() {
                     </td>
                     <td style="padding: 12px 16px; border: none; text-align: center;">
                         ${statusBadge}
-                    </td>
-                    <td style="padding: 12px 16px; border: none; text-align: center;">
-                        ${actionsButton}
                     </td>
                 `;
                 tbody.appendChild(row);

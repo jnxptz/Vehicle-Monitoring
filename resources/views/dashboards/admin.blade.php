@@ -3,6 +3,68 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard-styles.css') }}">
+<style>
+    /* Fixed Header and Sidebar Layout */
+    .dashboard-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1100 !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        height: 70px;
+    }
+
+    .dashboard-body {
+        margin-top: 70px; /* Offset for fixed header */
+        display: flex;
+        height: calc(100vh - 70px);
+        overflow: hidden;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    .dashboard-nav {
+        position: fixed !important;
+        top: 70px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 70px) !important;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border-right: 1px solid #e2e8f0;
+        flex: none !important;
+    }
+
+    .dashboard-container {
+        margin-left: 240px; /* Offset for fixed sidebar */
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1;
+        overflow-y: auto !important;
+        height: calc(100vh - 70px);
+        padding: 24px !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        scrollbar-width: thin;
+    }
+
+    /* Mobile overrides */
+    @media (max-width: 768px) {
+        .dashboard-nav {
+            display: none !important;
+        }
+        .dashboard-container {
+            margin-left: 0 !important;
+            padding: 16px !important;
+        }
+    }
+</style>
 <div class="dashboard-page">
     <!-- HEADER -->
     <div class="dashboard-header">
@@ -80,72 +142,80 @@
                 </div>
             </div>
 
-            <!-- CONTROLS & KPI -->
-            <div class="report-controls" style="background: #ffffff; border-radius: 12px; padding: 16px; margin-bottom: 16px; border: 1px solid #e2e8f0; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);">
-                <!-- Filters & Export -->
-                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px; padding-bottom: 16px; border-bottom: 1px solid #f1f5f9; margin-bottom: 16px;">
-                    <form method="GET" action="{{ route('admin.dashboard') }}" style="flex-grow: 1; display: flex; gap: 12px; flex-wrap: wrap;">
-                        <div style="flex: 1; min-width: 200px; max-width: 300px;">
-                            <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Office / Department</label>
-                            <select name="office" onchange="this.form.submit()" style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205%205z%22%20fill%3D%22%236b7280%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
-                                <option value="">All Offices</option>
-                                @foreach($offices as $office)
-                                    <option value="{{ $office->id }}" {{ $selectedOffice == $office->id ? 'selected' : '' }}>
-                                        {{ $office->name }}
-                                    </option>
-                                @endforeach
-                            </select>
-                        </div>
+            <!-- Report Controls -->
+            <div class="report-controls" style="background: #f8fafc; border-radius: 12px; padding: 12px; margin-bottom: 16px; border: 1px solid #e2e8f0;">
+                <div style="display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 16px;">
+                    <form method="GET" action="{{ route('admin.dashboard') }}" style="flex-grow: 1;">
+                        <div style="display: flex; gap: 12px; flex-wrap: wrap;">
+                            <!-- Office Selection -->
+                            <div style="flex: 1; min-width: 200px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Office / Department</label>
+                                <select name="office" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    <option value="">All Offices</option>
+                                    @foreach($offices as $office)
+                                        <option value="{{ $office->id }}" {{ $selectedOffice == $office->id ? 'selected' : '' }}>
+                                            {{ $office->name }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
 
-                        <div style="flex: 1; min-width: 160px; max-width: 240px;">
-                            <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px;">Month</label>
-                            <select name="month" onchange="this.form.submit()" style="width: 100%; padding: 10px 14px; border: 2px solid #e2e8f0; border-radius: 8px; background: #f8fafc; color: #1e293b; font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s ease; appearance: none; background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205%205z%22%20fill%3D%22%236b7280%22/%3E%3C/svg%3E'); background-repeat: no-repeat; background-position: right 12px center; background-size: 18px;" onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
-                                @foreach(range(1,12) as $month)
-                                    <option value="{{ $month }}" {{ $month == $selectedMonth ? 'selected' : '' }}>
-                                        {{ \Carbon\Carbon::create()->month($month)->format('F') }}
-                                    </option>
-                                @endforeach
-                            </select>
+                            <!-- Month Selection -->
+                            <div style="flex: 1; min-width: 140px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Month</label>
+                                <select name="month" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    @foreach(range(1,12) as $m)
+                                        <option value="{{ $m }}" {{ $m == $selectedMonth ? 'selected' : '' }}>
+                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                        </option>
+                                    @endforeach
+                                </select>
+                            </div>
+
+                            <!-- Year Selection -->
+                            <div style="flex: 1; min-width: 100px;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Year</label>
+                                <select name="year" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    @for($y = now()->year; $y >= now()->year - 2; $y--)
+                                        <option value="{{ $y }}" {{ $year == $y ? 'selected' : '' }}>{{ $y }}</option>
+                                    @endfor
+                                </select>
+                            </div>
                         </div>
                     </form>
 
-                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #ffffff; background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%); border: none; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(59, 130, 246, 0.2); text-decoration: none;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(59, 130, 246, 0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(59, 130, 246, 0.2)';">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            Export Monthly PDF
+                    <div style="display: flex; gap: 8px;">
+                        <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #2563eb; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(37,99,235,0.2); text-decoration: none;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Monthly (PDF)
                         </a>
-
-                        <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 10px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: #ffffff; background: linear-gradient(135deg, #10b981 0%, #059669 100%); border: none; cursor: pointer; transition: all 0.2s ease; box-shadow: 0 4px 6px rgba(16, 185, 129, 0.2); text-decoration: none;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 6px 12px rgba(16, 185, 129, 0.3)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 4px 6px rgba(16, 185, 129, 0.2)';">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                            Export Yearly PDF
+                        <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 8px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #10b981; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(16,185,129,0.2); text-decoration: none;" onmouseover="this.style.background='#059669';" onmouseout="this.style.background='#10b981';">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Yearly (PDF)
                         </a>
                     </div>
                 </div>
 
-                <!-- KPI -->
-                <div class="kpi-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px;">
-                    <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)';">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #3b82f6, #60a5fa);"></div>
-                        <h4 style="margin: 0 0 6px 0; font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</h4>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #1e293b;">₱{{ number_format($rows->sum('yearlyBudget'), 2, '.', ',') }}</p>
+                <!-- KPI Cards -->
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e2e8f0;">
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #3b82f6;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Budget</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1e293b;">₱{{ number_format($rows->sum('yearlyBudget'), 0) }}</p>
                     </div>
 
-                    <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)';">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #f59e0b, #fbbf24);"></div>
-                        <h4 style="margin: 0 0 6px 0; font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Used</h4>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #dc2626;">₱{{ number_format($rows->sum('totalUsed'), 2, '.', ',') }}</p>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #f59e0b;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Total Used</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #dc2626;">₱{{ number_format($rows->sum('totalUsed'), 0) }}</p>
                     </div>
 
-                    <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)';">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #10b981, #34d399);"></div>
-                        <h4 style="margin: 0 0 6px 0; font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Remaining Budget</h4>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #059669;">₱{{ number_format($rows->sum('remainingBudget'), 2, '.', ',') }}</p>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #10b981;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">Remaining Budget</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #059669;">₱{{ number_format($rows->sum('remainingBudget'), 0) }}</p>
                     </div>
 
-                    <div class="kpi-card" style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); position: relative; overflow: hidden; transition: all 0.2s ease;" onmouseover="this.style.transform='translateY(-2px)'; this.style.boxShadow='0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(0,0,0,0.02)';">
-                        <div style="position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: linear-gradient(90deg, #8b5cf6, #a78bfa);"></div>
-                        <h4 style="margin: 0 0 6px 0; font-size: 12px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px;">Total Liters ({{ $selectedMonthName }})</h4>
-                        <p style="margin: 0; font-size: 24px; font-weight: 700; color: #4338ca;">{{ number_format($rows->sum('monthlyLitersUsed'), 2, '.', ',') }} L</p>
+                    <div style="background: #ffffff; border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); border-top: 4px solid #8b5cf6;">
+                        <h4 style="margin: 0 0 8px 0; font-size: 12px; color: #64748b; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px;">{{ $selectedMonthName }} Liters</h4>
+                        <p style="margin: 0; font-size: 28px; font-weight: 700; color: #1d4ed8;">{{ number_format($rows->sum('monthlyLitersUsed'), 0) }} L</p>
                     </div>
                 </div>
             </div>
@@ -279,12 +349,11 @@
                     </tbody>
                 </table>
             </div>
+
+            
+
         </div>
     </div>
 </div>
-
-<footer class="dashboard-footer">
-    <span>&copy; Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union <span class="footer-divider">|</span>J.M.B
-</footer>
 <script src="{{ asset('js/admin-dashboard.js') }}"></script>
 @endsection

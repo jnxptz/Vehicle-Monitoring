@@ -107,6 +107,9 @@ class OfficeController extends Controller
         ]);
 
         $user->update(['office_id' => $request->office_id]);
+        
+        // Also update the office_id of all vehicles assigned to this user
+        $user->vehicles()->update(['office_id' => $request->office_id]);
 
         return redirect()->back()->with('success', "{$user->name} has been assigned to the office successfully.");
     }
@@ -135,6 +138,11 @@ class OfficeController extends Controller
 
         // Update user information
         $user->update($request->only(['name', 'email', 'office_id']));
+
+        // Also update the office_id of all vehicles assigned to this user
+        if ($request->has('office_id')) {
+            $user->vehicles()->update(['office_id' => $request->office_id]);
+        }
 
         // Update or create BM record with budget
         $topUpAmount = $request->input('yearly_budget');

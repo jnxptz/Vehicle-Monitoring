@@ -6,6 +6,74 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard-styles.css') }}">
+<style>
+    /* Fixed Header and Sidebar Layout */
+    .dashboard-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1100 !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        height: 70px;
+        padding: 10px 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .dashboard-body {
+        margin-top: 70px; /* Offset for fixed header */
+        display: flex;
+        height: calc(100vh - 70px);
+        overflow: hidden;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    .dashboard-nav {
+        position: fixed !important;
+        top: 70px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 70px) !important;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border-right: 1px solid #e2e8f0;
+        flex: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .dashboard-container {
+        margin-left: 240px; /* Offset for fixed sidebar */
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1;
+        overflow-y: auto !important;
+        height: calc(100vh - 70px);
+        padding: 24px !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        scrollbar-width: thin;
+    }
+
+    /* Mobile overrides */
+    @media (max-width: 768px) {
+        .dashboard-nav {
+            display: none !important;
+        }
+        .dashboard-container {
+            margin-left: 0 !important;
+            padding: 16px !important;
+        }
+    }
+</style>
 
 <div class="dashboard-page">
 
@@ -88,10 +156,23 @@
                             <div style="flex: 1; min-width: 160px;">
                                 <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Report Period</label>
                                 <select name="report_type" id="report-type" onchange="toggleMonthRange(); this.form.submit();" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
-                                    <option value="current-month" {{ $reportType == 'current-month' ? 'selected' : '' }}>Current Month</option>
+                                    <option value="current-month" {{ $reportType == 'current-month' ? 'selected' : '' }}>This Month</option>
+                                    <option value="single-month" {{ $reportType == 'single-month' ? 'selected' : '' }}>Specific Month</option>
                                     <option value="quarterly" {{ $reportType == 'quarterly' ? 'selected' : '' }}>Quarterly (3 Months)</option>
                                     <option value="semester" {{ $reportType == 'semester' ? 'selected' : '' }}>Semester (6 Months)</option>
                                     <option value="custom-range" {{ $reportType == 'custom-range' ? 'selected' : '' }}>Custom Range</option>
+                                </select>
+                            </div>
+
+                            <!-- Single Month Selection -->
+                            <div id="single-month-container" style="flex: 1; min-width: 120px; {{ $reportType == 'single-month' ? '' : 'display: none;' }}">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Select Month</label>
+                                <select name="month_range" id="single-month-select" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    @for($m = 1; $m <= 12; $m++)
+                                        <option value="{{ $m }}" {{ ($reportType == 'single-month' && $monthRange == $m) || ($reportType != 'single-month' && now()->month == $m) ? 'selected' : '' }}>
+                                            {{ \Carbon\Carbon::create()->month($m)->format('F') }}
+                                        </option>
+                                    @endfor
                                 </select>
                             </div>
 
@@ -107,8 +188,9 @@
 
                             <!-- Month Range (for custom range) -->
                             <div id="month-range-container" style="flex: 1; min-width: 160px; {{ $reportType == 'custom-range' ? '' : 'display: none;' }}">
-                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Custom Range</label>
-                                <select name="month_range" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                <label style="display: block; font-size: 11px; font-weight: 600; color: #64748b; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.5px;">Range Period</label>
+                                <select name="month_range" id="month-range-select" onchange="this.form.submit()" style="width: 100%; padding: 8px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #ffffff; font-size: 13px; font-weight: 500; color: #334155; cursor: pointer; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s;">
+                                    <option value="" disabled {{ !$monthRange ? 'selected' : '' }}>-- Select Range --</option>
                                     @foreach([
                                         '1-2' => 'January - February',
                                         '2-3' => 'February - March',
@@ -219,19 +301,22 @@
     </div>
 </div>
 
-<footer class="dashboard-footer">
-    <span>&copy; Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union <span class="footer-divider">|</span> Janial Bacani
-</footer>
 
 <script>
     function toggleMonthRange() {
         const reportType = document.getElementById('report-type').value;
         const monthRangeContainer = document.getElementById('month-range-container');
+        const singleMonthContainer = document.getElementById('single-month-container');
         
         if (reportType === 'custom-range') {
             monthRangeContainer.style.display = 'block';
+            singleMonthContainer.style.display = 'none';
+        } else if (reportType === 'single-month') {
+            monthRangeContainer.style.display = 'none';
+            singleMonthContainer.style.display = 'block';
         } else {
             monthRangeContainer.style.display = 'none';
+            singleMonthContainer.style.display = 'none';
         }
     }
 </script>

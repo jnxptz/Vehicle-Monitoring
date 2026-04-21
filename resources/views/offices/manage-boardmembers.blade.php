@@ -3,6 +3,74 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/forms.css') }}">
+<style>
+    /* Fixed Header and Sidebar Layout */
+    .dashboard-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1100 !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        height: 70px;
+        padding: 10px 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+
+    .dashboard-body {
+        margin-top: 70px; /* Offset for fixed header */
+        display: flex;
+        height: calc(100vh - 70px);
+        overflow: hidden;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    .dashboard-nav {
+        position: fixed !important;
+        top: 70px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 70px) !important;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border-right: 1px solid #e2e8f0;
+        flex: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .dashboard-container {
+        margin-left: 240px; /* Offset for fixed sidebar */
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1;
+        overflow-y: auto !important;
+        height: calc(100vh - 70px);
+        padding: 24px !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        scrollbar-width: thin;
+    }
+
+    /* Mobile overrides */
+    @media (max-width: 768px) {
+        .dashboard-nav {
+            display: none !important;
+        }
+        .dashboard-container {
+            margin-left: 0 !important;
+            padding: 16px !important;
+        }
+    }
+</style>
 
 <div class="dashboard-page">
     {{-- Header --}}
@@ -254,9 +322,6 @@
     </div>
 </div>
 
-<footer class="dashboard-footer">
-    &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
-</footer>
 
 <script>
 function openEditModal(userId, name, email, officeId, yearlyBudget) {

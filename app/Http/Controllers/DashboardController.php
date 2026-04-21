@@ -151,8 +151,51 @@ class DashboardController extends Controller
                 'maintenanceCostTotal' => $maintenanceCostTotal,
             ];
         });
+        
 
         return view('dashboards.admin', compact('rows', 'selectedMonth', 'selectedMonthName', 'year', 'offices', 'selectedOffice'));
+    }
+
+    /**
+     * Get start and end months for reports
+     */
+    private function getReportMonthRange(string $reportType, ?string $monthRange): array
+    {
+        $startMonth = 1;
+        $endMonth = 12;
+
+        switch ($reportType) {
+            case 'current-month':
+                $startMonth = now()->month;
+                $endMonth = now()->month;
+                break;
+            case 'single-month':
+                $startMonth = $monthRange ?: now()->month;
+                $endMonth = $startMonth;
+                break;
+            case 'quarterly':
+                $currentQuarter = ceil(now()->month / 3);
+                $startMonth = ($currentQuarter - 1) * 3 + 1;
+                $endMonth = $currentQuarter * 3;
+                break;
+            case 'semester':
+                $startMonth = now()->month <= 6 ? 1 : 7;
+                $endMonth = now()->month <= 6 ? 6 : 12;
+                break;
+            case 'custom-range':
+                if ($monthRange && strpos($monthRange, '-') !== false) {
+                    list($startMonth, $endMonth) = explode('-', $monthRange);
+                } else {
+                    // Default to current month if custom range is selected but no range is chose
+                    $startMonth = now()->month;
+                    $endMonth = now()->month;
+                    // Note: If they want January - February as default, we could use that instead
+                    // but current month is safer.
+                }
+                break;
+        }
+
+        return [(int) $startMonth, (int) $endMonth];
     }
 
     /**
@@ -173,29 +216,7 @@ class DashboardController extends Controller
         $ids = $boardmembers->pluck('id');
 
         // Calculate date range based on report type
-        $startMonth = 1;
-        $endMonth = 12;
-
-        switch ($reportType) {
-            case 'current-month':
-                $startMonth = now()->month;
-                $endMonth = now()->month;
-                break;
-            case 'quarterly':
-                $currentQuarter = ceil(now()->month / 3);
-                $startMonth = ($currentQuarter - 1) * 3 + 1;
-                $endMonth = $currentQuarter * 3;
-                break;
-            case 'semester':
-                $startMonth = now()->month <= 6 ? 1 : 7;
-                $endMonth = now()->month <= 6 ? 6 : 12;
-                break;
-            case 'custom-range':
-                if ($monthRange) {
-                    list($startMonth, $endMonth) = explode('-', $monthRange);
-                }
-                break;
-        }
+        list($startMonth, $endMonth) = $this->getReportMonthRange($reportType, $monthRange);
 
         // Get fuel slips data for the period
         $fuelQuery = FuelSlip::whereIn('user_id', $ids)
@@ -256,9 +277,10 @@ class DashboardController extends Controller
 
         $periodLabel = match($reportType) {
             'current-month' => Carbon::createFromDate(null, $startMonth, 1)->format('F Y'),
+            'single-month' => Carbon::createFromDate(null, $startMonth, 1)->format('F Y'),
             'quarterly' => "Q" . ceil($startMonth/3) . " $year",
             'semester' => ($startMonth == 1 ? 'First' : 'Second') . " Semester $year",
-            'custom-range' => Carbon::createFromDate(null, $startMonth, 1)->format('F') . ' - ' . Carbon::createFromDate(null, $endMonth, 1)->format('F Y'),
+            'custom-range' => Carbon::createFromDate(null, (int)$startMonth, 1)->format('F') . ' - ' . Carbon::createFromDate(null, (int)$endMonth, 1)->format('F Y'),
             default => "$year"
         };
 
@@ -773,29 +795,7 @@ class DashboardController extends Controller
         $ids = $boardmembers->pluck('id');
 
         // Calculate date range based on report type
-        $startMonth = 1;
-        $endMonth = 12;
-
-        switch ($reportType) {
-            case 'current-month':
-                $startMonth = now()->month;
-                $endMonth = now()->month;
-                break;
-            case 'quarterly':
-                $currentQuarter = ceil(now()->month / 3);
-                $startMonth = ($currentQuarter - 1) * 3 + 1;
-                $endMonth = $currentQuarter * 3;
-                break;
-            case 'semester':
-                $startMonth = now()->month <= 6 ? 1 : 7;
-                $endMonth = now()->month <= 6 ? 6 : 12;
-                break;
-            case 'custom-range':
-                if ($monthRange) {
-                    list($startMonth, $endMonth) = explode('-', $monthRange);
-                }
-                break;
-        }
+        list($startMonth, $endMonth) = $this->getReportMonthRange($reportType, $monthRange);
 
         // Get fuel slips data for the period
         $fuelQuery = FuelSlip::whereIn('user_id', $ids)
@@ -856,9 +856,10 @@ class DashboardController extends Controller
 
         $periodLabel = match($reportType) {
             'current-month' => Carbon::createFromDate(null, $startMonth, 1)->format('F Y'),
+            'single-month' => Carbon::createFromDate(null, $startMonth, 1)->format('F Y'),
             'quarterly' => "Q" . ceil($startMonth/3) . " $year",
             'semester' => ($startMonth == 1 ? 'First' : 'Second') . " Semester $year",
-            'custom-range' => Carbon::createFromDate(null, $startMonth, 1)->format('F') . ' - ' . Carbon::createFromDate(null, $endMonth, 1)->format('F Y'),
+            'custom-range' => Carbon::createFromDate(null, (int)$startMonth, 1)->format('F') . ' - ' . Carbon::createFromDate(null, (int)$endMonth, 1)->format('F Y'),
             default => "$year"
         };
 

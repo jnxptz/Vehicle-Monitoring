@@ -8,57 +8,70 @@
 <link rel="stylesheet" href="{{ asset('css/fuel-slips-styles.css') }}">
 
 <style>
-    /* Hide hamburger menu on desktop (larger screens) */
-    @media (min-width: 769px) {
-        .hamburger-menu-wrapper {
-            display: none !important;
-        }
-
-        .dashboard-nav {
-            display: flex !important;
-        }
+    /* Fixed Header and Sidebar Layout */
+    .dashboard-header {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 100%;
+        z-index: 1100 !important;
+        background: rgba(255, 255, 255, 0.98) !important;
+        backdrop-filter: blur(10px);
+        height: 70px;
+        padding: 10px 20px !important;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
     }
 
-    /* Mobile responsive table styles */
+    .dashboard-body {
+        margin-top: 70px; /* Offset for fixed header */
+        display: flex;
+        height: calc(100vh - 70px);
+        overflow: hidden;
+        padding: 0 !important;
+        gap: 0 !important;
+    }
+
+    .dashboard-nav {
+        position: fixed !important;
+        top: 70px;
+        left: 0;
+        width: 240px;
+        height: calc(100vh - 70px) !important;
+        overflow-y: auto;
+        z-index: 1000;
+        border-radius: 0 !important;
+        margin: 0 !important;
+        border-right: 1px solid #e2e8f0;
+        flex: none !important;
+        display: flex !important;
+        flex-direction: column !important;
+    }
+
+    .dashboard-container {
+        margin-left: 240px; /* Offset for fixed sidebar */
+        display: flex !important;
+        flex-direction: column !important;
+        flex: 1;
+        overflow-y: auto !important;
+        height: calc(100vh - 70px);
+        padding: 24px !important;
+        border: none !important;
+        border-radius: 0 !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        scrollbar-width: thin;
+    }
+
+    /* Mobile overrides */
     @media (max-width: 768px) {
-        .table-wrapper {
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
+        .dashboard-nav {
+            display: none !important;
         }
-
-        table {
-            width: 100%;
-            min-width: 600px;
-            font-size: 12px;
-        }
-
-        th {
-            padding: 8px 4px !important;
-            font-size: 11px !important;
-            white-space: nowrap;
-        }
-
-        td {
-            padding: 6px 4px !important;
-            font-size: 11px !important;
-            word-wrap: break-word;
-        }
-
-        .details-row div[style*="display:grid"] {
-            grid-template-columns: 1fr !important;
-            gap: 8px !important;
-        }
-
-        .details-row div[style*="display:grid"] > div {
-            min-width: 0 !important;
-            word-wrap: break-word;
-            overflow-wrap: break-word;
-            font-size: 10px !important;
-        }
-
-        .details-row div[style*="display:grid"] > div div {
-            margin-bottom: 1px !important;
-            font-size: 10px !important;
+        .dashboard-container {
+            margin-left: 0 !important;
+            padding: 16px !important;
         }
     }
 </style>
@@ -866,8 +879,5 @@
 </script>
 <script src="{{ asset('js/fuel-slips.js') }}"></script>
 
-<footer class="dashboard-footer">
-    &copy; {{ date('Y') }} <span>Vehicle Monitoring System</span> <span class="footer-divider">|</span> Sangguniang Panlalawigan - Provincial Government of La Union
-</footer>
 
 @endsection

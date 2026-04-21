@@ -56,7 +56,7 @@ class AuthController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
@@ -90,11 +90,16 @@ class AuthController extends Controller
     public function sendPasswordReset(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
         ]);
 
         // Get user by email
         $user = User::where('email', $request->email)->first();
+
+        // If user doesn't exist, still show success to prevent enumeration
+        if (!$user) {
+            return back()->with('status', 'If an account exists with that email, you will receive a password reset link.');
+        }
 
         // Generate a unique token
         $token = Str::random(64);
@@ -114,20 +119,19 @@ class AuthController extends Controller
         // Send email with reset link
         try {
             Mail::send(new ResetPasswordMail($resetUrl, $user->email, $user->name));
-            $emailSent = true;
         } catch (\Exception $e) {
-            // In development, show error details
+            // Log the error internally but don't disclose details to external users
+            \Log::error('Password reset email failed: ' . $e->getMessage());
+            
             if (config('app.debug')) {
-                return back()->with('error', 'Email Error: ' . $e->getMessage());
+                return back()->with('error', 'Email Error (Debug): ' . $e->getMessage());
             }
-            $emailSent = false;
         }
 
         // In development mode, also show the reset link as fallback
         if (config('app.debug')) {
-            return back()->with('status', 'Password reset instructions have been sent to ' . $request->email)
-                        ->with('resetUrl', $resetUrl)
-                        ->with('email', $request->email);
+            return back()->with('status', 'Instructions have been sent to ' . $request->email)
+                        ->with('resetUrl', $resetUrl);
         }
 
         return back()->with('status', 'If an account exists with that email, you will receive a password reset link.');
@@ -143,9 +147,9 @@ class AuthController extends Controller
     public function resetPassword(Request $request)
     {
         $request->validate([
-            'email' => 'required|email|exists:users,email',
+            'email' => 'required|email',
             'token' => 'required|string',
-            'password' => 'required|string|min:6|confirmed',
+            'password' => 'required|string|min:8|confirmed',
         ]);
 
         // Check if token exists and is valid
