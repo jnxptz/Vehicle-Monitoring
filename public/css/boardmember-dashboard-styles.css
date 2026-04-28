@@ -63,37 +63,95 @@
     box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
-/* Export button styling */
+/* Export dropdown styling */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
 .export-btn {
     padding: 10px 18px;
     background: linear-gradient(135deg, #ff9b00 0%, #f59e00 100%);
     color: white;
     border: none;
     border-radius: 8px;
-    font-weight: 600;
-    font-size: 14px;
+    font-weight: 500;
     cursor: pointer;
     transition: all 0.2s ease;
-    box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2);
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .export-btn:hover {
-    background: linear-gradient(135deg, #f59e00 0%, #d97706 100%);
+    background: linear-gradient(135deg, #e68a00 0%, #d97706 100%);
+    transform: translateY(-1px);
     box-shadow: 0 4px 12px rgba(255, 155, 0, 0.3);
-    transform: translateY(-1px);
 }
 
-/* Yearly button */
-.export-btn.yearly {
-    background: linear-gradient(135deg, #fef3c7 0%, #ff9b00 100%);
-    box-shadow: 0 2px 4px rgba(254, 243, 199, 0.2);
+/* Export dropdown styling */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
 }
 
-.export-btn.yearly:hover {
-    /* Darker gradient */
-    background: linear-gradient(135deg, #fde68a 0%, #d97706 100%);
-    box-shadow: 0 4px 12px rgba(254, 215, 123, 0.3);
-    transform: translateY(-1px);
+.dropdown-toggle {
+    padding-right: 14px;
+}
+
+.dropdown-toggle svg {
+    transition: transform 0.2s ease;
+    margin-left: 6px;
+}
+
+.export-dropdown:hover .dropdown-toggle svg {
+    transform: rotate(180deg);
+}
+
+.dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    overflow: hidden;
+}
+
+.export-dropdown:hover .dropdown-menu {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.dropdown-item:hover {
+    background: #f8fafc;
+    color: #ff9b00;
+}
+
+.dropdown-item:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
 }
 
 /* Alerts box styling */
@@ -159,6 +217,7 @@
 .kpi-card {
     background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
     border: 1px solid #e2e8f0;
+    border-top: 4px solid #3b82f6;
     border-radius: 12px;
     padding: 20px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
@@ -185,6 +244,23 @@
     color: #1e293b;
 }
 
+/* KPI Card Color Variants */
+.kpi-card-blue {
+    border-top-color: #3b82f6 !important;
+}
+
+.kpi-card-orange {
+    border-top-color: #f59e0b !important;
+}
+
+.kpi-card-green {
+    border-top-color: #10b981 !important;
+}
+
+.kpi-card-purple {
+    border-top-color: #8b5cf6 !important;
+}
+
 /* Dashboard sections */
 .dashboard-sections {
     display: grid;
@@ -208,10 +284,65 @@
 }
 
 .dashboard-card h3 {
-    margin: 0 0 16px 0;
+    margin: 0;
     font-size: 18px;
     color: #1e293b;
     font-weight: 600;
+}
+
+/* Card header with percentage badge */
+.card-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+.percentage-badge {
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: 700;
+    color: white;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #ff9b00 0%, #f59e00 100%);
+}
+
+.badge-primary {
+    background: linear-gradient(135deg, #ff9b00 0%, #f59e00 100%);
+}
+
+.badge-warning {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* Value row styling */
+.value-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    font-size: 14px;
+}
+
+.value-label {
+    font-weight: 600;
+    color: #1e293b;
+}
+
+.value-total {
+    color: #64748b;
+    font-weight: 500;
+}
+
+.text-danger {
+    color: #dc2626;
 }
 
 /* Progress bars */
@@ -232,6 +363,16 @@
 
 .budget-used.warning, .fuel-used.warning {
     background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+}
+
+/* Progress bar labels */
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+    font-size: 12px;
+    color: #64748b;
+    font-weight: 500;
 }
 
 .warning-text {

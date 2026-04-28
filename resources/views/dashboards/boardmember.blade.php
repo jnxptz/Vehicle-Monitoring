@@ -47,11 +47,10 @@
 
 /* Maintenance Alert Styles for Vehicle Pills */
 .maintenance-alert-orange {
-    background: linear-gradient(135deg, #fb923c 0%, #f97316 100%) !important;
-    border: 2px solid #ea580c !important;
-    color: white !important;
+    background: #ffffff !important;
+    border: 2px solid #e2e8f0 !important;
+    color: #1e293b !important;
     position: relative;
-    animation: pulse-orange 2s infinite;
 }
 
 .maintenance-alert-red {
@@ -321,12 +320,22 @@ use Carbon\Carbon;
                                 </option>
                             @endforeach
                         </select>
-                        <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="export-btn btn-primary" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important; box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2) !important;" onmouseover="this.style.background='linear-gradient(135deg, #d97706 0%, #b45309 100%) !important'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 155, 0, 0.3) !important';" onmouseout="this.style.background='linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 155, 0, 0.2) !important';">
-                            Export Monthly PDF
-                        </a>
-                        <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="export-btn btn-primary yearly" style="background: linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important; color: white !important; box-shadow: 0 2px 4px rgba(255, 155, 0, 0.2) !important;" onmouseover="this.style.background='linear-gradient(135deg, #d97706 0%, #b45309 100%) !important'; this.style.transform='translateY(-1px)'; this.style.boxShadow='0 4px 12px rgba(255, 155, 0, 0.3) !important';" onmouseout="this.style.background='linear-gradient(135deg, #ff9b00 0%, #d97706 100%) !important'; this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 4px rgba(255, 155, 0, 0.2) !important';">
-                            Export Yearly PDF
-                        </a>
+                        <div class="export-dropdown">
+                            <button type="button" class="export-btn dropdown-toggle">
+                                <span>📄 Export</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="{{ route('boardmember.dashboard.pdf', ['month' => $selectedMonth ?? now()->month]) }}" class="dropdown-item">
+                                    <span>📊</span> Monthly Report
+                                </a>
+                                <a href="{{ route('boardmember.dashboard.yearly.pdf') }}" class="dropdown-item">
+                                    <span>📈</span> Yearly Report
+                                </a>
+                            </div>
+                        </div>
                     </form>
                 @endif
             </div>
@@ -386,19 +395,19 @@ use Carbon\Carbon;
 
             @if(isset($vehicle) && $vehicle)
                 <div class="kpi-grid">
-                    <div class="kpi-card kpi-card-style">
+                    <div class="kpi-card kpi-card-blue">
                         <h4>Yearly Budget</h4>
                         <p>₱{{ number_format($yearlyBudget, 2) }}</p>
                     </div>
-                    <div class="kpi-card">
+                    <div class="kpi-card kpi-card-orange">
                         <h4>Budget Used</h4>
                         <p>₱{{ number_format($yearlyBudget - $remainingBudget, 2) }}</p>
                     </div>
-                    <div class="kpi-card">
+                    <div class="kpi-card kpi-card-green">
                         <h4>Remaining Budget</h4>
                         <p>₱{{ number_format($remainingBudget, 2) }}</p>
                     </div>
-                    <div class="kpi-card">
+                    <div class="kpi-card kpi-card-purple">
                         <h4>Fuel Used ({{ $selectedMonthName ?? \Carbon\Carbon::now()->format('F') }})</h4>
                         <p>{{ $monthlyLitersUsed }} L</p>
                     </div>
@@ -408,31 +417,47 @@ use Carbon\Carbon;
 
                 <div class="dashboard-sections">
                     <div class="dashboard-card">
-                        <h3>Budget Progress</h3>
-                        <div>
-                            <span>Used</span>
-                            <span>{{ $budgetUsedPercentage }}%</span>
+                        <div class="card-header-row">
+                            <h3>Budget Progress</h3>
+                            <span class="percentage-badge {{ $budgetUsedPercentage >= 80 ? 'badge-danger' : ($budgetUsedPercentage >= 50 ? 'badge-warning' : 'badge-success') }}">{{ $budgetUsedPercentage }}%</span>
+                        </div>
+                        <div class="value-row">
+                            <span class="value-label">₱{{ number_format($yearlyBudget - $remainingBudget, 0) }} used</span>
+                            <span class="value-total">₱{{ number_format($yearlyBudget, 0) }} total</span>
                         </div>
                         <div class="budget-bar">
                             <div class="budget-used {{ $budgetUsedPercentage >= 80 ? 'warning' : '' }}" style="width: {{ $budgetUsedPercentage }}%;"></div>
                         </div>
-                        <p>₱{{ number_format($yearlyBudget - $remainingBudget, 2) }} used of ₱{{ number_format($yearlyBudget, 2) }}</p>
+                        <div class="progress-labels">
+                            <span>0%</span>
+                            <span>50%</span>
+                            <span>100%</span>
+                        </div>
                     </div>
 
                     <div class="dashboard-card">
-                        <h3>Fuel Consumption</h3>
-                        <div>
-                            <span>{{ $monthlyLitersUsed }} L / {{ $monthlyLimit }} L</span>
+                        <div class="card-header-row">
+                            <h3>Fuel Consumption</h3>
                             @php
                                 $fuelPercent = $monthlyLimit > 0 ? round(($monthlyLitersUsed / $monthlyLimit) * 100, 2) : 0;
                                 if ($fuelPercent > 100) $fuelPercent = 100;
+                                $isOverLimit = $monthlyLitersUsed > $monthlyLimit;
                             @endphp
-                            <span class="{{ $monthlyLitersUsed > $monthlyLimit ? 'text-danger' : 'text-primary' }}">{{ $fuelPercent }}%</span>
+                            <span class="percentage-badge {{ $isOverLimit ? 'badge-danger' : ($fuelPercent >= 80 ? 'badge-warning' : 'badge-primary') }}">{{ $fuelPercent }}%</span>
+                        </div>
+                        <div class="value-row">
+                            <span class="value-label {{ $isOverLimit ? 'text-danger' : '' }}">{{ $monthlyLitersUsed }} L used</span>
+                            <span class="value-total">{{ $monthlyLimit }} L limit</span>
                         </div>
                         <div class="fuel-bar">
-                            <div class="fuel-used {{ $monthlyLitersUsed > $monthlyLimit ? 'warning' : '' }}" style="width: {{ $fuelPercent }}%;"></div>
+                            <div class="fuel-used {{ $isOverLimit ? 'warning' : '' }}" style="width: {{ $fuelPercent }}%;"></div>
                         </div>
-                        @if($monthlyLitersUsed > $monthlyLimit)
+                        <div class="progress-labels">
+                            <span>0L</span>
+                            <span>{{ round($monthlyLimit / 2) }}L</span>
+                            <span>{{ $monthlyLimit }}L</span>
+                        </div>
+                        @if($isOverLimit)
                             <p class="warning-text"><strong>⚠ Warning:</strong> Exceeded fuel limit!</p>
                         @endif
                     </div>
@@ -550,10 +575,6 @@ use Carbon\Carbon;
         </div> 
     </div> 
 </div>
-
-<script>
-// No toggle functionality needed - cards display all information directly
-</script>
 
 <script src="{{ asset('js/boardmember-dashboard.js') }}"></script>
 @endsection

@@ -4,68 +4,6 @@
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/admin-dashboard-styles.css') }}">
-<style>
-    /* Fixed Header and Sidebar Layout */
-    .dashboard-header {
-        position: fixed !important;
-        top: 0;
-        left: 0;
-        width: 100%;
-        z-index: 1100 !important;
-        background: rgba(255, 255, 255, 0.98) !important;
-        backdrop-filter: blur(10px);
-        height: 70px;
-    }
-
-    .dashboard-body {
-        margin-top: 70px; /* Offset for fixed header */
-        display: flex;
-        height: calc(100vh - 70px);
-        overflow: hidden;
-        padding: 0 !important;
-        gap: 0 !important;
-    }
-
-    .dashboard-nav {
-        position: fixed !important;
-        top: 70px;
-        left: 0;
-        width: 240px;
-        height: calc(100vh - 70px) !important;
-        overflow-y: auto;
-        z-index: 1000;
-        border-radius: 0 !important;
-        margin: 0 !important;
-        border-right: 1px solid #e2e8f0;
-        flex: none !important;
-    }
-
-    .dashboard-container {
-        margin-left: 240px; /* Offset for fixed sidebar */
-        display: flex !important;
-        flex-direction: column !important;
-        flex: 1;
-        overflow-y: auto !important;
-        height: calc(100vh - 70px);
-        padding: 24px !important;
-        border: none !important;
-        border-radius: 0 !important;
-        background: transparent !important;
-        box-shadow: none !important;
-        scrollbar-width: thin;
-    }
-
-    /* Mobile overrides */
-    @media (max-width: 768px) {
-        .dashboard-nav {
-            display: none !important;
-        }
-        .dashboard-container {
-            margin-left: 0 !important;
-            padding: 16px !important;
-        }
-    }
-</style>
 <div class="dashboard-page">
     <!-- HEADER -->
     <div class="dashboard-header">
@@ -178,16 +116,22 @@
                             </select>
                         </div>
 
-                        <!-- PDF Buttons -->
-                        <div style="display: flex; gap: 8px; align-items: flex-end;">
-                            <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #2563eb; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(37,99,235,0.2); text-decoration: none;" onmouseover="this.style.background='#1d4ed8';" onmouseout="this.style.background='#2563eb';">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Monthly (PDF)
-                            </a>
-                            <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="export-btn" style="display: inline-flex; align-items: center; justify-content: center; gap: 6px; padding: 6px 16px; border-radius: 6px; font-size: 13px; font-weight: 600; color: #ffffff; background: #10b981; border: none; cursor: pointer; transition: all 0.2s; box-shadow: 0 1px 2px rgba(16,185,129,0.2); text-decoration: none;" onmouseover="this.style.background='#059669';" onmouseout="this.style.background='#10b981';">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-                                Yearly (PDF)
-                            </a>
+                        <!-- Export Dropdown -->
+                        <div class="export-dropdown">
+                            <button type="button" class="export-btn dropdown-toggle">
+                                <span>📄 Export</span>
+                                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M2.5 4.5L6 8L9.5 4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                            <div class="dropdown-menu">
+                                <a href="{{ route('admin.dashboard.monthly.pdf', ['month' => $selectedMonth, 'office' => $selectedOffice, 'year' => $year]) }}" class="dropdown-item">
+                                    <span>📊</span> Monthly Report
+                                </a>
+                                <a href="{{ route('admin.dashboard.yearly.pdf') }}" class="dropdown-item">
+                                    <span>📈</span> Yearly Report
+                                </a>
+                            </div>
                         </div>
                     </div>
                 </form>
@@ -346,188 +290,160 @@
                 </table>
             </div>
 
-            <!-- Line Chart -->
-            <div style="background: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-top: 16px; width: 100%;">
-                <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1e293b;">Daily Expenses ({{ $selectedMonthName }} {{ $year }})</h4>
-                <div style="height: 300px;">
-                    <canvas id="fuelSlipTrendChart"></canvas>
+            <!-- Charts Container - Side by Side -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+                <!-- Daily Expenses Chart -->
+                <div style="background: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Daily Expenses ({{ $selectedMonthName }} {{ $year }})</h4>
+                    <div style="height: 220px;">
+                        <canvas id="fuelSlipTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Monthly Fuel Consumption Chart -->
+                <div style="background: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);">
+                    <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Monthly Fuel Consumption (Liters)</h4>
+                    <div style="height: 220px;">
+                        <canvas id="monthlyConsumptionChart"></canvas>
+                    </div>
                 </div>
             </div>
 
+            <!-- Budget Burn Rate Chart (Full Width) 
+            <div style="background: #ffffff; border-radius: 12px; padding: 20px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-top: 16px;">
+                <h4 style="margin: 0 0 16px 0; font-size: 16px; font-weight: 600; color: #1e293b;">Budget Burn Rate - Actual vs Projected ({{ $year }})</h4>
+                <div style="height: 300px;">
+                    <canvas id="budgetBurnChart"></canvas>
+                </div>
+            </div>
+-->
+            @php
+                // Get daily data for the selected month
+                $dailyFuelSlipCounts = [];
+                $dailyFuelCosts = [];
+                $dailyMaintenanceCosts = [];
+                $daysInMonth = \Carbon\Carbon::create($year, $selectedMonth)->daysInMonth;
+                
+                for($day = 1; $day <= $daysInMonth; $day++) {
+                    $date = \Carbon\Carbon::create($year, $selectedMonth, $day)->format('Y-m-d');
+                    
+                    // Fuel slip count
+                    $count = \App\Models\FuelSlip::whereMonth('date', $selectedMonth)
+                        ->whereYear('date', $year)
+                        ->whereDay('date', $day)
+                        ->when($selectedOffice, function($query) use ($selectedOffice) {
+                            return $query->whereHas('user', function($q) use ($selectedOffice) {
+                                $q->where('office_id', $selectedOffice);
+                            });
+                        })
+                        ->count();
+                    $dailyFuelSlipCounts[] = $count;
+                    
+                    // Fuel costs
+                    $fuelCost = \App\Models\FuelSlip::whereMonth('date', $selectedMonth)
+                        ->whereYear('date', $year)
+                        ->whereDay('date', $day)
+                        ->when($selectedOffice, function($query) use ($selectedOffice) {
+                            return $query->whereHas('user', function($q) use ($selectedOffice) {
+                                $q->where('office_id', $selectedOffice);
+                            });
+                        })
+                        ->sum('total_cost') ?? 0;
+                    $dailyFuelCosts[] = $fuelCost;
+                    
+                    // Maintenance costs
+                    $maintenanceCost = \App\Models\Maintenance::whereMonth('date', $selectedMonth)
+                        ->whereYear('date', $year)
+                        ->whereDay('date', $day)
+                        ->when($selectedOffice, function($query) use ($selectedOffice) {
+                            return $query->whereHas('vehicle', function($q) use ($selectedOffice) {
+                                $q->where('office_id', $selectedOffice);
+                            });
+                        })
+                        ->sum('cost') ?? 0;
+                    $dailyMaintenanceCosts[] = $maintenanceCost;
+                }
+                
+                $dayLabels = [];
+                for($day = 1; $day <= $daysInMonth; $day++) {
+                    $dayLabels[] = $day;
+                }
+
+                // Monthly fuel consumption (last 12 months)
+                $monthlyConsumption = [];
+                $monthLabels = [];
+                for($i = 11; $i >= 0; $i--) {
+                    $monthDate = \Carbon\Carbon::now()->subMonths($i);
+                    $monthLabels[] = $monthDate->format('M Y');
+                    $liters = \App\Models\FuelSlip::whereMonth('date', $monthDate->month)
+                        ->whereYear('date', $monthDate->year)
+                        ->when($selectedOffice, function($query) use ($selectedOffice) {
+                            return $query->whereHas('user', function($q) use ($selectedOffice) {
+                                $q->where('office_id', $selectedOffice);
+                            });
+                        })
+                        ->sum('liters') ?? 0;
+                    $monthlyConsumption[] = $liters;
+                }
+
+                // 3. Budget burn rate - cumulative spending by day of year
+                $startOfYear = \Carbon\Carbon::create($year, 1, 1);
+                $today = \Carbon\Carbon::now();
+                $endOfYear = \Carbon\Carbon::create($year, 12, 31);
+                $daysInYear = $startOfYear->isLeapYear() ? 366 : 365;
+                $currentDayOfYear = min($today->dayOfYear, $daysInYear);
+                
+                $budgetBurnLabels = [];
+                $budgetBurnActual = [];
+                $budgetBurnProjected = [];
+                $totalYearlyBudget = $rows->sum('yearlyBudget');
+                
+                // Calculate actual cumulative spending up to today
+                $cumulativeSpent = 0;
+                for($d = 1; $d <= $currentDayOfYear; $d++) {
+                    $date = $startOfYear->copy()->addDays($d - 1);
+                    $dailySpent = \App\Models\FuelSlip::whereDate('date', $date)
+                        ->when($selectedOffice, function($query) use ($selectedOffice) {
+                            return $query->whereHas('user', function($q) use ($selectedOffice) {
+                                $q->where('office_id', $selectedOffice);
+                            });
+                        })
+                        ->sum('total_cost') ?? 0;
+                    $dailySpent += \App\Models\Maintenance::whereDate('date', $date)
+                        ->when($selectedOffice, function($query) use ($selectedOffice) {
+                            return $query->whereHas('vehicle', function($q) use ($selectedOffice) {
+                                $q->where('office_id', $selectedOffice);
+                            });
+                        })
+                        ->sum('cost') ?? 0;
+                    $cumulativeSpent += $dailySpent;
+                    
+                    if ($d % 7 === 0 || $d === $currentDayOfYear) { // Weekly points
+                        $budgetBurnLabels[] = 'Week ' . ceil($d / 7);
+                        $budgetBurnActual[] = $cumulativeSpent;
+                        $budgetBurnProjected[] = ($totalYearlyBudget / $daysInYear) * $d; // Linear projection
+                    }
+                }
+            @endphp
+
+            <!-- Pass chart data to JavaScript -->
             <script>
-                @php
-                    // Get daily data for the selected month
-                    $dailyFuelSlipCounts = [];
-                    $dailyFuelCosts = [];
-                    $dailyMaintenanceCosts = [];
-                    $daysInMonth = \Carbon\Carbon::create($year, $selectedMonth)->daysInMonth;
-                    
-                    for($day = 1; $day <= $daysInMonth; $day++) {
-                        $date = \Carbon\Carbon::create($year, $selectedMonth, $day)->format('Y-m-d');
-                        
-                        // Fuel slip count
-                        $count = \App\Models\FuelSlip::whereMonth('date', $selectedMonth)
-                            ->whereYear('date', $year)
-                            ->whereDay('date', $day)
-                            ->when($selectedOffice, function($query) use ($selectedOffice) {
-                                return $query->whereHas('user', function($q) use ($selectedOffice) {
-                                    $q->where('office_id', $selectedOffice);
-                                });
-                            })
-                            ->count();
-                        $dailyFuelSlipCounts[] = $count;
-                        
-                        // Fuel costs
-                        $fuelCost = \App\Models\FuelSlip::whereMonth('date', $selectedMonth)
-                            ->whereYear('date', $year)
-                            ->whereDay('date', $day)
-                            ->when($selectedOffice, function($query) use ($selectedOffice) {
-                                return $query->whereHas('user', function($q) use ($selectedOffice) {
-                                    $q->where('office_id', $selectedOffice);
-                                });
-                            })
-                            ->sum('total_cost') ?? 0;
-                        $dailyFuelCosts[] = $fuelCost;
-                        
-                        // Maintenance costs
-                        $maintenanceCost = \App\Models\Maintenance::whereMonth('date', $selectedMonth)
-                            ->whereYear('date', $year)
-                            ->whereDay('date', $day)
-                            ->when($selectedOffice, function($query) use ($selectedOffice) {
-                                return $query->whereHas('vehicle', function($q) use ($selectedOffice) {
-                                    $q->where('office_id', $selectedOffice);
-                                });
-                            })
-                            ->sum('cost') ?? 0;
-                        $dailyMaintenanceCosts[] = $maintenanceCost;
-                    }
-                    
-                    $dayLabels = [];
-                    for($day = 1; $day <= $daysInMonth; $day++) {
-                        $dayLabels[] = $day;
-                    }
-                @endphp
-
-                const dayLabels = @json($dayLabels);
-                const dailyFuelSlipCounts = @json($dailyFuelSlipCounts);
-                const dailyFuelCosts = @json($dailyFuelCosts);
-                const dailyMaintenanceCosts = @json($dailyMaintenanceCosts);
-
-                const ctx = document.getElementById('fuelSlipTrendChart').getContext('2d');
-                new Chart(ctx, {
-                    type: 'line',
-                    data: {
-                        labels: dayLabels,
-                        datasets: [
-                            {
-                                label: 'Fuel Costs',
-                                data: dailyFuelCosts,
-                                borderColor: '#f59e0b',
-                                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4,
-                                pointRadius: 3,
-                                pointBackgroundColor: '#f59e0b',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                yAxisID: 'y'
-                            },
-                            {
-                                label: 'Maintenance Costs',
-                                data: dailyMaintenanceCosts,
-                                borderColor: '#10b981',
-                                backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                                borderWidth: 2,
-                                fill: true,
-                                tension: 0.4,
-                                pointRadius: 3,
-                                pointBackgroundColor: '#10b981',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                yAxisID: 'y'
-                            }
-                        ]
+                window.dashboardChartData = {
+                    dayLabels: @json($dayLabels),
+                    dailyFuelCosts: @json($dailyFuelCosts),
+                    dailyMaintenanceCosts: @json($dailyMaintenanceCosts),
+                    monthlyConsumption: {
+                        labels: @json($monthLabels),
+                        data: @json($monthlyConsumption)
                     },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    padding: 20,
-                                    font: {
-                                        size: 12,
-                                        weight: 600
-                                    }
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: 'rgba(30, 64, 175, 0.9)',
-                                padding: 10,
-                                cornerRadius: 6,
-                                callbacks: {
-                                    title: function(context) {
-                                        return 'Day ' + context[0].label;
-                                    },
-                                    label: function(context) {
-                                        return context.dataset.label + ': ₱' + context.parsed.y.toLocaleString();
-                                    }
-                                }
-                            }
-                        },
-                        scales: {
-                            y: {
-                                beginAtZero: true,
-                                ticks: {
-                                    font: {
-                                        size: 11
-                                    },
-                                    callback: function(value) {
-                                        return '₱' + value.toLocaleString();
-                                    }
-                                },
-                                grid: {
-                                    display: true,
-                                    color: 'rgba(0, 0, 0, 0.05)'
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Amount (₱)',
-                                    font: {
-                                        size: 11,
-                                        weight: 600
-                                    }
-                                }
-                            },
-                            x: {
-                                ticks: {
-                                    font: {
-                                        size: 10
-                                    },
-                                    maxRotation: 45,
-                                    minRotation: 45
-                                },
-                                grid: {
-                                    display: false
-                                },
-                                title: {
-                                    display: true,
-                                    text: 'Day of Month',
-                                    font: {
-                                        size: 11,
-                                        weight: 600
-                                    }
-                                }
-                            }
-                        }
+                    budgetBurn: {
+                        labels: @json($budgetBurnLabels),
+                        actual: @json($budgetBurnActual),
+                        projected: @json($budgetBurnProjected),
+                        totalBudget: {{ $totalYearlyBudget }}
                     }
-                });
+                };
             </script>
-
         </div>
     </div>
 </div>

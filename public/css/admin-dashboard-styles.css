@@ -1,5 +1,79 @@
 /* Admin Dashboard Specific Styles */
 
+/* Fixed Header and Sidebar Layout */
+.dashboard-header {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    width: 100%;
+    z-index: 1100 !important;
+    background: rgba(255, 255, 255, 0.98) !important;
+    backdrop-filter: blur(10px);
+    height: 70px;
+}
+
+.dashboard-body {
+    margin-top: 70px; /* Offset for fixed header */
+    display: flex;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+    padding: 0 !important;
+    gap: 0 !important;
+}
+
+.dashboard-nav {
+    position: fixed !important;
+    top: 70px;
+    left: 0;
+    width: 240px;
+    height: calc(100vh - 70px) !important;
+    overflow-y: auto;
+    z-index: 1000;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    border-right: 1px solid #e2e8f0;
+    flex: none !important;
+}
+
+.dashboard-container {
+    margin-left: 240px; /* Offset for fixed sidebar */
+    display: flex !important;
+    flex-direction: column !important;
+    flex: 1;
+    overflow-y: auto !important;
+    height: calc(100vh - 70px);
+    padding: 24px !important;
+    border: none !important;
+    border-radius: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE/Edge */
+}
+
+/* Hide scrollbar for Chrome/Safari/Opera */
+.dashboard-container::-webkit-scrollbar,
+.dashboard-nav::-webkit-scrollbar {
+    display: none;
+}
+
+/* Hide scrollbar for Firefox */
+.dashboard-nav {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+/* Mobile overrides for layout */
+@media (max-width: 768px) {
+    .dashboard-nav {
+        display: none !important;
+    }
+    .dashboard-container {
+        margin-left: 0 !important;
+        padding: 16px !important;
+    }
+}
+
 /* Logout form styling */
 .logout-form {
     margin-top: auto;
@@ -65,7 +139,68 @@
     box-shadow: 0 4px 12px rgba(255, 155, 0, 0.3);
 }
 
-/* KPI Grid styling */
+/* Export dropdown styling */
+.export-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.export-dropdown .dropdown-toggle svg:last-child {
+    transition: transform 0.2s ease;
+    margin-left: 4px;
+}
+
+.export-dropdown:hover .dropdown-toggle svg:last-child {
+    transform: rotate(180deg);
+}
+
+.export-dropdown .dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 8px;
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+    min-width: 180px;
+    opacity: 0;
+    visibility: hidden;
+    transform: translateY(-10px);
+    transition: all 0.2s ease;
+    z-index: 1000;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.export-dropdown:hover .dropdown-menu,
+.export-dropdown .dropdown-menu:hover {
+    opacity: 1;
+    visibility: visible;
+    transform: translateY(0);
+    pointer-events: auto;
+}
+
+.export-dropdown .dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 16px;
+    color: #1e293b;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.15s ease;
+}
+
+.export-dropdown .dropdown-item:hover {
+    background: #f8fafc;
+    color: #2563eb;
+}
+
+.export-dropdown .dropdown-item:not(:last-child) {
+    border-bottom: 1px solid #f1f5f9;
+}
+
 /* KPI Grid styling */
 .kpi-grid {
     display: flex;
