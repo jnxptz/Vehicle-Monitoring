@@ -22,12 +22,11 @@ RUN apt-get update && apt-get install -y \
 RUN curl -sS https://getcomposer.org/installer | php \
     && mv composer.phar /usr/local/bin/composer
 
-# Copy existing project files
+# Copy project files FIRST
 COPY . /var/www/html
 
-# Set permissions (optional but recommended)
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Install Laravel dependencies
+RUN composer install
 
 # Create and set permissions for Laravel directories
 RUN mkdir -p storage/logs bootstrap/cache \
