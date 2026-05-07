@@ -31,7 +31,7 @@ RUN apt-get update && apt-get install -y \
 COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 # Copy project files
-COPY . .
+COPY . /var/www/html
 
 # Create Laravel directories
 RUN mkdir -p storage/logs bootstrap/cache
