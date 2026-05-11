@@ -20,7 +20,6 @@
             width: 100%;
             border-collapse: collapse;
             margin-bottom: 14px;
-            border-bottom: 2px solid #1976d2;
         }
         .header-table td { vertical-align: middle; padding-bottom: 10px; }
         .header-logo { width: 36px; text-align: center; padding: 0 4px; }
@@ -56,8 +55,7 @@
         }
         .card {
             width: 50%;
-            background: #f7f9fd;
-            border: 1px solid #d0d9e8;
+            background: #f0f4fb;
             border-radius: 5px;
             padding: 10px 14px;
             text-align: center;
@@ -77,13 +75,16 @@
             padding: 7px 10px; text-align: left;
             font-weight: 600; font-size: 10px; letter-spacing: 0.3px;
         }
-        .data-table th.tr, .data-table td.tr { text-align: right; }
-        .data-table th.tc, .data-table td.tc { text-align: center; }
-        .data-table td { padding: 6px 10px; border-bottom: 1px solid #e8edf4; color: #333; }
+        .data-table td {
+            padding: 7px 10px;
+            color: #444; font-size: 10.5px;
+            vertical-align: middle;
+        }
+        .data-table tr:nth-child(even) { background: #f8fafc; }
         .data-table tbody tr:nth-child(even) { background: #f7f9fd; }
         .data-table tfoot td {
             background: #e8f0fb; font-weight: 700;
-            padding: 7px 10px; border-top: 2px solid #c0cfe8;
+            padding: 7px 10px;
         }
 
         /* ── VEHICLE SECTION ── */
@@ -95,9 +96,24 @@
         }
 
         /* ── STATUS COLORS ── */
-        .status-high   { color: #dc2626; font-weight: 600; }
-        .status-medium { color: #f59e0b; font-weight: 600; }
-        .status-low    { color: #059669; font-weight: 600; }
+        .status-normal  { color: #059669; font-weight: 700; }
+        .status-warning { color: #d97706; font-weight: 700; }
+        .status-danger  { color: #dc2626; font-weight: 700; }
+
+        /* ── BADGES ── */
+        .badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+        .badge-success { background: #d1fae5; color: #065f46; }
+        .badge-danger  { background: #fee2e2; color: #991b1b; }
+        .badge-warning { background: #fef3c7; color: #92400e; }
+        .badge-primary { background: #dbeafe; color: #1e40af; }
 
         /* ── HIGHLIGHT ── */
         .highlight-box {

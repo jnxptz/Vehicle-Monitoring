@@ -119,12 +119,11 @@ class MaintenanceController extends Controller
 
     public function create()
     {
-        $vehicles = Vehicle::orderBy('plate_number')->get();
-        if ($vehicles->isEmpty()) {
-            return redirect()->route('maintenances.index')
-                ->with('error', 'Add at least one vehicle before creating a maintenance record.');
-        }
-        return view('maintenances.create', compact('vehicles'));
+        $vehicles = Vehicle::with('bm')->get();
+        $boardmembers = User::where('role', 'boardmember')->with(['vehicles' => function($query) {
+            $query->select('id', 'vehicle_name', 'plate_number', 'current_km', 'bm_id');
+        }])->get();
+        return view('maintenances.create', compact('vehicles', 'boardmembers'));
     }
 
     public function store(Request $request)
@@ -163,7 +162,7 @@ class MaintenanceController extends Controller
                     $emailStatus = 'Email notification sent.';
                 } catch (\Exception $e) {
                     \Log::error('Failed to send maintenance notification email: ' . $e->getMessage());
-                    $emailStatus = 'Email notification failed.';
+                    $emailStatus = 'Email notification failed: ' . $e->getMessage();
                 }
             } else {
                 $emailStatus = 'No email notification (boardmember has no email).';

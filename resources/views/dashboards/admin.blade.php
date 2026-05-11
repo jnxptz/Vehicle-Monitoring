@@ -448,4 +448,22 @@
     </div>
 </div>
 <script src="{{ asset('js/admin-dashboard.js') }}"></script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        var dropdowns = document.querySelectorAll('.export-dropdown');
+        dropdowns.forEach(function(dd) {
+            var toggle = dd.querySelector('.dropdown-toggle');
+            if (toggle) {
+                toggle.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    dd.classList.toggle('show');
+                });
+            }
+        });
+        document.addEventListener('click', function() {
+            dropdowns.forEach(function(dd) { dd.classList.remove('show'); });
+        });
+    });
+</script>
 @endsection

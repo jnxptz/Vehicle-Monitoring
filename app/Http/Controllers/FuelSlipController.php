@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Mail;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Mail\MaintenanceDueMail;
+use App\Mail\FuelSlipCreatedMail;
 
 class FuelSlipController extends Controller
 {
@@ -215,7 +216,7 @@ class FuelSlipController extends Controller
             }
         }
 
-        FuelSlip::create([
+        $fuelSlip = FuelSlip::create([
             'user_id' => $request->boardmember_id,
             'vehicle_id' => $selectedVehicle?->id,
             'vehicle_name' => $selectedVehicle?->vehicle_name ?? $request->vehicle_name,
@@ -235,6 +236,18 @@ class FuelSlipController extends Controller
         // Update vehicle's current_km if vehicle exists
         if ($selectedVehicle) {
             $selectedVehicle->update(['current_km' => $request->km_reading]);
+        }
+
+        // Send email notification to the user
+        try {
+            if ($fuelSlip->user && $fuelSlip->user->email) {
+                Mail::to($fuelSlip->user->email)->send(new FuelSlipCreatedMail($fuelSlip));
+                \Log::info('Fuel slip notification email sent to: ' . $fuelSlip->user->email);
+            } else {
+                \Log::warning('Cannot send fuel slip notification: user or email not found for fuel slip ID ' . $fuelSlip->id);
+            }
+        } catch (\Exception $e) {
+            \Log::error('Failed to send fuel slip notification email: ' . $e->getMessage());
         }
 
         $redirectRoute = auth()->user()->role === 'admin' ? 'admin.dashboard' : 'boardmember.dashboard';

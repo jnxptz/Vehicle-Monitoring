@@ -2,17 +2,17 @@
 
 namespace App\Mail;
 
-use App\Models\Maintenance;
+use App\Models\FuelSlip;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
-class MaintenanceNotificationMail extends Mailable
+class FuelSlipCreatedMail extends Mailable
 {
     use SerializesModels;
 
-    public $maintenance;
+    public $fuelSlip;
     public $vehicle;
     public $user;
     public $timestamp;
@@ -20,11 +20,11 @@ class MaintenanceNotificationMail extends Mailable
     /**
      * Create a new message instance.
      */
-    public function __construct(Maintenance $maintenance)
+    public function __construct(FuelSlip $fuelSlip)
     {
-        $this->maintenance = $maintenance;
-        $this->vehicle = $maintenance->vehicle;
-        $this->user = $maintenance->vehicle?->bm;
+        $this->fuelSlip = $fuelSlip;
+        $this->vehicle = $fuelSlip->vehicle;
+        $this->user = $fuelSlip->user;
         $this->timestamp = now()->format('Y-m-d H:i:s');
     }
 
@@ -34,7 +34,7 @@ class MaintenanceNotificationMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'New Maintenance Record - ' . $this->vehicle?->plate_number . ' - Vehicle Monitoring System',
+            subject: 'New Fuel Slip Recorded - ' . $this->vehicle?->plate_number . ' - Vehicle Monitoring System',
         );
     }
 
@@ -44,7 +44,7 @@ class MaintenanceNotificationMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.maintenance-notification',
+            view: 'emails.fuel-slip-created',
         );
     }
 

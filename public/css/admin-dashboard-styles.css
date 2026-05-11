@@ -110,7 +110,7 @@
 
 /* Export button styling */
 .export-btn {
-    padding: 5px 18px;
+    padding: 7px 5px;
     background: linear-gradient(135deg, var(--primary-orange) 0%, var(--primary-orange-dark) 100%);
     color: white;
     border: none;
@@ -150,7 +150,7 @@
     margin-left: 4px;
 }
 
-.export-dropdown:hover .dropdown-toggle svg:last-child {
+.export-dropdown.show .dropdown-toggle svg:last-child {
     transform: rotate(180deg);
 }
 
@@ -172,8 +172,7 @@
     pointer-events: none;
 }
 
-.export-dropdown:hover .dropdown-menu,
-.export-dropdown .dropdown-menu:hover {
+.export-dropdown.show .dropdown-menu {
     opacity: 1;
     visibility: visible;
     transform: translateY(0);
