@@ -46,12 +46,19 @@ body {
 /* Horizontal Layout */
 .auth-container.horizontal {
     display: flex;
-    width: 1000px;
+    width: 460px;
     max-width: 95vw;
-    height: 650px;
+    height: 650;
     padding: 0;
     border-radius: 20px;
     overflow: hidden;
+}
+
+/* When only auth-form is present, center it */
+.auth-container.horizontal > .auth-form:only-child {
+    width: 100%;
+    max-width: 450px;
+    margin: 0 auto;
 }
 
 .auth-form {
@@ -83,12 +90,20 @@ body {
     background-clip: text;
 }
 
-/* Logo */
+/* Logo in form */
+.auth-logo-form {
+    display: block;
+    width: 280px;
+    margin: 0 auto 25px auto;
+}
+
+/* Logo (right side - deprecated) */
 .auth-logo {
     display: block;
-    height: 520px;
-    width: auto;
-    border-radius: 12px;
+    width: 420px;
+    background: #fff;
+    border-radius: 8px;
+    padding: 0px 40px 0px 40px;
     box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
 }
 
@@ -167,8 +182,8 @@ body {
 /* Link Section */
 .auth-container .link {
     text-align: center;
-    margin-top: 18px;
-    font-size: 14px;
+    margin: 0 0 8px 0;
+    font-size: 26px;
 }
 
 .auth-container .link a {
@@ -254,6 +269,7 @@ body {
 
     .auth-container label {
         font-size: 14px;
+        line-height: 1.3;
         margin: 12px 0 6px;
         text-align: left;
     }
@@ -308,7 +324,8 @@ body {
         align-items: flex-start;
         min-height: 100vh;
         background-attachment: scroll;
-        padding: 20px auto;
+        padding: 20px;
+    margin: 0 auto;
     }
 
     .auth-container {

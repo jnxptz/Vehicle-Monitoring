@@ -10,7 +10,7 @@
     <div class="auth-container horizontal">
         <!-- LEFT: FORM -->
         <div class="auth-form">
-            <h2>Vehicle Monitoring System</h2>
+            <img src="{{ asset('images/drivelogo.png') }}" class="auth-logo-form" alt="Logo">
 
             @if(session('error'))
                 <div class="error">{{ session('error') }}</div>
@@ -40,11 +40,6 @@
                 Don't have an account?
                 <a href="{{ route('register.form') }}">Register here</a>
             </div> -->
-        </div>
-
-        <!-- RIGHT: LOGO -->
-        <div class="auth-logo-right">
-            <img src="{{ asset('images/carlogo.jpg') }}" class="auth-logo" alt="Logo">
         </div>
     </div>
 </body>
