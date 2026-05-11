@@ -202,7 +202,7 @@
                 </div>
                 <div class="info-row">
                     <span class="info-label">Date:</span>
-                    <span class="info-value">{{ $maintenance->date->format('F d, Y') }}</span>
+                    <span class="info-value">{{ \Carbon\Carbon::parse($maintenance->date)->format('F d, Y') }}</span>
                 </div>
                 <div class="info-row">
                     <span class="info-label">Conducted By:</span>

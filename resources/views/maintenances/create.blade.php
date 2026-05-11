@@ -75,6 +75,40 @@
                         @csrf
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
+                            <!-- Boardmember Selection -->
+                            <div>
+                                <label for="boardmember_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">� Select Boardmember</label>
+                                <div style="position: relative;">
+                                    <select id="boardmember_id" name="boardmember_id" required style="
+                                        width: 100%;
+                                        padding: 12px 16px;
+                                        border: 2px solid #e2e8f0;
+                                        border-radius: 10px;
+                                        font-size: 15px;
+                                        font-weight: 500;
+                                        color: #1e293b;
+                                        background: #fff;
+                                        cursor: pointer;
+                                        transition: all 0.2s ease;
+                                        appearance: none;
+                                        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236b7280\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>');
+                                        background-repeat: no-repeat;
+                                        background-position: right 12px center;
+                                        padding-right: 40px;
+                                    " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
+                                        <option value="">Choose a boardmember...</option>
+                                        @foreach($boardmembers as $boardmember)
+                                            <option value="{{ $boardmember->id }}" {{ old('boardmember_id') == $boardmember->id ? 'selected' : '' }}>
+                                                {{ $boardmember->name }}
+                                            </option>
+                                        @endforeach
+                                    </select>
+                                </div>
+                                @error('boardmember_id')
+                                    <div style="color: #dc2626; font-size: 12px; margin-top: 6px; font-weight: 500;">{{ $message }}</div>
+                                @enderror
+                            </div>
+
                             <!-- Vehicle Selection -->
                             <div>
                                 <label for="vehicle_id" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">🚗 Select Vehicle</label>
@@ -83,28 +117,37 @@
                                         width: 100%;
                                         padding: 12px 16px;
                                         border: 2px solid #e2e8f0;
-                                        border-radius: 8px;
-                                        background: #ffffff;
-                                        font-size: 14px;
+                                        border-radius: 10px;
+                                        font-size: 15px;
+                                        font-weight: 500;
                                         color: #1e293b;
-                                        appearance: none;
-                                        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http://www.w3.org/2000/svg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%3E%3Cpath%20d%3D%22M7%2010l5%205%205%205z%22%20fill%3D%22%236b7280%22/%3E%3C/svg%3E');
-                                        background-repeat: no-repeat;
-                                        background-position: right 12px center;
-                                        background-size: 20px;
+                                        background: #fff;
                                         cursor: pointer;
                                         transition: all 0.2s ease;
+                                        appearance: none;
+                                        background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns=\"http://www.w3.org/2000/svg\" width=\"20\" height=\"20\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"%236b7280\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>');
+                                        background-repeat: no-repeat;
+                                        background-position: right 12px center;
+                                        padding-right: 40px;
                                     " onmouseover="this.style.borderColor='#cbd5e1'; this.style.boxShadow='0 0 0 3px rgba(59, 130, 246, 0.1)';" onmouseout="this.style.borderColor='#e2e8f0'; this.style.boxShadow='none';">
                                         <option value="">Choose a vehicle...</option>
                                         @foreach($vehicles as $vehicle)
-                                            <option value="{{ $vehicle->id }}" {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
+                                            <option value="{{ $vehicle->id }}"
+                                                    data-current-km="{{ $vehicle->current_km ?? 0 }}"
+                                                    data-boardmember="{{ $vehicle->bm_id }}"
+                                                    {{ old('vehicle_id') == $vehicle->id ? 'selected' : '' }}>
                                                 {{ $vehicle->plate_number }} - {{ $vehicle->vehicle_name }}
                                             </option>
                                         @endforeach
                                     </select>
                                 </div>
+                                @error('vehicle_id')
+                                    <div style="color: #dc2626; font-size: 12px; margin-top: 6px; font-weight: 500;">{{ $message }}</div>
+                                @enderror
                             </div>
+                        </div>
 
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px;">
                             <!-- Maintenance Type -->
                             <div>
                                 <label for="maintenance_type" style="display: block; margin-bottom: 8px; font-weight: 600; color: #1e293b;">🔧 Maintenance Type</label>
@@ -284,6 +327,69 @@
                                 🚀 Create Maintenance Record
                             </button>
                         </div>
+
+                        <script>
+                            (function() {
+                                const boardmemberSelect = document.getElementById('boardmember_id');
+                                const vehicleSelect = document.getElementById('vehicle_id');
+                                const odometerInput = document.getElementById('maintenance_km');
+                                const originalVehicleOptions = Array.from(vehicleSelect.querySelectorAll('option:not([value=""])'));
+
+                                // Filter vehicles when boardmember is selected
+                                if (boardmemberSelect) {
+                                    boardmemberSelect.addEventListener('change', function() {
+                                        const selectedBoardmemberId = this.value;
+                                        const currentVehicleId = vehicleSelect.value;
+
+                                        // Clear and add default option
+                                        vehicleSelect.innerHTML = '<option value="">Choose a vehicle...</option>';
+                                        odometerInput.value = '';
+
+                                        if (!selectedBoardmemberId) {
+                                            // Show all vehicles if no boardmember selected
+                                            originalVehicleOptions.forEach(opt => vehicleSelect.appendChild(opt.cloneNode(true)));
+                                            return;
+                                        }
+
+                                        // Filter vehicles by boardmember
+                                        const matchingVehicles = originalVehicleOptions.filter(opt => {
+                                            const vehicleBoardmemberId = opt.getAttribute('data-boardmember');
+                                            return vehicleBoardmemberId === selectedBoardmemberId;
+                                        });
+
+                                        matchingVehicles.forEach(opt => vehicleSelect.appendChild(opt.cloneNode(true)));
+
+                                        // Restore selection if it still exists
+                                        if (currentVehicleId) {
+                                            const stillExists = matchingVehicles.some(opt => opt.value === currentVehicleId);
+                                            if (stillExists) {
+                                                vehicleSelect.value = currentVehicleId;
+                                                // Trigger change to auto-fill odometer
+                                                vehicleSelect.dispatchEvent(new Event('change'));
+                                            }
+                                        }
+                                    });
+                                }
+
+                                // Auto-fill odometer when vehicle is selected
+                                if (vehicleSelect) {
+                                    vehicleSelect.addEventListener('change', function() {
+                                        const selectedOption = this.options[this.selectedIndex];
+                                        if (selectedOption && selectedOption.value) {
+                                            const currentKm = selectedOption.getAttribute('data-current-km');
+                                            if (currentKm) {
+                                                odometerInput.value = currentKm;
+                                            } else {
+                                                odometerInput.value = '';
+                                                odometerInput.placeholder = 'Enter odometer reading';
+                                            }
+                                        } else {
+                                            odometerInput.value = '';
+                                        }
+                                    });
+                                }
+                            })();
+                        </script>
                     </form>
                 </div>
             </div>

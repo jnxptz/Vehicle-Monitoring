@@ -88,6 +88,12 @@
     </div>
 
     <div class="details">
+        <table style="width:100%; margin-top:10px; border-collapse:collapse;">
+            <tr>
+                <td class="key" style="padding:6px 0; font-weight:700; width:120px;">KM Reading</td>
+                <td style="padding:6px 0;">{{ $fuelSlip->km_reading }}</td>
+            </tr>
+        </table>
         <div style="margin-top:14px;"><strong>Purpose:</strong></div>
         <div style="margin-top:6px; margin-bottom:4px;">
             <div style="border-bottom:1px solid #000; height:14px;"></div>
@@ -140,10 +146,9 @@
         
         <div style="display:flex; justify-content:space-between; margin-top:18px;">
             <div><strong>Accept by:</strong> ____________________<br><strong>Invoice No.:</strong> ____________________</div>
+            <div style="text-align:right; margin-top:-10px;"><strong>KM Reading:</strong> {{ $fuelSlip->km_reading }}</div>
         </div>
     </div>
-
-    <div class="km-reading">KM READING: {{ $fuelSlip->km_reading }}</div>
 <br>
 <br>
 <br>

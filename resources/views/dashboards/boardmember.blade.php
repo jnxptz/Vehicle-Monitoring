@@ -3,6 +3,7 @@
 @section('content')
 <link rel="stylesheet" href="{{ asset('css/dashboard.css') }}">
 <link rel="stylesheet" href="{{ asset('css/boardmember-dashboard-styles.css') }}">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 /* Fixed Header and Sidebar Layout */
@@ -463,6 +464,95 @@ use Carbon\Carbon;
                     </div>
                 </div>
 
+                @php
+                    // Get last 6 months fuel usage trend
+                    $monthlyLabels = [];
+                    $monthlyLitersData = [];
+                    $monthlyLimitData = [];
+                    $now = \Carbon\Carbon::now();
+                    $userId = Auth::id();
+                    
+                    for($i = 5; $i >= 0; $i--) {
+                        $monthDate = $now->copy()->subMonths($i);
+                        $monthlyLabels[] = $monthDate->format('M Y');
+                        
+                        $liters = 0;
+                        if(isset($vehicles) && $vehicles->count() > 0) {
+                            foreach($vehicles as $v) {
+                                $liters += \App\Models\FuelSlip::where('vehicle_id', $v->id)
+                                    ->where('user_id', $userId)
+                                    ->whereMonth('date', $monthDate->month)
+                                    ->whereYear('date', $monthDate->year)
+                                    ->sum('liters') ?? 0;
+                            }
+                        }
+                        $monthlyLitersData[] = $liters;
+                        
+                        // Monthly fuel limit across all vehicles
+                        $totalLimit = 0;
+                        if(isset($vehicles) && $vehicles->count() > 0) {
+                            foreach($vehicles as $v) {
+                                $totalLimit += $v->monthly_fuel_limit ?? 0;
+                            }
+                        }
+                        $monthlyLimitData[] = $totalLimit;
+
+                        // Fuel cost for this month
+                        $fuelCost = 0;
+                        if(isset($vehicles) && $vehicles->count() > 0) {
+                            foreach($vehicles as $v) {
+                                $fuelCost += \App\Models\FuelSlip::where('vehicle_id', $v->id)
+                                    ->where('user_id', $userId)
+                                    ->whereMonth('date', $monthDate->month)
+                                    ->whereYear('date', $monthDate->year)
+                                    ->sum('total_cost') ?? 0;
+                            }
+                        }
+                        $monthlyFuelCostData[] = $fuelCost;
+
+                        // Maintenance cost for this month
+                        $maintenanceCost = 0;
+                        if(isset($vehicles) && $vehicles->count() > 0) {
+                            foreach($vehicles as $v) {
+                                $maintenanceCost += \App\Models\Maintenance::where('vehicle_id', $v->id)
+                                    ->whereMonth('date', $monthDate->month)
+                                    ->whereYear('date', $monthDate->year)
+                                    ->sum('cost') ?? 0;
+                            }
+                        }
+                        $monthlyMaintenanceCostData[] = $maintenanceCost;
+                    }
+                @endphp
+
+                <!-- Fuel Usage Trend Chart -->
+                <div style="background: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Fuel Usage Trend (Last 6 Months)</h4>
+                    <div style="height: 220px;">
+                        <canvas id="fuelUsageTrendChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- Fuel vs Maintenance Costs Chart -->
+                <div style="background: #ffffff; border-radius: 12px; padding: 16px; border: 1px solid #e2e8f0; box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px 0; font-size: 14px; font-weight: 600; color: #1e293b;">Monthly Costs: Fuel vs Maintenance</h4>
+                    <div style="height: 220px;">
+                        <canvas id="monthlyCostsChart"></canvas>
+                    </div>
+                </div>
+
+                <script>
+                    window.fuelUsageTrendData = {
+                        labels: @json($monthlyLabels),
+                        liters: @json($monthlyLitersData),
+                        limit: @json($monthlyLimitData)
+                    };
+                    window.monthlyCostsData = {
+                        labels: @json($monthlyLabels),
+                        fuel: @json($monthlyFuelCostData),
+                        maintenance: @json($monthlyMaintenanceCostData)
+                    };
+                </script>
+
                 {{-- Vehicle Cards --}}
 
                 @if(isset($vehicles) && $vehicles->count() > 0)
@@ -575,6 +665,163 @@ use Carbon\Carbon;
         </div> 
     </div> 
 </div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Fuel Usage Trend Chart
+        const fuelCtx = document.getElementById('fuelUsageTrendChart');
+        if (fuelCtx && window.fuelUsageTrendData) {
+            const data = window.fuelUsageTrendData;
+            new Chart(fuelCtx.getContext('2d'), {
+                type: 'line',
+                data: {
+                    labels: data.labels,
+                    datasets: [
+                        {
+                            label: 'Fuel Used (L)',
+                            data: data.liters,
+                            borderColor: '#3b82f6',
+                            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                            borderWidth: 2,
+                            fill: true,
+                            tension: 0.4,
+                            pointRadius: 4,
+                            pointBackgroundColor: '#3b82f6',
+                            pointBorderColor: '#ffffff',
+                            pointBorderWidth: 2
+                        },
+                        {
+                            label: 'Monthly Limit (L)',
+                            data: data.limit,
+                            borderColor: '#ef4444',
+                            backgroundColor: 'transparent',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0,
+                            pointRadius: 0,
+                            pointHoverRadius: 0,
+                            fill: false
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 10,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 64, 175, 0.9)',
+                            padding: 10,
+                            cornerRadius: 6,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toLocaleString() + ' L';
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                font: { size: 10 },
+                                callback: function(value) {
+                                    return value + ' L';
+                                }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        },
+                        x: {
+                            ticks: { font: { size: 10 } },
+                            grid: { display: false }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Monthly Costs: Fuel vs Maintenance (Stacked Bar)
+        const costsCtx = document.getElementById('monthlyCostsChart');
+        if (costsCtx && window.monthlyCostsData) {
+            const cData = window.monthlyCostsData;
+            new Chart(costsCtx.getContext('2d'), {
+                type: 'bar',
+                data: {
+                    labels: cData.labels,
+                    datasets: [
+                        {
+                            label: 'Fuel Cost',
+                            data: cData.fuel,
+                            backgroundColor: 'rgba(245, 158, 11, 0.8)',
+                            borderColor: '#f59e0b',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        },
+                        {
+                            label: 'Maintenance Cost',
+                            data: cData.maintenance,
+                            backgroundColor: 'rgba(16, 185, 129, 0.8)',
+                            borderColor: '#10b981',
+                            borderWidth: 1,
+                            borderRadius: 4
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                usePointStyle: true,
+                                padding: 10,
+                                font: { size: 11 }
+                            }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(30, 64, 175, 0.9)',
+                            padding: 10,
+                            cornerRadius: 6,
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': P' + context.parsed.y.toLocaleString();
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            stacked: true,
+                            ticks: {
+                                font: { size: 10 }
+                            },
+                            grid: { display: false }
+                        },
+                        y: {
+                            stacked: true,
+                            beginAtZero: true,
+                            ticks: {
+                                font: { size: 10 },
+                                callback: function(value) {
+                                    return 'P' + (value / 1000).toFixed(0) + 'k';
+                                }
+                            },
+                            grid: { color: 'rgba(0, 0, 0, 0.05)' }
+                        }
+                    }
+                }
+            });
+        }
+    });
+</script>
 
 <script src="{{ asset('js/boardmember-dashboard.js') }}"></script>
 @endsection
