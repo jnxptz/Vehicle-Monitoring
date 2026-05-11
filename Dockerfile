@@ -1,41 +1,51 @@
-# Use official PHP image with FPM
 FROM php:8.4-fpm
 
 # Set working directory
-WORKDIR /var/www/html
+WORKDIR /var/www
 
 # Install system dependencies
 RUN apt-get update && apt-get install -y \
     git \
-    unzip \
     curl \
-    libzip-dev \
-    libonig-dev \
     libpng-dev \
     libjpeg62-turbo-dev \
     libfreetype6-dev \
-    pkg-config \
-    && docker-php-ext-configure gd --with-jpeg --with-freetype \
-    && docker-php-ext-install -j$(nproc) gd pdo_mysql zip mbstring
+    libonig-dev \
+    libxml2-dev \
+    zip \
+    unzip \
+    libzip-dev \
+    && rm -rf /var/lib/apt/lists/*
+
+# Install PHP extensions (including gd)
+RUN docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install \
+    gd \
+    pdo_mysql \
+    mbstring \
+    exif \
+    pcntl \
+    bcmath \
+    zip
+
+# Install Redis PHP extension
+RUN pecl install redis && docker-php-ext-enable redis
 
 # Install Composer
-RUN curl -sS https://getcomposer.org/installer | php \
-    && mv composer.phar /usr/local/bin/composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# Copy existing project files
-COPY . /var/www/html
+# Copy application code
+COPY . .
 
-# Set permissions (optional but recommended)
-RUN chown -R www-data:www-data /var/www/html \
-    && chmod -R 755 /var/www/html
+# Create necessary directories
+RUN mkdir -p storage/logs storage/framework/cache storage/framework/sessions storage/framework/views \
+    && chown -R www-data:www-data storage bootstrap
 
-# Create and set permissions for Laravel directories
-RUN mkdir -p storage/logs bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache \
-    && chown -R www-data:www-data storage bootstrap/cache
+# Install application dependencies
+RUN composer install --no-interaction --no-dev --optimize-autoloader
 
-# Expose port 9000 for PHP-FPM
+# Expose port
 EXPOSE 9000
 
-# Start PHP-FPM
+# Run PHP-FPM
 CMD ["php-fpm"]
