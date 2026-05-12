@@ -248,43 +248,7 @@
                                 </td>
                             </tr>
                             <!-- VEHICLE DETAILS -->
-                            @if(count($row['vehicles']) > 0)
-                                <tr id="{{ $rowId }}-details" class="details-row">
-                                    <td colspan="6">
-                                        <div class="vehicle-cards">
-                                            @foreach($row['vehicles'] as $v)
-                                                <div class="vehicle-card">
-                                                    <div class="vehicle-main">
-                                                        <div class="vehicle-name">
-                                                            {{ $v['vehicle']->vehicle_name }}
-                                                            <span class="vehicle-plate">
-                                                                {{ $v['vehicle']->plate_number }}
-                                                            </span>
-                                                        </div>
-                                                        <div class="vehicle-limit">
-                                                            Limit: {{ $v['vehicle']->monthly_fuel_limit }} L
-                                                        </div>
-                                                    </div>
-                                                    <div class="vehicle-stats">
-                                                        <div class="stat">
-                                                            <div class="label">Fuel</div>
-                                                            <div class="value">
-                                                                ₱{{ number_format($v['fuelSlipCost'],2) }}
-                                                            </div>
-                                                        </div>
-                                                        <div class="stat">
-                                                            <div class="label">Maintenance</div>
-                                                            <div class="value">
-                                                                ₱{{ number_format($v['maintenanceCost'],2) }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            @endforeach
-                                        </div>
-                                    </td>
-                                </tr>
-                            @endif
+                            
                         @endforeach
                     </tbody>
                 </table>
