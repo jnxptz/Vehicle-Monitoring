@@ -182,8 +182,9 @@ body {
 /* Link Section */
 .auth-container .link {
     text-align: center;
-    margin: 0 0 8px 0;
-    font-size: 26px;
+    margin: 20px 0 8px 0;
+    font-size: 12px;
+    color: #94a3b8;
 }
 
 .auth-container .link a {

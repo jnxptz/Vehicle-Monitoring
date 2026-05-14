@@ -564,9 +564,11 @@ class DashboardController extends Controller
     }
 
     
-    public function exportAdminYearlyPdf()
+    public function exportAdminYearlyPdf(Request $request)
     {
-        $year = now()->year;
+        $year = (int) $request->input('year', now()->year);
+        $selectedOffice = $request->input('office', null);
+        $officeName = $selectedOffice ? (Office::find($selectedOffice)?->name ?? '') : '';
 
         
         $monthlyData = [];
@@ -576,9 +578,19 @@ class DashboardController extends Controller
         for ($month = 1; $month <= 12; $month++) {
             $monthName = Carbon::createFromDate(null, $month, 1)->format('F');
             $monthlyLiters = FuelSlip::whereYear('date', $year)
+                ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                    return $query->whereHas('user', function ($q) use ($selectedOffice) {
+                        $q->where('office_id', $selectedOffice);
+                    });
+                })
                 ->whereMonth('date', $month)
                 ->sum('liters');
             $monthlyCost = FuelSlip::whereYear('date', $year)
+                ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                    return $query->whereHas('user', function ($q) use ($selectedOffice) {
+                        $q->where('office_id', $selectedOffice);
+                    });
+                })
                 ->whereMonth('date', $month)
                 ->sum('total_cost');
 
@@ -596,22 +608,61 @@ class DashboardController extends Controller
         $highest = collect($monthlyData)->sortByDesc('liters')->first();
 
         
-        $vehicles = Vehicle::with('bm')->get();
+        $vehicles = Vehicle::with('bm')
+            ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                return $query->where('office_id', $selectedOffice);
+            })
+            ->get();
         $topVehicles = $vehicles->map(function ($v) use ($year) {
             $vLiters = FuelSlip::where('vehicle_id', $v->id)
                 ->whereYear('date', $year)
                 ->sum('liters');
-            return ['vehicle' => $v, 'liters' => $vLiters];
+            $vCost = FuelSlip::where('vehicle_id', $v->id)
+                ->whereYear('date', $year)
+                ->sum('total_cost');
+            return ['vehicle' => $v, 'liters' => $vLiters, 'fuelCost' => $vCost];
         })->filter(fn($v) => $v['liters'] > 0)
           ->sortByDesc('liters')
-          ->take(5)
           ->values();
 
         
         $boardmembers = User::where('role', 'boardmember')
             ->with(['vehicles', 'office.vehicles'])
+            ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                return $query->where('office_id', $selectedOffice);
+            })
             ->orderBy('name')
             ->get();
+
+        $monthlyFuelByOffice = FuelSlip::query()
+            ->join('users', 'fuel_slips.user_id', '=', 'users.id')
+            ->leftJoin('offices', 'users.office_id', '=', 'offices.id')
+            ->whereYear('fuel_slips.date', $year)
+            ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                return $query->where('users.office_id', $selectedOffice);
+            })
+            ->selectRaw("
+                users.office_id,
+                COALESCE(offices.name, 'No Office') as office,
+                MONTH(fuel_slips.date) as month_number,
+                SUM(fuel_slips.liters) as liters,
+                SUM(fuel_slips.total_cost) as cost
+            ")
+            ->groupBy('users.office_id', 'offices.name', 'month_number')
+            ->get()
+            ->map(function ($monthData) {
+                return [
+                    'office' => $monthData->office,
+                    'month' => Carbon::createFromDate(null, (int) $monthData->month_number, 1)->format('F'),
+                    'monthNumber' => (int) $monthData->month_number,
+                    'liters' => (float) $monthData->liters,
+                    'cost' => (float) $monthData->cost,
+                ];
+            })
+            ->sortBy(function ($row) {
+                return strtolower($row['office']) . '-' . str_pad($row['monthNumber'], 2, '0', STR_PAD_LEFT);
+            })
+            ->values();
 
         $boardmembersData = $boardmembers->map(function ($bm) use ($year) {
             // prefer user's direct vehicle, otherwise fall back to their office's first vehicle
@@ -650,15 +701,136 @@ class DashboardController extends Controller
             ];
         });
 
+        // Gather Maintenance Data
+        $maintenanceRecords = Maintenance::whereYear('date', $year)
+            ->with('vehicle', 'vehicle.office', 'vehicle.bm')
+            ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                return $query->whereHas('vehicle', function ($q) use ($selectedOffice) {
+                    $q->where('office_id', $selectedOffice);
+                });
+            })
+            ->orderBy('date', 'desc')
+            ->get();
+
+        $totalMaintenanceCost = $maintenanceRecords->sum('cost');
+
+        // Maintenance by type
+        $maintenanceByType = $maintenanceRecords->groupBy('maintenance_type')
+            ->map(function ($items) {
+                return [
+                    'type' => $items->first()->maintenance_type,
+                    'count' => $items->count(),
+                    'totalCost' => $items->sum('cost'),
+                    'averageCost' => $items->avg('cost'),
+                ];
+            })
+            ->sortByDesc('totalCost')
+            ->values();
+
+        // Vehicles with high maintenance costs
+        $vehiclesWithHighMaintenance = $maintenanceRecords->groupBy('vehicle_id')
+            ->map(function ($items) {
+                $vehicle = $items->first()->vehicle;
+                return [
+                    'vehicle' => $vehicle,
+                    'maintenanceCount' => $items->count(),
+                    'totalCost' => $items->sum('cost'),
+                    'averageCost' => $items->avg('cost'),
+                ];
+            })
+            ->sortByDesc('totalCost')
+            ->take(10)
+            ->values();
+
+        // Overdue or pending maintenance (based on maintenance_km intervals)
+        $vehiclesNeedingAttention = Vehicle::with('maintenances', 'fuelSlips')
+            ->when($selectedOffice, function ($query) use ($selectedOffice) {
+                return $query->where('office_id', $selectedOffice);
+            })
+            ->get()
+            ->filter(function ($vehicle) use ($year) {
+                $latestFuelSlip = $vehicle->fuelSlips()->latest('date')->first();
+                $latestMaintenance = $vehicle->maintenances()->latest('date')->first();
+                
+                if (!$latestFuelSlip) return false;
+                
+                $currentKm = $latestFuelSlip->km_reading ?? $vehicle->current_km ?? 0;
+                $lastMaintenanceKm = $latestMaintenance ? $latestMaintenance->maintenance_km : 0;
+                $kmSinceLastMaintenance = $currentKm - $lastMaintenanceKm;
+                
+                // Flag if more than 5000 km since last maintenance
+                return $kmSinceLastMaintenance > 5000;
+            })
+            ->sortBy(function ($v) {
+                $latestFuelSlip = $v->fuelSlips()->latest('date')->first();
+                $latestMaintenance = $v->maintenances()->latest('date')->first();
+                $currentKm = $latestFuelSlip->km_reading ?? $v->current_km ?? 0;
+                $lastMaintenanceKm = $latestMaintenance ? $latestMaintenance->maintenance_km : 0;
+                return -($currentKm - $lastMaintenanceKm);
+            })
+            ->take(5)
+            ->values();
+
+        // Financial Summary
+        $grandTotalExpense = $totalCost + $totalMaintenanceCost;
+        $totalBudgetAllocated = $boardmembersData->sum('yearlyBudget');
+        $totalBudgetUsed = $boardmembersData->sum('totalUsed');
+        $totalBudgetRemaining = $totalBudgetAllocated - $totalBudgetUsed;
+        $budgetUtilizationPercent = $totalBudgetAllocated > 0 
+            ? round(($totalBudgetUsed / $totalBudgetAllocated) * 100, 2)
+            : 0;
+
+        // Identify high-cost vehicles
+        $highCostVehicles = $vehicles->map(function ($v) use ($year) {
+            $fuelCost = FuelSlip::where('vehicle_id', $v->id)
+                ->whereYear('date', $year)
+                ->sum('total_cost');
+            $maintenanceCost = Maintenance::where('vehicle_id', $v->id)
+                ->whereYear('date', $year)
+                ->sum('cost');
+            $totalCost = $fuelCost + $maintenanceCost;
+            
+            return [
+                'vehicle' => $v,
+                'fuelCost' => $fuelCost,
+                'maintenanceCost' => $maintenanceCost,
+                'totalCost' => $totalCost,
+                'costPerKm' => 0, // Will calculate if we have km data
+            ];
+        })->filter(fn($v) => $v['totalCost'] > 0)
+          ->sortByDesc('totalCost')
+          ->take(10)
+          ->values();
+
+        // Board members with budget alerts
+        $boardmembersWithAlerts = $boardmembersData->filter(function ($bm) {
+            return $bm['usedPercent'] >= 85; // 85% or higher usage
+        })->sortByDesc('usedPercent')->values();
+
         // Generate PDF
         $pdf = Pdf::loadView('dashboards.admin_yearly_pdf', compact(
             'monthlyData',
             'totalLiters',
             'totalCost',
+            'totalMaintenanceCost',
             'highest',
             'topVehicles',
+            'vehicles',
             'boardmembersData',
-            'year'
+            'monthlyFuelByOffice',
+            'officeName',
+            'year',
+            'maintenanceRecords',
+            'maintenanceByType',
+            'vehiclesWithHighMaintenance',
+            'vehiclesNeedingAttention',
+            'grandTotalExpense',
+            'totalBudgetAllocated',
+            'totalBudgetUsed',
+            'totalBudgetRemaining',
+            'budgetUtilizationPercent',
+            'highCostVehicles',
+            'boardmembersWithAlerts'
         ));
 
         $filename = 'admin-dashboard-yearly-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
@@ -762,6 +934,56 @@ class DashboardController extends Controller
             ->whereYear('date', $year)->whereMonth('date', $selectedMonth)
             ->sum('total_cost');
 
+        // Analysis Data
+        $highestMonthlySpender = $rows->sortByDesc('monthlyCostUsed')->first();
+        $highestFuelUsage = $rows->sortByDesc('monthlyLitersUsed')->first();
+        
+        // Find highest vehicle expense and identify it
+        $allVehicleCosts = [];
+        foreach ($rows as $row) {
+            foreach ($row['vehicles'] as $vehicle) {
+                $totalVehicleCost = $vehicle['fuelSlipCost'] + $vehicle['maintenanceCost'];
+                $allVehicleCosts[] = [
+                    'vehicle' => $vehicle['vehicle'],
+                    'boardMember' => $row['user']->name,
+                    'fuelCost' => $vehicle['fuelSlipCost'],
+                    'maintenanceCost' => $vehicle['maintenanceCost'],
+                    'totalCost' => $totalVehicleCost,
+                ];
+            }
+        }
+        usort($allVehicleCosts, fn($a, $b) => $b['totalCost'] <=> $a['totalCost']);
+        $highestVehicleExpense = $allVehicleCosts[0] ?? null;
+
+        // Find vehicles with high fuel or maintenance costs
+        $highFuelCostVehicles = collect($allVehicleCosts)
+            ->filter(fn($v) => $v['fuelCost'] > ($totalMonthlyCost / count($allVehicleCosts) * 1.5))
+            ->take(3)
+            ->values();
+        
+        $highMaintenanceCostVehicles = collect($allVehicleCosts)
+            ->filter(fn($v) => $v['maintenanceCost'] > 0)
+            ->sortByDesc('maintenanceCost')
+            ->take(3)
+            ->values();
+
+        // Board members with budget concerns
+        $boardMembersNearLimit = $rows->filter(fn($bm) => $bm['budgetUsedPercentage'] >= 80)
+            ->sortByDesc('budgetUsedPercentage');
+        
+        $boardMembersExceeded = $rows->filter(fn($bm) => $bm['remainingBudget'] < 0);
+        
+        $boardMembersNoUsage = $rows->filter(fn($bm) => $bm['monthlyLitersUsed'] == 0);
+
+        // Monthly usage assessment
+        $averageMonthlyCost = $totalMonthlyCost / max(1, $rows->count());
+        $usageAssessment = 'Normal';
+        if ($totalMonthlyCost > $averageMonthlyCost * 1.3) {
+            $usageAssessment = 'High - Review recommended';
+        } elseif ($totalMonthlyCost < $averageMonthlyCost * 0.7) {
+            $usageAssessment = 'Low - Below average';
+        }
+
         // Generate PDF
         $pdf = Pdf::loadView('dashboards.admin_monthly_pdf', compact(
             'rows',
@@ -770,7 +992,17 @@ class DashboardController extends Controller
             'year',
             'officeName',
             'totalMonthlyLiters',
-            'totalMonthlyCost'
+            'totalMonthlyCost',
+            'highestMonthlySpender',
+            'highestFuelUsage',
+            'highestVehicleExpense',
+            'highFuelCostVehicles',
+            'highMaintenanceCostVehicles',
+            'boardMembersNearLimit',
+            'boardMembersExceeded',
+            'boardMembersNoUsage',
+            'usageAssessment',
+            'averageMonthlyCost'
         ));
 
         $filename = 'admin-dashboard-' . $selectedMonthName . '-' . $year . '-' . now()->format('Y-m-d') . '.pdf';
@@ -878,4 +1110,3 @@ class DashboardController extends Controller
         return $pdf->download($filename);
     }
 }
-

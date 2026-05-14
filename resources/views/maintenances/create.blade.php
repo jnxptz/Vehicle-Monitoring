@@ -305,16 +305,10 @@
                         <!-- Submit Button -->
                         <div style="display: flex; align-items: center; justify-content: space-between;">
                             <div style="color: #64748b; font-size: 14px;">
-                                <div style="display: flex; align-items: center; margin-bottom: 4px;">
-                                    <span style="color: #059669; margin-right: 4px;">ℹ️</span>
-                                    Call of No. will be automatically generated
-                                </div>
-                                <div style="font-size: 12px;">
-                                    Format: MN-YYYYMMDD-XXXXXX
-                                </div>
+                               
                             </div>
                             <button type="submit" class="btn-primary" style="
-                                padding: 14px 32px;
+                                padding: 10px 12px;
                                 font-size: 16px;
                                 font-weight: 600;
                                 background: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%);
